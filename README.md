@@ -1,0 +1,3 @@
+# Nonsense Client
+An open source MCP client for 1.8.9<br>
+I need to finish the readme...
