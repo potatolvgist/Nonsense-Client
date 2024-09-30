@@ -1,6 +1,8 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 import java.text.DecimalFormat;
 
@@ -10,7 +12,9 @@ public class FloatSetting extends NumberSetting<Float> {
     public final float min, max;
     public DecimalFormat format;
 
-    public FloatSetting(String name, String description, float min, float max, float defaultValue, DecimalFormat format) {
+    private final ChangedCallback<Float> changedCallback;
+
+    public FloatSetting(String name, String description, float min, float max, float defaultValue, DecimalFormat format, ChangedCallback<Float> changedCallback) {
         super(name, description);
 
         if (min > max) throw new IllegalArgumentException("Minimum value must be smaller than maximum value");
@@ -19,10 +23,11 @@ public class FloatSetting extends NumberSetting<Float> {
         this.max = max;
         this.value = defaultValue;
         this.format = format;
+        this.changedCallback = changedCallback;
     }
 
     public FloatSetting(String name, String description, float min, float max, float defaultValue) {
-        this(name, description, min, max, defaultValue, DEFAULT_DECIMAL_FORMAT);
+        this(name, description, min, max, defaultValue, DEFAULT_FORMAT, null);
     }
 
     @Override
@@ -33,8 +38,14 @@ public class FloatSetting extends NumberSetting<Float> {
     @Override
     public void set(Float value) {
         this.value = value;
-        if (this.value < min) this.value = min;
-        else if (this.value > max) this.value = max;
+        if (this.value < min) {
+            this.value = min;
+        } else if (this.value > max) {
+            this.value = max;
+        }
+        if (this.changedCallback != null) {
+            this.changedCallback.onChanged(value);
+        }
     }
 
     @Override
@@ -56,7 +67,7 @@ public class FloatSetting extends NumberSetting<Float> {
 
     @Override
     public void deserialize(JsonObject object) {
-        this.value = object.get(this.name).getAsFloat();
+        JsonUtil.getSafe(object, this.name, element -> this.set(element.getAsFloat()));
     }
 
     @Override

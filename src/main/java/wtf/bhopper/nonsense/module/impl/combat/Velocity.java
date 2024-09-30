@@ -5,6 +5,7 @@ import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.event.impl.EventReceivePacket;
 import wtf.bhopper.nonsense.module.Module;
+import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.impl.FloatSetting;
 import wtf.bhopper.nonsense.module.setting.impl.IntSetting;
@@ -13,17 +14,14 @@ import java.text.DecimalFormat;
 
 public class Velocity extends Module {
 
-    private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.PACKET, new EnumSetting.ChangedCallback<Mode>() {
-        @Override
-        public void onChanged(Mode value) {
-            horizontal.setDisplayed(value == Mode.PACKET);
-            vertical.setDisplayed(value == Mode.PACKET);
-            airTicks.setDisplayed(value == Mode.AIR);
-        }
+    private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.PACKET, value -> {
+        this.horizontal.setDisplayed(value == Mode.PACKET);
+        this.vertical.setDisplayed(value == Mode.PACKET);
+        this.airTicks.setDisplayed(value == Mode.AIR);
     });
 
-    private final FloatSetting horizontal = new FloatSetting("Horizontal", "Horizontal velocity", 0.0F, 100.0F, 0.0F, new DecimalFormat("#0.##'%'"));
-    private final FloatSetting vertical = new FloatSetting("Vertical", "Vertical velocity", 0.0F, 100.0F, 0.0F, new DecimalFormat("#0.##'%'"));
+    private final FloatSetting horizontal = new FloatSetting("Horizontal", "Horizontal velocity", 0.0F, 100.0F, 0.0F, Setting.PERCENT_FORMAT, null);
+    private final FloatSetting vertical = new FloatSetting("Vertical", "Vertical velocity", 0.0F, 100.0F, 0.0F, Setting.PERCENT_FORMAT, null);
     private final IntSetting airTicks = new IntSetting("Ticks", "Air ticks", 1, 20, 5);
 
     private int ticks = 0;

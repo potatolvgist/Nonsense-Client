@@ -1,7 +1,10 @@
 package wtf.bhopper.nonsense.util.minecraft.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.IChatComponent;
 
 public class ChatUtil {
@@ -29,6 +32,14 @@ public class ChatUtil {
         raw(CHAT_PREFIX + "\247c" + String.format(message, args));
     }
 
+    public static void style(ChatStyle style, String message, Object... args) {
+        ChatComponentText component = new ChatComponentText(CHAT_PREFIX_SHORT + String.format(message, args));
+        component.setChatStyle(style);
+        raw(component);
+    }
 
+    public static void send(String message, Object... args) {
+        PacketUtil.send(new C01PacketChatMessage(String.format(message, args)));
+    }
 
 }

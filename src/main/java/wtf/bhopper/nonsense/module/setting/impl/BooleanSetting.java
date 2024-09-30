@@ -1,7 +1,10 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 public class BooleanSetting extends Setting<Boolean> {
 
@@ -38,11 +41,11 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void serialize(JsonObject object) {
-        object.addProperty(name, value);
+       object.addProperty(this.name, this.value);
     }
 
     @Override
     public void deserialize(JsonObject object) {
-        this.value = object.get(name).getAsBoolean();
+        JsonUtil.getSafe(object, this.name, element -> this.set(element.getAsBoolean()));
     }
 }

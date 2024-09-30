@@ -12,6 +12,7 @@ import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
 import wtf.bhopper.nonsense.module.impl.other.Derp;
 import wtf.bhopper.nonsense.module.impl.player.GameSpeed;
 import wtf.bhopper.nonsense.module.impl.player.NoFall;
+import wtf.bhopper.nonsense.module.impl.player.NoRotate;
 import wtf.bhopper.nonsense.module.impl.visual.ClickGuiMod;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
 import wtf.bhopper.nonsense.module.impl.visual.ItemAnimations;
@@ -38,6 +39,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Player
         this.addModule(new NoFall());
         this.addModule(new GameSpeed());
+        this.addModule(new NoRotate());
 
         // Exploit
         this.addModule(new ServerLagger());

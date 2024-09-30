@@ -1,7 +1,9 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 public class StringSetting extends Setting<String> {
 
@@ -74,6 +76,6 @@ public class StringSetting extends Setting<String> {
 
     @Override
     public void deserialize(JsonObject object) {
-        this.value = object.get(this.name).getAsString();
+        JsonUtil.getSafe(object, this.name, element -> this.set(element.getAsString()));
     }
 }

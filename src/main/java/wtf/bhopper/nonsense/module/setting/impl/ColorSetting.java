@@ -1,7 +1,9 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 import java.awt.*;
 
@@ -67,6 +69,6 @@ public class ColorSetting extends Setting<Color> {
 
     @Override
     public void deserialize(JsonObject object) {
-        this.color = new Color(object.get(this.name).getAsInt());
+        JsonUtil.getSafe(object, this.name, element -> this.set(element.getAsInt()));
     }
 }

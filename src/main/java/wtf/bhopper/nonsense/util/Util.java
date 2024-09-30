@@ -1,9 +1,11 @@
 package wtf.bhopper.nonsense.util;
 
+import io.netty.util.internal.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
@@ -44,6 +46,13 @@ public class Util {
             result[i] = indexes.get(i);
         }
         return result;
+    }
+
+    public static <T> T randomElement(Collection<T> collection) {
+        return collection.stream()
+                .skip((int)(collection.size() * Math.random()))
+                .findFirst()
+                .orElse(null);
     }
 
     // Stack Overflow copy paste xd

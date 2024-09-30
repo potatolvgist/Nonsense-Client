@@ -1,13 +1,18 @@
 package wtf.bhopper.nonsense.module;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Module {
@@ -79,6 +84,37 @@ public abstract class Module {
 
     public List<Setting<?>> getSettings() {
         return this.settings;
+    }
+
+    public void serialize(JsonObject object) {
+        JsonObject moduleObject = new JsonObject();
+        moduleObject.addProperty("toggled", this.toggled);
+        moduleObject.addProperty("bind", this.bind);
+        moduleObject.addProperty("hidden", this.hidden);
+
+        JsonObject settingsObject = new JsonObject();
+        for (Setting<?> setting : this.settings) {
+            setting.serialize(settingsObject);
+        }
+
+        moduleObject.add("settings", settingsObject);
+        object.add(this.name, moduleObject);
+    }
+
+    public void deserialize(JsonObject object) {
+        JsonUtil.getSafe(object, this.name, element -> {
+            JsonObject moduleObject = element.getAsJsonObject();
+            JsonUtil.getSafe(moduleObject, "toggled", toggled -> this.toggle(toggled.getAsBoolean()));
+            JsonUtil.getSafe(moduleObject, "bind", bind -> this.setBind(bind.getAsInt()));
+            JsonUtil.getSafe(moduleObject, "hidden", hidden -> this.setHidden(hidden.getAsBoolean()));
+
+            JsonUtil.getSafe(moduleObject, "settings", settingsElement -> {
+                JsonObject settingsObject = settingsElement.getAsJsonObject();
+                for (Setting<?> setting : this.settings) {
+                    setting.deserialize(settingsObject);
+                }
+            });
+        });
     }
 
     public void onEnable() {}

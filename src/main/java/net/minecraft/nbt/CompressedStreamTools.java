@@ -57,29 +57,29 @@ public class CompressedStreamTools
         }
     }
 
-    public static void safeWrite(NBTTagCompound p_74793_0_, File p_74793_1_) throws IOException
+    public static void safeWrite(NBTTagCompound nbtTagCompound, File file) throws IOException
     {
-        File file1 = new File(p_74793_1_.getAbsolutePath() + "_tmp");
+        File file1 = new File(file.getAbsolutePath() + "_tmp");
 
         if (file1.exists())
         {
             file1.delete();
         }
 
-        write(p_74793_0_, file1);
+        write(nbtTagCompound, file1);
 
-        if (p_74793_1_.exists())
+        if (file.exists())
         {
-            p_74793_1_.delete();
+            file.delete();
         }
 
-        if (p_74793_1_.exists())
+        if (file.exists())
         {
-            throw new IOException("Failed to delete " + p_74793_1_);
+            throw new IOException("Failed to delete " + file);
         }
         else
         {
-            file1.renameTo(p_74793_1_);
+            file1.renameTo(file);
         }
     }
 
@@ -87,25 +87,22 @@ public class CompressedStreamTools
     {
         DataOutputStream dataoutputstream = new DataOutputStream(new FileOutputStream(p_74795_1_));
 
-        try
-        {
+        try {
             write(p_74795_0_, dataoutputstream);
-        }
-        finally
-        {
+        } finally {
             dataoutputstream.close();
         }
     }
 
-    public static NBTTagCompound read(File p_74797_0_) throws IOException
+    public static NBTTagCompound read(File file) throws IOException
     {
-        if (!p_74797_0_.exists())
+        if (!file.exists())
         {
             return null;
         }
         else
         {
-            DataInputStream datainputstream = new DataInputStream(new FileInputStream(p_74797_0_));
+            DataInputStream datainputstream = new DataInputStream(new FileInputStream(file));
             NBTTagCompound nbttagcompound;
 
             try

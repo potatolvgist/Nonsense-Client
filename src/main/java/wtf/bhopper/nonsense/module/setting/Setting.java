@@ -1,12 +1,14 @@
 package wtf.bhopper.nonsense.module.setting;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.text.DecimalFormat;
 
 public abstract class Setting<T> {
 
-    public static final DecimalFormat DEFAULT_DECIMAL_FORMAT = new DecimalFormat("#0.##");
+    public static final DecimalFormat DEFAULT_FORMAT = new DecimalFormat("#0.##");
+    public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#0.##'%'");
 
     public final String name;
     public final String displayName;
@@ -37,5 +39,9 @@ public abstract class Setting<T> {
 
     public boolean isDisplayed() {
         return this.displayed;
+    }
+
+    public interface ChangedCallback<U> {
+        void onChanged(U value);
     }
 }

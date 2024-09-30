@@ -1,9 +1,11 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.module.setting.util.Description;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
+import wtf.bhopper.nonsense.util.JsonUtil;
 import wtf.bhopper.nonsense.util.Util;
 
 import java.util.HashMap;
@@ -110,17 +112,16 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
 
     @Override
     public void deserialize(JsonObject object) {
-        try {
-            String valueStr = object.get(this.name).getAsString();
+        JsonUtil.getSafe(object, this.name, element -> {
+            String valueStr = element.getAsString();
             for (T value : values) {
                 if (value.name().equalsIgnoreCase(valueStr)) {
                     currentValue = value;
                     break;
                 }
             }
-        } catch (NullPointerException | UnsupportedOperationException | IllegalStateException ignored) {}
+        });
     }
-
 
     public static <E extends Enum<?>> String toDisplay(E e) {
 
@@ -146,10 +147,6 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
         } catch (NoSuchFieldException | NullPointerException ignored) {}
 
         return null;
-    }
-
-    public static interface ChangedCallback<E extends Enum<E>> {
-        void onChanged(E value);
     }
 
 }

@@ -1,11 +1,14 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GroupSetting extends Setting<List<Setting<?>>> {
@@ -66,18 +69,18 @@ public class GroupSetting extends Setting<List<Setting<?>>> {
     public void serialize(JsonObject object) {
         JsonObject newObject = new JsonObject();
         for (Setting<?> setting : this.settings) {
-            setting.serialize(newObject);
+            setting.serialize(object);
         }
         object.add(this.name, newObject);
     }
 
     @Override
     public void deserialize(JsonObject object) {
-        try {
-            JsonObject parseObject = object.get(this.name).getAsJsonObject();
-            for (Setting<?> setting : settings) {
-                setting.deserialize(parseObject);
+        JsonUtil.getSafe(object, this.name, element -> {
+            JsonObject jsonObject = element.getAsJsonObject();
+            for (Setting<?> setting : this.settings) {
+                setting.deserialize(jsonObject);
             }
-        } catch (NullPointerException | UnsupportedOperationException | IllegalStateException ignored) {}
+        });
     }
 }

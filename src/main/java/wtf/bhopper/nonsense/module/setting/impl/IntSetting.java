@@ -1,6 +1,10 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.NBTTagCompound;
+import wtf.bhopper.nonsense.util.JsonUtil;
+
+import java.awt.*;
 
 public class IntSetting extends NumberSetting<Integer> {
 
@@ -8,7 +12,9 @@ public class IntSetting extends NumberSetting<Integer> {
     public final int min, max;
     public final String format;
 
-    public IntSetting(String name, String description, int min, int max, int defaultValue, String format) {
+    private final ChangedCallback<Integer> changedCallback;
+
+    public IntSetting(String name, String description, int min, int max, int defaultValue, String format, ChangedCallback<Integer> changedCallback) {
         super(name, description);
 
         if (min > max) throw new IllegalArgumentException("Minimum value must be smaller than maximum value");
@@ -17,10 +23,11 @@ public class IntSetting extends NumberSetting<Integer> {
         this.max = max;
         this.value = defaultValue;
         this.format = format;
+        this.changedCallback = changedCallback;
     }
 
     public IntSetting(String name, String description, int min, int max, int defaultValue) {
-        this(name, description, min, max, defaultValue, "%d");
+        this(name, description, min, max, defaultValue, "%d", null);
     }
 
     @Override
@@ -31,8 +38,14 @@ public class IntSetting extends NumberSetting<Integer> {
     @Override
     public void set(Integer value) {
         this.value = value;
-        if (this.value < min) this.value = min;
-        else if (this.value > max) this.value = max;
+        if (this.value < min) {
+            this.value = min;
+        } else if (this.value > max) {
+            this.value = max;
+        }
+        if (this.changedCallback != null) {
+            this.changedCallback.onChanged(this.value);
+        }
     }
 
     @Override
@@ -54,7 +67,7 @@ public class IntSetting extends NumberSetting<Integer> {
 
     @Override
     public void deserialize(JsonObject object) {
-        this.value = object.get(this.name).getAsInt();
+        JsonUtil.getSafe(object, this.name, element -> this.set(element.getAsInt()));
     }
 
 

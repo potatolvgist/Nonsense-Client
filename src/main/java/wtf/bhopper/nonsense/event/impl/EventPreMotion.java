@@ -1,5 +1,7 @@
 package wtf.bhopper.nonsense.event.impl;
 
+import wtf.bhopper.nonsense.util.minecraft.player.Rotation;
+
 public class EventPreMotion {
 
     public double x, y, z;
@@ -15,6 +17,11 @@ public class EventPreMotion {
         this.onGround = onGround;
         this.sprinting = sprinting;
         this.sneaking = sneaking;
+    }
+
+    public void setRotations(Rotation rotation) {
+        this.yaw = rotation.yaw;
+        this.pitch = rotation.pitch;
     }
 
 

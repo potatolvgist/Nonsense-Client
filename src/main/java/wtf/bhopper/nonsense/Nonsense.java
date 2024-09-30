@@ -1,10 +1,12 @@
 package wtf.bhopper.nonsense;
 
 import meteordevelopment.orbit.IEventBus;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.lwjgl.opengl.Display;
 import wtf.bhopper.nonsense.command.CommandManager;
+import wtf.bhopper.nonsense.config.ConfigManager;
 import wtf.bhopper.nonsense.event.NonsenseEventBus;
 import wtf.bhopper.nonsense.gui.clickgui.ClickGui;
 import wtf.bhopper.nonsense.gui.font.FontManager;
@@ -12,6 +14,7 @@ import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.module.ModuleManager;
 import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 
 public class Nonsense {
@@ -29,10 +32,12 @@ public class Nonsense {
     // Managers
     public ModuleManager moduleManager;
     public CommandManager commandManager;
+    public ConfigManager configManager;
     public FontManager fontManager;
 
     // Utility
     public TickRate tickRate;
+    public File dataDir;
 
     public Nonsense() {
         INSTANCE = this;
@@ -41,8 +46,11 @@ public class Nonsense {
     public void init() {
         LOGGER.info("Loading {}:{}", NAME, VERSION);
         Display.setTitle("Minecraft 1.8.9 - " + NAME + " (" + VERSION + ")");
-        this.eventBus = new NonsenseEventBus();
 
+        this.dataDir = Minecraft.getMinecraft().mcDataDir.toPath().resolve("nonsense").toFile();
+        this.dataDir.mkdirs();
+
+        this.eventBus = new NonsenseEventBus();
         this.eventBus.registerLambdaFactory("net.minecraft", (method, clazz) -> (MethodHandles.Lookup)method.invoke(null, clazz, MethodHandles.lookup()));
         this.eventBus.registerLambdaFactory("wtf.bhopper.nonsense", (method, clazz) -> (MethodHandles.Lookup)method.invoke(null, clazz, MethodHandles.lookup()));
 
@@ -53,6 +61,9 @@ public class Nonsense {
 
         this.commandManager = new CommandManager();
         this.commandManager.addCommands();
+
+        this.configManager = new ConfigManager();
+        this.configManager.init();
 
         this.tickRate = new TickRate();
 

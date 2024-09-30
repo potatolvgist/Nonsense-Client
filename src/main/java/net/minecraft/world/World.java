@@ -3016,7 +3016,7 @@ public abstract class World implements IBlockAccess
 
     public <T extends Entity> List<T> getEntities(Class <? extends T > entityType, Predicate <? super T > filter)
     {
-        List<T> list = Lists.<T>newArrayList();
+        List<T> list = Lists.newArrayList();
 
         for (Entity entity : this.loadedEntityList)
         {
