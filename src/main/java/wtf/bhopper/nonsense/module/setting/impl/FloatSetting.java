@@ -71,14 +71,13 @@ public class FloatSetting extends NumberSetting<Float> {
     }
 
     @Override
-    public float getPercent() {
-        return value / (max - min);
+    public float getF() {
+        return this.value;
     }
 
     @Override
-    public void setFromPercent(float f) {
-        float range = this.max - this.min;
-        this.set(this.min + range * f);
+    public void setF(float f) {
+        this.set(f);
     }
 
     @Override

@@ -43,16 +43,16 @@ public class ClickGuiTextBox extends ClickGuiComponent {
 
         if (this.selected) {
             ClickGui.drawString(name, this.x + groupFactor, this.y + HEIGHT / 2.0F - ClickGui.stringHeight(name) / 2.0F, -1);
-            int stringX = Math.min(this.x + groupFactor, this.x + ClickGui.WIDTH - groupFactor - (int)ClickGui.stringWidth(value + "|"));
-            String display = value + (this.dash ? "\2477_" : "");
-            ClickGui.drawString(display, stringX, this.y + HEIGHT + HEIGHT / 2.0F - ClickGui.stringHeight(display) / 2.0F, -1);
+            int stringX = Math.min(this.x + groupFactor, this.x + ClickGui.WIDTH - groupFactor - (int)ClickGui.stringWidth(value + "_"));
+            String display = "\2477" + value + (this.dash ? "\2478_" : "");
+            ClickGui.drawString(display, stringX, this.y + HEIGHT + HEIGHT / 6.0F - ClickGui.stringHeight(display) / 2.0F, -1);
         } else {
             String fullText = name + "\2477: " + value;
             ClickGui.drawString(fullText, this.x + groupFactor, this.y + HEIGHT / 2.0F - ClickGui.stringHeight(fullText) / 2.0F, -1);
         }
 
 
-        this.panel.drawY += this.selected ? HEIGHT * 2 : HEIGHT;
+        this.panel.drawY += this.selected ? HEIGHT * 1.5F : HEIGHT;
 
     }
 

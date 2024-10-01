@@ -3,6 +3,8 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventMove;
 import wtf.bhopper.nonsense.event.impl.EventSlowDown;
 
 public class MoveUtil {
@@ -10,7 +12,7 @@ public class MoveUtil {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
     public static boolean isMoving() {
-        return mc.thePlayer.moveForward != 0 || mc.thePlayer.moveStrafing != 0;
+        return mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F;
     }
 
     public static double getMotion() {
@@ -37,13 +39,18 @@ public class MoveUtil {
     }
 
     public static void setSpeed(double speed) {
-        setSpeed(speed, mc.thePlayer.rotationYaw, mc.thePlayer.moveForward, mc.thePlayer.moveStrafing);
+        setSpeed(null, speed);
     }
 
-    public static void setSpeed(double speed, float yaw, double forward, double strafe) {
+    public static void setSpeed(EventMove event, double speed) {
+        setSpeed(event, speed, mc.thePlayer.rotationYaw, mc.thePlayer.moveForward, mc.thePlayer.moveStrafing);
+    }
+
+    public static void setSpeed(EventMove event, double speed, float yaw, double forward, double strafe) {
 
         if (mc.thePlayer.isUsingItem() && !mc.thePlayer.isRiding()) {
             EventSlowDown eventSlowDown = new EventSlowDown(0.2F);
+            Nonsense.INSTANCE.eventBus.post(eventSlowDown);
             if (!eventSlowDown.isCancelled()) {
                 speed *= eventSlowDown.factor;
             }
@@ -74,6 +81,33 @@ public class MoveUtil {
         double mz = Math.sin(Math.toRadians(yaw + 90.0F));
         mc.thePlayer.motionX = forward * motion * mx + strafe * motion * mz;
         mc.thePlayer.motionZ = forward * motion * mz - strafe * motion * mx;
+        if (event != null) {
+            event.x = mc.thePlayer.motionX;
+            event.y = mc.thePlayer.motionY;
+        }
+    }
+
+    public static void setVertical(EventMove event, double speed) {
+        mc.thePlayer.motionY = speed;
+        if (event != null) {
+            event.y = speed;
+        }
+    }
+
+    public static void setVertical(double speed) {
+        setSpeed(null, speed);
+    }
+
+    public static void jump(EventMove event, double motion) {
+        mc.thePlayer.jump(motion);
+        event.y = motion;
+    }
+
+    public static double lastDistance() {
+        double diffX = mc.thePlayer.posX - mc.thePlayer.prevPosX;
+        double diffZ = mc.thePlayer.posZ - mc.thePlayer.prevPosZ;
+
+        return Math.sqrt(diffX * diffX + diffZ * diffZ);
     }
 
 }

@@ -1783,6 +1783,21 @@ public abstract class EntityPlayer extends EntityLivingBase
         }
     }
 
+    public void jump(double motion)
+    {
+        super.jump(motion);
+        this.triggerAchievement(StatList.jumpStat);
+
+        if (this.isSprinting())
+        {
+            this.addExhaustion(0.8F);
+        }
+        else
+        {
+            this.addExhaustion(0.2F);
+        }
+    }
+
     /**
      * Moves the entity based on the specified heading.  Args: strafe, forward
      */

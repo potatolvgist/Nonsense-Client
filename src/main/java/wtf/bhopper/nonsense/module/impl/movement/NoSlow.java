@@ -11,6 +11,7 @@ import wtf.bhopper.nonsense.event.impl.EventSlowDown;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
+import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
 public class NoSlow extends Module {

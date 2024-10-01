@@ -102,7 +102,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
 
         try
         {
-            List<String> list = Lists.<String>newArrayList();
+            List<String> list = Lists.newArrayList();
             bufferedreader = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(splashTexts).getInputStream(), Charsets.UTF_8));
             String s;
 
@@ -153,7 +153,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
 
         if (!GLContext.getCapabilities().OpenGL20 && !OpenGlHelper.areShadersSupported())
         {
-            this.openGLWarning1 = I18n.format("title.oldgl1", new Object[0]);
+            this.openGLWarning1 = I18n.format("title.oldgl1");
             this.openGLWarning2 = I18n.format("title.oldgl2", new Object[0]);
             this.openGLWarningLink = "https://help.mojang.com/customer/portal/articles/325948?ref=game";
         }

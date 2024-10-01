@@ -214,6 +214,7 @@ import org.apache.logging.log4j.Logger;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventJoinGame;
 import wtf.bhopper.nonsense.event.impl.EventSendPacket;
+import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
 
 public class NetHandlerPlayClient implements INetHandlerPlayClient
 {
@@ -811,7 +812,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
         else
         {
-            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", reason));
+            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(NonsenseMainMenu.get()), "disconnect.lost", reason));
         }
     }
 

@@ -1,10 +1,7 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.util.JsonUtil;
-
-import java.awt.*;
 
 public class IntSetting extends NumberSetting<Integer> {
 
@@ -72,14 +69,13 @@ public class IntSetting extends NumberSetting<Integer> {
 
 
     @Override
-    public float getPercent() {
-        return (float)value / (float)(max - min);
+    public float getF() {
+        return (float)this.value;
     }
 
     @Override
-    public void setFromPercent(float f) {
-        float range = this.max - this.min;
-        this.set(this.min + Math.round(range * f));
+    public void setF(float f) {
+        this.set(Math.round(f));
     }
 
     @Override

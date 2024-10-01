@@ -95,6 +95,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.util.glu.GLU;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
+import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -482,11 +483,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
         if (this.serverName != null)
         {
-            this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
+            this.displayGuiScreen(new GuiConnecting(NonsenseMainMenu.get(), this, this.serverName, this.serverPort));
         }
         else
         {
-            this.displayGuiScreen(new GuiMainMenu());
+            this.displayGuiScreen(NonsenseMainMenu.get());
         }
 
         this.renderEngine.deleteTexture(this.mojangLogo);
@@ -885,7 +886,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
         if (guiScreenIn == null && this.theWorld == null)
         {
-            guiScreenIn = new GuiMainMenu();
+            guiScreenIn = NonsenseMainMenu.get();
         }
         else if (guiScreenIn == null && this.thePlayer.getHealth() <= 0.0F)
         {

@@ -52,9 +52,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import wtf.bhopper.nonsense.Nonsense;
-import wtf.bhopper.nonsense.event.impl.EventPostMotion;
-import wtf.bhopper.nonsense.event.impl.EventPreMotion;
-import wtf.bhopper.nonsense.event.impl.EventSlowDown;
+import wtf.bhopper.nonsense.event.impl.*;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 public class EntityPlayerSP extends AbstractClientPlayer
@@ -174,6 +172,8 @@ public class EntityPlayerSP extends AbstractClientPlayer
     {
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
         {
+            Nonsense.INSTANCE.eventBus.post(new EventPreUpdate());
+
             super.onUpdate();
 
             if (this.isRiding())
@@ -906,4 +906,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
             this.sendPlayerAbilities();
         }
     }
+
+    @Override
+    public void moveEntity(double x, double y, double z) {
+        EventMove event = new EventMove(x, y, z);
+        Nonsense.INSTANCE.eventBus.post(event);
+        super.moveEntity(event.x, event.y, event.z);
+    }
+
+
 }

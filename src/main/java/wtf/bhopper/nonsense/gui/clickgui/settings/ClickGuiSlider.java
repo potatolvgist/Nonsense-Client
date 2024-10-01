@@ -26,19 +26,25 @@ public class ClickGuiSlider extends ClickGuiComponent {
         this.updatePosition();
         this.drawBackground();
 
-        float percent = setting.getPercent();
+        float value = this.setting.getF();
+        float min = this.setting.minF();
+        float max = this.setting.maxF();
+        float percent = (value - min) / (max - min);
         int left = this.x + (inGroup ? 9 : 5);
+        int right = this.x + ClickGui.WIDTH - (inGroup ? 9 : 5);
         int width = ClickGui.WIDTH - (inGroup ? 18 : 10);
+
         int color = ClickGui.getColor(this.panel);
         String name = ClickGui.mod().displayNames.get() ? this.setting.displayName : this.setting.name;
-        String value = this.setting.getDisplayValue();
+        String displayValue = this.setting.getDisplayValue();
 
-        Gui.drawRect(left, this.y + 2, left + width, this.y + HEIGHT - 2, this.inGroup ? 0xFF070707 : 0xFF111111);
-        Gui.drawRect(left + 2, this.y + 2, (int)(left + 2 + (width - 2) * percent), this.y + HEIGHT - 2, color);
-        Gui.drawRect((int)(left + (width - 2) * percent), this.y + 2, (int)(left + 2 + (width - 2) * percent), this.y + HEIGHT - 2, ColorUtil.darken(color));
+        Gui.drawRect(left, this.y + 2, right, this.y + HEIGHT - 2, this.inGroup ? 0xFF070707 : 0xFF111111);
+
+        Gui.drawRect(left + 2, this.y + 2, left + (int)((width - 2) * percent), this.y + HEIGHT - 2, color);
+        Gui.drawRect(left + (int)((width - 2) * percent), this.y + 2, left + 2 + (int)(width * percent), this.y + HEIGHT - 2, ColorUtil.darken(color));
 
         ClickGui.drawString(name, this.x + (inGroup ? 18 : 14), this.y + HEIGHT / 2.0F - ClickGui.font().getHeight(name), -1);
-        ClickGui.drawString(value, this.x + ClickGui.WIDTH - ClickGui.font().getStringWidth(value) * 2 - (inGroup ? 16 : 12), this.y + HEIGHT / 2.0F - ClickGui.font().getHeight(name), 0xFFAAAAAA);
+        ClickGui.drawString(displayValue, this.x + ClickGui.WIDTH - ClickGui.font().getStringWidth(displayValue) * 2 - (inGroup ? 16 : 12), this.y + HEIGHT / 2.0F - ClickGui.font().getHeight(name), 0xFFAAAAAA);
 
         if (this.mouseIntersecting(mouseX, mouseY)) {
             ClickGui.toolTip = this.setting.description;
@@ -67,11 +73,12 @@ public class ClickGuiSlider extends ClickGuiComponent {
         if (ClickGui.shouldHide(this.setting)) return;
 
         if (this.selected) {
-            int left = this.x + (inGroup ? 11 : 7);
-            int width = ClickGui.WIDTH - (inGroup ? 22 : 14);
-            float percent = MathHelper.clamp_float((float)(mouseX - left) / (float)width, 0.0F, 1.0F);
-            this.setting.setFromPercent(percent);
+            float min = this.setting.minF();
+            float max = this.setting.maxF();
+            float left = this.x + (inGroup ? 9 : 5);
+            float width = ClickGui.WIDTH - (inGroup ? 18 : 10);
+            float percent = (mouseX - left) / (width - 1);
+            setting.setF(min + percent * (max - min));
         }
-
     }
 }

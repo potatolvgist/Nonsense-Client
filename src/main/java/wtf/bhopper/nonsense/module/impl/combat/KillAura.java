@@ -2,7 +2,6 @@ package wtf.bhopper.nonsense.module.impl.combat;
 
 import io.netty.util.internal.ThreadLocalRandom;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -107,11 +106,11 @@ public class KillAura extends Module {
     private void rotate(EventPreMotion event) {
 
         switch (this.randomization.get()) {
-            case FAST:
+            case SAMPLE:
                 this.targetRotations = RotationUtil.getRotationsRandomOptimizedQuick(this.target.getEntityBoundingBox(), 0.05, this.canAttack ? this.attackRange.get() : this.rotateRange.get());
                 break;
 
-            case ACCURATE:
+            case GEOMETRY:
                 this.targetRotations = RotationUtil.getRotationsRandomOptimized(this.target.getEntityBoundingBox(), this.canAttack ? this.attackRange.get() : this.rotateRange.get());
                 break;
 
@@ -283,8 +282,8 @@ public class KillAura extends Module {
     }
 
     private enum RotationRandomization {
-        FAST,
-        ACCURATE,
+        GEOMETRY,
+        SAMPLE,
         NONE
     }
 

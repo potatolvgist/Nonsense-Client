@@ -6,13 +6,13 @@ import wtf.bhopper.nonsense.module.impl.combat.KillAura;
 import wtf.bhopper.nonsense.module.impl.combat.NoClickDelay;
 import wtf.bhopper.nonsense.module.impl.combat.Velocity;
 import wtf.bhopper.nonsense.module.impl.exploit.ServerLagger;
+import wtf.bhopper.nonsense.module.impl.movement.Flight;
 import wtf.bhopper.nonsense.module.impl.movement.NoSlow;
+import wtf.bhopper.nonsense.module.impl.movement.Speed;
 import wtf.bhopper.nonsense.module.impl.movement.Sprint;
 import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
 import wtf.bhopper.nonsense.module.impl.other.Derp;
-import wtf.bhopper.nonsense.module.impl.player.GameSpeed;
-import wtf.bhopper.nonsense.module.impl.player.NoFall;
-import wtf.bhopper.nonsense.module.impl.player.NoRotate;
+import wtf.bhopper.nonsense.module.impl.player.*;
 import wtf.bhopper.nonsense.module.impl.visual.ClickGuiMod;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
 import wtf.bhopper.nonsense.module.impl.visual.ItemAnimations;
@@ -35,11 +35,15 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Movement
         this.addModule(new Sprint());
         this.addModule(new NoSlow());
+        this.addModule(new Speed());
+        this.addModule(new Flight());
 
         // Player
+        this.addModule(new Scaffold());
         this.addModule(new NoFall());
         this.addModule(new GameSpeed());
         this.addModule(new NoRotate());
+        this.addModule(new AutoRespawn());
 
         // Exploit
         this.addModule(new ServerLagger());

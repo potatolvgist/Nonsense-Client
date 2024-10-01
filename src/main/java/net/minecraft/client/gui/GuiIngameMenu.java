@@ -6,6 +6,7 @@ import net.minecraft.client.gui.achievement.GuiStats;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.realms.RealmsBridge;
+import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
 
 public class GuiIngameMenu extends GuiScreen
 {
@@ -58,16 +59,16 @@ public class GuiIngameMenu extends GuiScreen
 
                 if (flag)
                 {
-                    this.mc.displayGuiScreen(new GuiMainMenu());
+                    this.mc.displayGuiScreen(NonsenseMainMenu.get());
                 }
                 else if (flag1)
                 {
                     RealmsBridge realmsbridge = new RealmsBridge();
-                    realmsbridge.switchToRealms(new GuiMainMenu());
+                    realmsbridge.switchToRealms(NonsenseMainMenu.get());
                 }
                 else
                 {
-                    this.mc.displayGuiScreen(new GuiMultiplayer(new GuiMainMenu()));
+                    this.mc.displayGuiScreen(new GuiMultiplayer(NonsenseMainMenu.get()));
                 }
 
             case 2:

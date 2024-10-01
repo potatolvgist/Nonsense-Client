@@ -8,8 +8,8 @@ public abstract class NumberSetting<T extends Number> extends Setting<T> {
         super(name, description);
     }
 
-    public abstract float getPercent();
-    public abstract void setFromPercent(float f);
+    public abstract float getF();
+    public abstract void setF(float f);
     public abstract float minF();
     public abstract float maxF();
 

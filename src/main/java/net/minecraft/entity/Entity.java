@@ -613,7 +613,7 @@ public abstract class Entity implements ICommandSender
             {
                 this.isInWeb = false;
                 x *= 0.25D;
-                y *= 0.05000000074505806D;
+                y *= 0.05;
                 z *= 0.25D;
                 this.motionX = 0.0D;
                 this.motionY = 0.0D;
