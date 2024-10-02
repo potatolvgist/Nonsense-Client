@@ -1,4 +1,4 @@
-package wtf.bhopper.nonsense.util.minecraft;
+package wtf.bhopper.nonsense.util;
 
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
@@ -63,6 +63,10 @@ public class MathUtil {
         }
 
         return new Vec3(closestX, closestY, closestZ);
+    }
+
+    public static Vec3 closestPointOnFace(AxisAlignedBB aabb, EnumFacing face, Vec3 vec) {
+        return closestPointOnFace(aabb, face, vec.xCoord, vec.yCoord, vec.zCoord);
     }
 
     public static Vec3 randomPoint(AxisAlignedBB aabb, double x, double y, double z, double range) {
@@ -175,6 +179,10 @@ public class MathUtil {
 
     public static double randomInRange(double min, double max) {
         return min + (max - min) * RANDOM.nextDouble();
+    }
+
+    public static double solveMathProblem(String problem) {
+        return new EquationParser(problem).parse();
     }
 
 }

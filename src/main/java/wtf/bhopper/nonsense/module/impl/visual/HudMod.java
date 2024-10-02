@@ -44,6 +44,7 @@ public class HudMod extends Module {
 
     public final ColorSetting color = new ColorSetting("Color", "HUD color", 0xFFFF5555);
     public final BooleanSetting customFont = new BooleanSetting("Custom Font", "Uses a custom font", true);
+    public final BooleanSetting hidef3 = new BooleanSetting("Hide In F3", "Hide the HUD when the debug/F3 menu is open", true);
 
     public HudMod() {
         super("HUD", "Heads Up Display", Category.VISUAL);
@@ -78,7 +79,7 @@ public class HudMod extends Module {
                 this.notificationEnabled,
                 this.notificationSound
         );
-        this.addSettings(this.moduleListGroup, this.watermarkGroup, this.infoGroup, this.notificationGroup, this.customFont);
+        this.addSettings(this.moduleListGroup, this.watermarkGroup, this.infoGroup, this.notificationGroup, this.customFont, this.hidef3);
 
         this.toggle(true);
     }

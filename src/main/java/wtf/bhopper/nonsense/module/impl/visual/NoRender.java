@@ -21,8 +21,7 @@ public class NoRender extends Module {
     public void onPreTick(EventPreTick event) {
         if (weather.get()) {
             mc.theWorld.getWorldInfo().setRaining(false);
-            mc.theWorld.setThunderStrength(0.0F);
-            mc.theWorld.setRainStrength(0.0F);
+            mc.theWorld.getWorldInfo().setThundering(false);
         }
     }
 

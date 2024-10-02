@@ -4,7 +4,6 @@ import meteordevelopment.orbit.IEventBus;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.lwjgl.opengl.Display;
 import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
 import wtf.bhopper.nonsense.event.NonsenseEventBus;
@@ -20,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 public class Nonsense {
 
     public static final String NAME = "Nonsense";
-    public static final String VERSION = "Alpha-240922";
+    public static final String VERSION = "Alpha-241002";
 
     public static final Logger LOGGER = LogManager.getLogger("Nonsense");
 
@@ -45,7 +44,6 @@ public class Nonsense {
 
     public void init() {
         LOGGER.info("Loading {}:{}", NAME, VERSION);
-        Display.setTitle("Minecraft 1.8.9 - " + NAME + " (" + VERSION + ")");
 
         this.dataDir = Minecraft.getMinecraft().mcDataDir.toPath().resolve("nonsense").toFile();
         this.dataDir.mkdirs();

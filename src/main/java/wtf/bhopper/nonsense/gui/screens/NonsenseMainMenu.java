@@ -29,7 +29,7 @@ public class NonsenseMainMenu extends GuiScreen {
         return new NonsenseMainMenu();
     }
 
-    private static final ResourceLocation[] PANORAMA = new ResourceLocation[] {
+    private static final ResourceLocation[] PANORAMA = new ResourceLocation[]{
             new ResourceLocation("textures/gui/title/background/panorama_0.png"),
             new ResourceLocation("textures/gui/title/background/panorama_1.png"),
             new ResourceLocation("textures/gui/title/background/panorama_2.png"),
@@ -67,20 +67,25 @@ public class NonsenseMainMenu extends GuiScreen {
             "If she leaves you on seen, put it all on green"
     };
 
+    private final TTFFontRenderer font;
+    private final TTFFontRenderer titleFont;
+    private final TTFFontRenderer buttonFont;
+
+    private ScaledResolution res;
+
     private ResourceLocation backgroundTexture;
 
     private String splashText;
 
     private int panoramaTimer;
 
-    private final TTFFontRenderer font;
-    private final TTFFontRenderer titleFont;
-    private final TTFFontRenderer buttonFont;
+    private GuiChangelog.VersionInfo latestVersionInfo;
 
     private final Button[] buttons = new Button[]{
             new Button("Singleplayer", () -> this.mc.displayGuiScreen(new GuiSelectWorld(this))),
             new Button("Multiplayer", () -> this.mc.displayGuiScreen(new GuiMultiplayer(this))),
-            new Button("Alt Manager", () -> {})
+            new Button("Alt Manager", () -> {
+            })
     };
 
     private final IconButton[] iconButtons = new IconButton[]{
@@ -91,6 +96,10 @@ public class NonsenseMainMenu extends GuiScreen {
 
     public NonsenseMainMenu() {
         this.selectNewSplashText();
+        GuiChangelog.ChangeLog changeLog = GuiChangelog.loadChangeLog();
+        if (changeLog != null) {
+            this.latestVersionInfo = changeLog.changelog[0];
+        }
         this.font = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 20);
         this.titleFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 72);
         this.buttonFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 22);
@@ -98,15 +107,16 @@ public class NonsenseMainMenu extends GuiScreen {
 
     @Override
     public void initGui() {
+        this.res = new ScaledResolution(this.mc);
         this.backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", new DynamicTexture(256, 256));
 
         for (int i = 0; i < this.buttons.length; i++) {
-            this.buttons[i].x = this.width / 2 - 50;
-            this.buttons[i].y = this.height / 2 + 30 + i * 25;
+            this.buttons[i].x = this.getWidth() / 2 - 100;
+            this.buttons[i].y = this.getHeight() / 2 + 60 + i * 50;
         }
 
         for (int i = 0; i < this.iconButtons.length; i++) {
-            this.iconButtons[i].x = this.width * 2 - (i + 1) * 72;
+            this.iconButtons[i].x = this.getWidth() - (i + 1) * 72;
             this.iconButtons[i].y = 8;
         }
 
@@ -120,14 +130,14 @@ public class NonsenseMainMenu extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         for (Button button : this.buttons) {
-            if (button.mouseIntersecting(mouseX, mouseY) && mouseButton == 0) {
+            if (button.mouseIntersecting(mouseX * res.getScaleFactor(), mouseY * res.getScaleFactor()) && mouseButton == 0) {
                 this.playPressSound(mc.getSoundHandler());
                 button.action.run();
             }
         }
 
         for (IconButton button : this.iconButtons) {
-            if (button.mouseIntersecting(mouseX * 2, mouseY * 2) && mouseButton == 0) {
+            if (button.mouseIntersecting(mouseX * res.getScaleFactor(), mouseY * res.getScaleFactor()) && mouseButton == 0) {
                 this.playPressSound(mc.getSoundHandler());
                 button.action.run();
             }
@@ -143,26 +153,40 @@ public class NonsenseMainMenu extends GuiScreen {
         this.renderSkybox(partialTicks);
         GlStateManager.enableAlpha();
 
+        float inverseScale = 1.0F / res.getScaleFactor();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(inverseScale, inverseScale, 0.0F);
+
         String title = "\247l" + Nonsense.NAME.charAt(0) + "\247r\247f" + Nonsense.NAME.substring(1);
-        this.titleFont.drawStringWithShadow(title, (this.width - this.titleFont.getStringWidth(title)) / 2.0F, this.height / 2.0F - this.titleFont.getHeight(title) - 10.0F, 0xFFFF5555);
+        this.drawString(titleFont, title, (int) ((this.getWidth() - this.stringWidth(titleFont, title)) / 2.0F), (int) (this.getHeight() / 2.0F - this.stringWidth(font, title) - 10.0F), 0xFFFF5555);
 
         for (Button button : this.buttons) {
-            button.draw(mouseX, mouseY);
+            button.draw(mouseX * res.getScaleFactor(), mouseY * res.getScaleFactor());
         }
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        GlStateManager.scale(0.5, 0.5, 0.5);
         for (IconButton button : this.iconButtons) {
-            button.draw(mouseX * 2, mouseY * 2);
+            button.draw(mouseX * this.res.getScaleFactor(), mouseY * this.res.getScaleFactor());
         }
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
 
         String version = Nonsense.NAME + " \2477- \247f" + Nonsense.VERSION;
 
-        font.drawStringWithShadow(splashText, (int)((this.width - font.getStringWidth(splashText)) / 2.0F), (int)(this.height / 2.0F - 5.0F), ColorUtil.rainbowColor(System.currentTimeMillis(), 0, 1.0F, 1.0F));
-        font.drawStringWithShadow(version, 2, this.height - font.getHeight(version) - 2, 0xFFFF5555);
+        this.drawString(this.font, splashText, (int) ((this.getWidth() - this.stringWidth(this.font, splashText)) / 2.0F), (int) (this.getHeight() / 2.0F - 5.0F), ColorUtil.rainbow(System.currentTimeMillis(), 0, 1.0F, 1.0F));
+        this.drawString(this.font, version, 4, (int) (this.getHeight() - this.stringHeight(this.font, version) - 4), 0xFFFF5555);
+
+        if (this.latestVersionInfo != null) {
+            this.drawString(this.font, "Changelog", 4, 4, 0xFFFF5555);
+            int count = 1;
+            for (String change : this.latestVersionInfo.changes) {
+                this.drawString(this.font, "- " + change, 4, 4 + (int)(this.stringHeight(font, "I") + 2) * count, 0xFFAAAAAA);
+                ++count;
+            }
+        }
+
+        GlStateManager.popMatrix();
 
     }
 
@@ -185,35 +209,43 @@ public class NonsenseMainMenu extends GuiScreen {
         GlStateManager.depthMask(false);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
-        for (int i = 0; i < 64; ++i)
-        {
+        for (int i = 0; i < 64; ++i) {
             GlStateManager.pushMatrix();
-            float f = ((float)(i % 8) / 8.0F - 0.5F) / 64.0F;
-            float f1 = ((float)(i / 8) / 8.0F - 0.5F) / 64.0F;
+            float f = ((float) (i % 8) / 8.0F - 0.5F) / 64.0F;
+            float f1 = ((float) (i / 8) / 8.0F - 0.5F) / 64.0F;
             float f2 = 0.0F;
             GlStateManager.translate(f, f1, f2);
-            GlStateManager.rotate(MathHelper.sin(((float)this.panoramaTimer + partialTicks) / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(-((float)this.panoramaTimer + partialTicks) * 0.1F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(MathHelper.sin(((float) this.panoramaTimer + partialTicks) / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(-((float) this.panoramaTimer + partialTicks) * 0.1F, 0.0F, 1.0F, 0.0F);
 
-            for (int k = 0; k < 6; ++k)
-            {
+            for (int k = 0; k < 6; ++k) {
                 GlStateManager.pushMatrix();
 
                 switch (k) {
-                    case 1: GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F); break;
-                    case 2: GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F); break;
-                    case 3: GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); break;
-                    case 4: GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F); break;
-                    case 5: GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F); break;
+                    case 1:
+                        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                        break;
+                    case 2:
+                        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                        break;
+                    case 3:
+                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+                        break;
+                    case 4:
+                        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                        break;
+                    case 5:
+                        GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+                        break;
                 }
 
                 this.mc.getTextureManager().bindTexture(PANORAMA[k]);
                 worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-                int l = 255 / (i + 1);
-                worldRenderer.pos(-1.0, -1.0, 1.0).tex(0.0, 0.0).color(255, 255, 255, l).endVertex();
-                worldRenderer.pos(1.0, -1.0, 1.0).tex(1.0, 0.0).color(255, 255, 255, l).endVertex();
-                worldRenderer.pos(1.0, 1.0, 1.0).tex(1.0, 1.0).color(255, 255, 255, l).endVertex();
-                worldRenderer.pos(-1.0, 1.0, 1.0).tex(0.0, 1.0).color(255, 255, 255, l).endVertex();
+                int alpha = 255 / (i + 1);
+                worldRenderer.pos(-1.0, -1.0, 1.0).tex(0.0, 0.0).color(255, 255, 255, alpha).endVertex();
+                worldRenderer.pos(1.0, -1.0, 1.0).tex(1.0, 0.0).color(255, 255, 255, alpha).endVertex();
+                worldRenderer.pos(1.0, 1.0, 1.0).tex(1.0, 1.0).color(255, 255, 255, alpha).endVertex();
+                worldRenderer.pos(-1.0, 1.0, 1.0).tex(0.0, 1.0).color(255, 255, 255, alpha).endVertex();
                 tessellator.draw();
                 GlStateManager.popMatrix();
             }
@@ -246,16 +278,15 @@ public class NonsenseMainMenu extends GuiScreen {
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
         GlStateManager.disableAlpha();
 
-        for (int i = 0; i < 3; ++i)
-        {
-            float alpha = 1.0F / (float)(i + 1);
+        for (int i = 0; i < 3; ++i) {
+            float alpha = 1.0F / (float) (i + 1);
             int width = this.width;
             int height = this.height;
-            float u = (float)(i - 3 / 2) / 256.0F;
+            float u = (float) (i - 3 / 2) / 256.0F;
             worldRenderer.pos(width, height, this.zLevel).tex(u, 1.0).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
             worldRenderer.pos(width, 0.0, this.zLevel).tex(u + 1.0F, 1.0).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
             worldRenderer.pos(0.0, 0.0, this.zLevel).tex(u + 1.0F, 0.0).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
-            worldRenderer.pos(0.0, height, this.zLevel).tex( u, 0.0).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
+            worldRenderer.pos(0.0, height, this.zLevel).tex(u, 0.0).color(1.0F, 1.0F, 1.0F, alpha).endVertex();
         }
 
         tessellator.draw();
@@ -276,9 +307,9 @@ public class NonsenseMainMenu extends GuiScreen {
         this.rotateAndBlurSkybox();
         this.mc.getFramebuffer().bindFramebuffer(true);
         GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-        float f = this.width > this.height ? 120.0F / (float)this.width : 120.0F / (float)this.height;
-        float u = (float)this.height * f / 256.0F;
-        float v = (float)this.width * f / 256.0F;
+        float f = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
+        float u = (float) this.height * f / 256.0F;
+        float v = (float) this.width * f / 256.0F;
         int width = this.width;
         int height = this.height;
         Tessellator tessellator = Tessellator.getInstance();
@@ -293,9 +324,13 @@ public class NonsenseMainMenu extends GuiScreen {
 
     public void selectNewSplashText() {
         String prevSplash = splashText;
-        if (prevSplash == null) prevSplash = "";
+        if (prevSplash == null) {
+            prevSplash = "";
+        }
 
-        do splashText = SPLASHES[ThreadLocalRandom.current().nextInt(0, SPLASHES.length)];
+        do {
+            splashText = SPLASHES[ThreadLocalRandom.current().nextInt(0, SPLASHES.length)];
+        }
         while (prevSplash.equals(splashText));
 
         Calendar calendar = Calendar.getInstance();
@@ -312,13 +347,36 @@ public class NonsenseMainMenu extends GuiScreen {
     void playPressSound(SoundHandler soundHandler) {
         try {
             soundHandler.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
+    }
+
+    private int getWidth() {
+        return res.getScaledWidth() * res.getScaleFactor();
+    }
+
+    private int getHeight() {
+        return res.getScaledHeight() * res.getScaleFactor();
+    }
+
+    private void drawString(TTFFontRenderer font, String text, int x, int y, int color) {
+        GlStateManager.scale(2.0F, 2.0F, 0.0F);
+        font.drawStringWithShadow(text, (int) Math.floor(x / 2.0F), (int) Math.floor(y / 2.0F), color);
+        GlStateManager.scale(0.5F, 0.5F, 0.0F);
+    }
+
+    private float stringWidth(TTFFontRenderer font, String text) {
+        return font.getStringWidth(text) * 2.0F;
+    }
+
+    private float stringHeight(TTFFontRenderer font, String text) {
+        return font.getHeight(text) * 2.0F;
     }
 
     public class Button {
 
-        public static final int WIDTH = 100;
-        public static final int HEIGHT = 20;
+        public static final int WIDTH = 200;
+        public static final int HEIGHT = 40;
 
         public int x, y;
         public final String text;
@@ -332,8 +390,8 @@ public class NonsenseMainMenu extends GuiScreen {
         }
 
         public void draw(int mouseX, int mouseY) {
-            RenderUtil.drawCircleRect(x, y, x + WIDTH, y + HEIGHT, 4, this.mouseIntersecting(mouseX, mouseY) ? 0xAA000000 : 0x55000000);
-            NonsenseMainMenu.this.buttonFont.drawStringWithShadow(text, (int)(this.x + (WIDTH  - NonsenseMainMenu.this.buttonFont.getStringWidth(text)) / 2.0F), (int)(this.y + HEIGHT / 2 - NonsenseMainMenu.this.buttonFont.getHeight(text) / 2 + 1), this.mouseIntersecting(mouseX, mouseY) ? 0xFFFF5555 : 0xFFFFFFFF);
+            RenderUtil.drawCircleRect(x, y, x + WIDTH, y + HEIGHT, 8, this.mouseIntersecting(mouseX, mouseY) ? 0xAA000000 : 0x55000000);
+            NonsenseMainMenu.this.drawString(NonsenseMainMenu.this.buttonFont, text, (int) (this.x + (WIDTH - NonsenseMainMenu.this.stringWidth(NonsenseMainMenu.this.buttonFont, text)) / 2.0F), (int) (this.y + HEIGHT / 2 - NonsenseMainMenu.this.stringHeight(NonsenseMainMenu.this.buttonFont, text) / 2 + 1), this.mouseIntersecting(mouseX, mouseY) ? 0xFFFF5555 : 0xFFFFFFFF);
             GlStateManager.color(0.0F, 0.0F, 0.0F, 0.0F);
         }
 

@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.block.BlockLiquid;
@@ -61,7 +62,7 @@ public abstract class World implements IBlockAccess
      * boolean; if true updates scheduled by scheduleBlockUpdate happen immediately
      */
     protected boolean scheduledUpdatesAreImmediate;
-    public final List<Entity> loadedEntityList = Lists.<Entity>newArrayList();
+    public final List<Entity> loadedEntityList = Lists.newArrayList();
     protected final List<Entity> unloadedEntityList = Lists.<Entity>newArrayList();
     public final List<TileEntity> loadedTileEntityList = Lists.<TileEntity>newArrayList();
     public final List<TileEntity> tickableTileEntities = Lists.<TileEntity>newArrayList();
@@ -70,7 +71,7 @@ public abstract class World implements IBlockAccess
     public final List<EntityPlayer> playerEntities = Lists.<EntityPlayer>newArrayList();
     public final List<Entity> weatherEffects = Lists.<Entity>newArrayList();
     protected final IntHashMap<Entity> entitiesById = new IntHashMap();
-    private long cloudColour = 16777215L;
+    private long cloudColour = 0xffffffL;
 
     /** How much light is subtracted from full daylight */
     private int skylightSubtracted;

@@ -1,6 +1,7 @@
 package wtf.bhopper.nonsense.command;
 
 import net.minecraft.client.Minecraft;
+import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 public abstract class Command {
 
@@ -26,6 +27,10 @@ public abstract class Command {
         }
 
         return false;
+    }
+
+    protected void invalidArgs() {
+        ChatUtil.error("Invalid arguments: %s", this.syntax);
     }
 
     public abstract void onCommand(String[] args, String rawCommand) throws Exception;

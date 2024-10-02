@@ -7,6 +7,7 @@ import net.minecraft.util.ChatStyle;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.command.Command;
 import wtf.bhopper.nonsense.config.Config;
+import wtf.bhopper.nonsense.util.NonsenseException;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 public class ConfigCmd extends Command {
@@ -31,10 +32,12 @@ public class ConfigCmd extends Command {
                 return;
             }
 
-            if (Nonsense.INSTANCE.configManager.createConfig(args[2])) {
+            try {
+                Nonsense.INSTANCE.configManager.createConfig(args[2]);
                 ChatUtil.info("Created config: %s", args[2].toLowerCase());
-            } else {
-                ChatUtil.error("Failed to create config: %s", args[2].toLowerCase());
+            } catch (NonsenseException exception) {
+                ChatUtil.error("Failed to create config: %s", exception.getMessage());
+                Nonsense.LOGGER.error(exception);
             }
         } else if (action.equalsIgnoreCase("delete")) {
             if (args.length < 3) {
@@ -42,21 +45,26 @@ public class ConfigCmd extends Command {
                 return;
             }
 
-            if (Nonsense.INSTANCE.configManager.deleteConfig(args[2])) {
+            try {
+                Nonsense.INSTANCE.configManager.deleteConfig(args[2]);
                 ChatUtil.info("Deleted config: %s", args[2].toLowerCase());
-            } else {
-                ChatUtil.error("Failed to delete config: %s", args[2].toLowerCase());
+            } catch (NonsenseException exception) {
+                ChatUtil.error("Failed to delete config: %s", exception.getMessage());
+                Nonsense.LOGGER.error(exception);
             }
+
         } else if (action.equalsIgnoreCase("save")) {
             if (args.length < 3) {
                 ChatUtil.error("Invalid arguments: %s", syntax);
                 return;
             }
 
-            if (Nonsense.INSTANCE.configManager.saveConfig(args[2])) {
+            try {
+                Nonsense.INSTANCE.configManager.saveConfig(args[2]);
                 ChatUtil.info("Saved config: %s", args[2].toLowerCase());
-            } else {
-                ChatUtil.error("Failed to save config: %s", args[2].toLowerCase());
+            } catch (NonsenseException exception) {
+                ChatUtil.error("Failed to save config: %s", exception.getMessage());
+                Nonsense.LOGGER.error(exception);
             }
         } else if (action.equalsIgnoreCase("load")) {
             if (args.length < 3) {
@@ -64,10 +72,12 @@ public class ConfigCmd extends Command {
                 return;
             }
 
-            if (Nonsense.INSTANCE.configManager.loadConfig(args[2])) {
+            try {
+                Nonsense.INSTANCE.configManager.loadConfig(args[2]);
                 ChatUtil.info("Loaded config: %s", args[2].toLowerCase());
-            } else {
-                ChatUtil.error("Failed to load config: %s", args[2].toLowerCase());
+            } catch (NonsenseException exception) {
+                ChatUtil.error("Failed to load config: %s", exception.getMessage());
+                Nonsense.LOGGER.error(exception);
             }
         } else if (action.equalsIgnoreCase("list")) {
             ChatUtil.print("\247c\247l--- Configs ---");
@@ -75,7 +85,7 @@ public class ConfigCmd extends Command {
             for (Config config : Nonsense.INSTANCE.configManager.getConfigs()) {
                 ChatStyle style = new ChatStyle()
                         .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ".config load " + config.getName()))
-                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to load config")));
+                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to load config: " + config.getName())));
                 ChatUtil.style(style,"\247f%d. \2477%s", count, config.getName());
                 ++count;
             }

@@ -35,7 +35,15 @@ public class Hud {
     }
 
     public static boolean enabled() {
-        return module.isEnabled();
+        if (!module.isEnabled()) {
+            return false;
+        }
+
+        if (module.hidef3.get() && mc.gameSettings.showDebugInfo) {
+            return false;
+        }
+
+        return true;
     }
 
     public static int color() {
@@ -63,7 +71,9 @@ public class Hud {
         } else {
             font.drawString(text, (int)Math.floor(x / 2.0F), (int)Math.floor(y / 2.0F), color, shadow);
         }
-        GlStateManager.scale(0.5F, 0.5F, 0.0F);
+
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+
         GlStateManager.color(0.0F, 0.0F, 0.0F, 0.0F); // Fix a weird rendering bug that happens with the custom fonts
     }
 

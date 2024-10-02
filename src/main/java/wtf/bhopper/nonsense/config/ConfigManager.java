@@ -1,6 +1,8 @@
 package wtf.bhopper.nonsense.config;
 
+import org.apache.logging.log4j.LogManager;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.util.NonsenseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,78 +43,75 @@ public class ConfigManager {
         if (defaultConfig != null) {
             try {
                 defaultConfig.load();
-            } catch (IOException ignored) { }
+            } catch (IOException exception) {
+                Nonsense.LOGGER.error("Failed to load config", exception);
+            }
         } else {
             Config newConfig = new Config("default");
             configs.put("default", newConfig);
             try {
                 newConfig.save();
-            } catch (IOException ignored) { }
+            } catch (IOException exception) {
+                Nonsense.LOGGER.error("Failed to save config", exception);
+            }
         }
     }
 
 
-    public boolean createConfig(String name) {
+    public void createConfig(String name) {
         if (this.configs.containsKey(name.toLowerCase())) {
-            return false;
+            throw new NonsenseException("Config '" + name + "' already exists.");
         }
 
         Config config = new Config(name.toLowerCase());
         try {
             config.save();
-        } catch (IOException ignored) {}
+        } catch (IOException exception) {
+            throw new NonsenseException("Failed to create config", exception);
+        }
         this.configs.put(name, config);
-
-        return true;
     }
 
-    public boolean deleteConfig(String name) {
+    public void deleteConfig(String name) {
         if (!this.configs.containsKey(name.toLowerCase())) {
-            return false;
+            throw new NonsenseException("Config '" + name + "' does not exist.");
         }
 
         Config config = this.configs.get(name.toLowerCase());
         try {
             if (config.delete()) {
                 this.configs.remove(name.toLowerCase());
-                return true;
             }
-        } catch (IOException ignored) {
-            return false;
+        } catch (IOException exception) {
+            throw new NonsenseException("Failed to delete config", exception);
         }
-
-        return false;
 
     }
 
-    public boolean saveConfig(String name) {
-        if (this.configs.containsKey(name.toLowerCase())) {
-            return false;
+    public void saveConfig(String name) {
+        if (!this.configs.containsKey(name.toLowerCase())) {
+            throw new NonsenseException("Config '" + name + "' does not exist.");
         }
 
         Config config = configs.get(name.toLowerCase());
         try {
             config.save();
         } catch (IOException exception) {
-            return false;
+            throw new NonsenseException("Failed to save config", exception);
         }
-
-        return true;
     }
 
-    public boolean loadConfig(String name) {
+    public void loadConfig(String name) {
         if (!this.configs.containsKey(name.toLowerCase())) {
-            return false;
+            throw new NonsenseException("Config '" + name + "' does not exist.");
         }
 
         Config config = configs.get(name.toLowerCase());
         try {
             config.load();
         } catch (IOException exception) {
-            return false;
+            throw new NonsenseException("Failed to load config", exception);
         }
-
-        return true;
     }
 
 }

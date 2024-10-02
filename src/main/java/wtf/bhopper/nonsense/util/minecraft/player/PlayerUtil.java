@@ -8,6 +8,10 @@ public class PlayerUtil {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
+    public static boolean canUpdate() {
+        return mc != null && mc.thePlayer != null && mc.theWorld != null;
+    }
+
     public static Vec3 eyesPos() {
         return new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
     }

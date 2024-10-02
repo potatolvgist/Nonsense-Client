@@ -1,17 +1,16 @@
 package wtf.bhopper.nonsense.module;
 
 import wtf.bhopper.nonsense.Nonsense;
-import wtf.bhopper.nonsense.module.impl.combat.AutoBlock;
-import wtf.bhopper.nonsense.module.impl.combat.KillAura;
-import wtf.bhopper.nonsense.module.impl.combat.NoClickDelay;
-import wtf.bhopper.nonsense.module.impl.combat.Velocity;
+import wtf.bhopper.nonsense.module.impl.combat.*;
 import wtf.bhopper.nonsense.module.impl.exploit.ServerLagger;
 import wtf.bhopper.nonsense.module.impl.movement.Flight;
 import wtf.bhopper.nonsense.module.impl.movement.NoSlow;
 import wtf.bhopper.nonsense.module.impl.movement.Speed;
 import wtf.bhopper.nonsense.module.impl.movement.Sprint;
 import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
+import wtf.bhopper.nonsense.module.impl.other.Debugger;
 import wtf.bhopper.nonsense.module.impl.other.Derp;
+import wtf.bhopper.nonsense.module.impl.other.Panic;
 import wtf.bhopper.nonsense.module.impl.player.*;
 import wtf.bhopper.nonsense.module.impl.visual.ClickGuiMod;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
@@ -29,6 +28,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Combat
         this.addModule(new KillAura());
         this.addModule(new AutoBlock());
+        this.addModule(new AntiBot());
         this.addModule(new Velocity());
         this.addModule(new NoClickDelay());
 
@@ -51,6 +51,8 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Other
         this.addModule(new ChatFilter());
         this.addModule(new Derp());
+        this.addModule(new Panic());
+        this.addModule(new Debugger());
 
         // Visual
         this.addModule(new HudMod());

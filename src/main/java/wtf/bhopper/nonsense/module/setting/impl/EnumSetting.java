@@ -1,12 +1,11 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.module.setting.util.Description;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
 import wtf.bhopper.nonsense.util.JsonUtil;
-import wtf.bhopper.nonsense.util.Util;
+import wtf.bhopper.nonsense.util.GeneralUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -136,7 +135,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
     }
 
     public static String toDisplay(String str) {
-        return Util.capitalize(str.replace('_', ' ').toLowerCase());
+        return GeneralUtil.capitalize(str.replace('_', ' ').toLowerCase());
     }
 
     public static <E extends Enum<E>> String getEnumDescription(E e) {

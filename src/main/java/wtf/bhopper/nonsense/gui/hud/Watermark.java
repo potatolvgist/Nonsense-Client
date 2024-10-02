@@ -35,12 +35,12 @@ public class Watermark {
 
             case RAINBOW:
                 text = "\247l" + rawText.charAt(0) + "\247r\247f" + rawText.substring(1);
-                color = ColorUtil.rainbowColor(System.currentTimeMillis(), 0, 0.5F, 1.0F);
+                color = ColorUtil.rainbow(System.currentTimeMillis(), 0, 0.5F, 1.0F);
                 break;
 
             case RAINBOW_2:
                 text = "\247l" + rawText.charAt(0) + "\247r\247f" + rawText.substring(1);
-                color = ColorUtil.rainbowColor(System.currentTimeMillis(), 0, 1.0F, 1.0F);
+                color = ColorUtil.rainbow(System.currentTimeMillis(), 0, 1.0F, 1.0F);
                 break;
 
             default:

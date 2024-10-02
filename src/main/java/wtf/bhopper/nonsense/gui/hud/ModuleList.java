@@ -2,6 +2,7 @@ package wtf.bhopper.nonsense.gui.hud;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.Sys;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.util.render.ColorUtil;
@@ -153,15 +154,15 @@ public class ModuleList {
                     break;
 
                 case WAVY:
-                    this.color = ColorUtil.wavyColor(Hud.mod().moduleListColor.getRgb(), timeMS, count);
+                    this.color = ColorUtil.wave(Hud.mod().moduleListColor.getRgb(), timeMS, count);
                     break;
 
                 case RAINBOW:
-                    this.color = ColorUtil.rainbowColor(timeMS, count, 0.5F, 1.0F);
+                    this.color = ColorUtil.rainbow(timeMS, count, 0.5F, 1.0F);
                     break;
 
                 case RAINBOW_2:
-                    this.color = ColorUtil.rainbowColor(timeMS, count, 1.0F, 1.0F);
+                    this.color = ColorUtil.rainbow(timeMS, count, 1.0F, 1.0F);
                     break;
 
                 case CATEGORY:
@@ -169,11 +170,11 @@ public class ModuleList {
                     break;
 
                 case ASTOLFO:
-                    this.color = ColorUtil.astolfoColor(timeMS, count);
+                    this.color = ColorUtil.astolfo(timeMS, count);
                     break;
 
                 case RISE:
-                    this.color = ColorUtil.riseColor(timeMS, count);
+                    this.color = ColorUtil.rise(timeMS, count);
                     break;
 
                 case RANDOM:

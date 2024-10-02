@@ -9,8 +9,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
-import wtf.bhopper.nonsense.util.Util;
 import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
+import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,7 +23,7 @@ public class InfoDisplay {
     public void draw(ScaledResolution sr) {
 
         // Don't display if not in game or the chat is open
-        if (!Util.canUpdate() || mc.currentScreen instanceof GuiChat) {
+        if (!PlayerUtil.canUpdate() || mc.currentScreen instanceof GuiChat) {
             return;
         }
 

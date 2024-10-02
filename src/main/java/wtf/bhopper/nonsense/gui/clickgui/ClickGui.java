@@ -128,13 +128,13 @@ public class ClickGui extends GuiScreen {
                 return panel.category.color;
 
             case WAVY:
-                return ColorUtil.wavyColor(module.color.getRgb(), ClickGui.time, panel.drawCount);
+                return ColorUtil.wave(module.color.getRgb(), ClickGui.time, panel.drawCount);
 
             case RAINBOW_1:
-                return ColorUtil.rainbowColor(ClickGui.time, panel.drawCount, 0.5F, 1.0F);
+                return ColorUtil.rainbow(ClickGui.time, panel.drawCount, 0.5F, 1.0F);
 
             case RAINBOW_2:
-                return ColorUtil.rainbowColor(ClickGui.time, panel.drawCount, 1.0F, 1.0F);
+                return ColorUtil.rainbow(ClickGui.time, panel.drawCount, 1.0F, 1.0F);
         }
 
         // if the the mode is null for some strange reason return -1 (which is just white)

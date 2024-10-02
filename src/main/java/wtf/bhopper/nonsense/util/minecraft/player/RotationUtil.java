@@ -3,8 +3,8 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
-import wtf.bhopper.nonsense.util.Util;
-import wtf.bhopper.nonsense.util.minecraft.MathUtil;
+import wtf.bhopper.nonsense.util.GeneralUtil;
+import wtf.bhopper.nonsense.util.MathUtil;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class RotationUtil {
         if (hitVecs.isEmpty()) {
             return getRotationsOptimized(boundingBox);
         }
-        Vec3 hitVec = Util.randomElement(hitVecs);
+        Vec3 hitVec = GeneralUtil.randomElement(hitVecs);
         return getRotations(hitVec);
     }
 
@@ -89,52 +89,10 @@ public class RotationUtil {
     }
 
     public static Vec3 getHitVecOptimized(BlockPos blockPos, EnumFacing facing) {
-
         Vec3 eyes = PlayerUtil.eyesPos();
         double x, y, z;
 
-        switch (facing) {
-            case DOWN:
-                x = Math.max(blockPos.getX(), Math.min(eyes.xCoord, blockPos.getX() + 1));
-                y = eyes.yCoord;
-                z = Math.max(blockPos.getZ(), Math.min(eyes.xCoord, blockPos.getZ() + 1));
-                break;
-
-            case UP:
-                x = Math.max(blockPos.getX(), Math.min(eyes.xCoord, blockPos.getX() + 1));
-                y = eyes.yCoord + 1;
-                z = Math.max(blockPos.getZ(), Math.min(eyes.xCoord, blockPos.getZ() + 1));
-                break;
-
-            case NORTH:
-                x = Math.max(blockPos.getX(), Math.min(eyes.xCoord, blockPos.getX() + 1));
-                y = Math.max(blockPos.getY(), Math.min(eyes.xCoord, blockPos.getY() + 1));
-                z = eyes.zCoord;
-                break;
-
-            case SOUTH:
-                x = Math.max(blockPos.getX(), Math.min(eyes.xCoord, blockPos.getX() + 1));
-                y = Math.max(blockPos.getY(), Math.min(eyes.xCoord, blockPos.getY() + 1));
-                z = eyes.zCoord + 1;
-                break;
-
-            case WEST:
-                x = eyes.xCoord;
-                y = Math.max(blockPos.getY(), Math.min(eyes.xCoord, blockPos.getY() + 1));
-                z = Math.max(blockPos.getZ(), Math.min(eyes.xCoord, blockPos.getZ() + 1));
-                break;
-
-            case EAST:
-                x = eyes.xCoord + 1;
-                y = Math.max(blockPos.getY(), Math.min(eyes.xCoord, blockPos.getY() + 1));
-                z = Math.max(blockPos.getZ(), Math.min(eyes.xCoord, blockPos.getZ() + 1));
-                break;
-
-            default:
-                throw new IllegalArgumentException("Invalid face: " + facing);
-        }
-
-        return new Vec3(x, y, z);
+        return MathUtil.closestPointOnFace(new AxisAlignedBB(blockPos, blockPos.add(1, 1, 1)), facing, eyes);
     }
 
 }

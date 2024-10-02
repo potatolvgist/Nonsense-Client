@@ -8,6 +8,7 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreMotion;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.*;
@@ -228,6 +229,10 @@ public class KillAura extends Module {
         float rangeCheck = Math.max(attackRange.get(), Math.max(swingRange.get(), rotateRange.get()));
 
         if (entity == mc.thePlayer) {
+            return false;
+        }
+
+        if (Nonsense.INSTANCE.moduleManager.get(AntiBot.class).isBot(entity)) {
             return false;
         }
 

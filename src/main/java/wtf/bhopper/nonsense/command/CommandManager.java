@@ -10,6 +10,7 @@ import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 public class CommandManager extends LinkedHashMap<Class<? extends Command>, Command> {
 
@@ -81,6 +82,7 @@ public class CommandManager extends LinkedHashMap<Class<? extends Command>, Comm
                 command.onCommand(args, message);
             } catch (Exception exception) {
                 ChatUtil.error("Error while running command '%s': %s", command.name, exception.getMessage());
+                Nonsense.LOGGER.error("Error while running command: " + command.name, exception);
             }
         }
     }

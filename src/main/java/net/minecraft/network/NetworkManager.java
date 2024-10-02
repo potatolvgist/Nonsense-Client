@@ -364,22 +364,22 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             lazyloadbase = CLIENT_NIO_EVENTLOOP;
         }
 
-        ((Bootstrap)((Bootstrap)((Bootstrap)(new Bootstrap()).group((EventLoopGroup)lazyloadbase.getValue())).handler(new ChannelInitializer<Channel>()
-        {
-            protected void initChannel(Channel p_initChannel_1_) throws Exception
-            {
-                try
-                {
-                    p_initChannel_1_.config().setOption(ChannelOption.TCP_NODELAY, Boolean.valueOf(true));
-                }
-                catch (ChannelException var3)
-                {
-                    ;
-                }
+        new Bootstrap().group(lazyloadbase.getValue()).handler(new ChannelInitializer<Channel>() {
+            protected void initChannel(Channel channel) {
+                try {
+                    channel.config().setOption(ChannelOption.TCP_NODELAY, Boolean.TRUE);
+                } catch (ChannelException ignored) { }
 
-                p_initChannel_1_.pipeline().addLast((String)"timeout", (ChannelHandler)(new ReadTimeoutHandler(30))).addLast((String)"splitter", (ChannelHandler)(new MessageDeserializer2())).addLast((String)"decoder", (ChannelHandler)(new MessageDeserializer(EnumPacketDirection.CLIENTBOUND))).addLast((String)"prepender", (ChannelHandler)(new MessageSerializer2())).addLast((String)"encoder", (ChannelHandler)(new MessageSerializer(EnumPacketDirection.SERVERBOUND))).addLast((String)"packet_handler", (ChannelHandler)networkmanager);
+                channel.pipeline()
+                        .addLast("timeout", new ReadTimeoutHandler(30))
+                        .addLast("splitter", new MessageDeserializer2())
+                        .addLast("decoder", new MessageDeserializer(EnumPacketDirection.CLIENTBOUND))
+                        .addLast("prepender", new MessageSerializer2())
+                        .addLast("encoder", new MessageSerializer(EnumPacketDirection.SERVERBOUND))
+                        .addLast("packet_handler", networkmanager);
+
             }
-        })).channel(oclass)).connect(address, serverPort).syncUninterruptibly();
+        }).channel(oclass).connect(address, serverPort).syncUninterruptibly();
         return networkmanager;
     }
 

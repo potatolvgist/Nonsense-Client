@@ -96,6 +96,7 @@ import org.lwjgl.util.glu.GLU;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
+import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -1626,7 +1627,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void runTick() throws IOException
     {
-        Nonsense.INSTANCE.eventBus.post(new EventPreTick());
+
+        if (PlayerUtil.canUpdate()) {
+            Nonsense.INSTANCE.eventBus.post(new EventPreTick());
+        }
 
         if (this.rightClickDelayTimer > 0)
         {
