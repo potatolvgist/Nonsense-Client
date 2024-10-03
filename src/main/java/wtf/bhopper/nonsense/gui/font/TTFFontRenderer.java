@@ -270,7 +270,9 @@ public class TTFFontRenderer {
      */
     private void renderString(String text, float x, float y, int color, boolean shadow) {
         // Returns if the text is empty.
-        if (Objects.equals(text, "") || text.isEmpty()) return;
+        if (Objects.equals(text, "") || text.isEmpty()) {
+            return;
+        }
 
         // Pushes the matrix to store gl values.
         GL11.glPushMatrix();
@@ -345,10 +347,14 @@ public class TTFFontRenderer {
                     characterData = regularData;
 
                     // Clamps the index just to be safe in case an odd character somehow gets in here.
-                    if (index < 0) index = 15;
+                    if (index < 0) {
+                        index = 15;
+                    }
 
                     // Adds 16 to the color index to get the darker shadow color.
-                    if (shadow) index += 16;
+                    if (shadow) {
+                        index += 16;
+                    }
 
                     // Gets the text color from the color codes array.
                     int textColor = this.colorCodes[index];
@@ -381,11 +387,14 @@ public class TTFFontRenderer {
                 }
             } else {
                 // Continues to not crash!
-                if (character > 255) continue;
+                if (character > 255) {
+                    continue;
+                }
 
                 // Sets the character to a random char if obfuscated is enabled.
-                if (obfuscated)
+                if (obfuscated) {
                     character = (char) (((int) character) + RANDOM_OFFSET);
+                }
 
                 // Draws the character.
                 drawChar(character, characterData, x, y);
@@ -394,12 +403,14 @@ public class TTFFontRenderer {
                 CharacterData charData = characterData[character];
 
                 // Draws the strikethrough line if enabled.
-                if (strikethrough)
+                if (strikethrough) {
                     drawLine(new Vector2f(0, charData.height / 2f), new Vector2f(charData.width, charData.height / 2f), 3);
+                }
 
                 // Draws the underline if enabled.
-                if (underlined)
+                if (underlined) {
                     drawLine(new Vector2f(0, charData.height - 15), new Vector2f(charData.width, charData.height - 15), 3);
+                }
 
                 // Adds to the offset.
                 x += charData.width - (2 * MARGIN);
@@ -440,7 +451,9 @@ public class TTFFontRenderer {
             char previous = i > 0 ? text.charAt(i - 1) : '.';
 
             // Continues if the previous color was the color invoker.
-            if (previous == COLOR_INVOKER) continue;
+            if (previous == COLOR_INVOKER) {
+                continue;
+            }
 
             // Sets the color if the character is the color invoker and the character index is less than the length.
             if (character == COLOR_INVOKER) {
@@ -449,17 +462,23 @@ public class TTFFontRenderer {
                 int index = "0123456789abcdefklmnor".indexOf(text.toLowerCase(Locale.ENGLISH).charAt(i + 1));
 
                 if (index == 17)
+                {
                     // Sets the character data to the bold type.
                     characterData = boldData;
-                else if (index == 20)
+                } else if (index == 20)
+                {
                     // Sets the character data to the italics type.
                     characterData = italicsData;
-                else if (index == 21)
+                } else if (index == 21)
+                {
                     // Sets the character data to the regular type.
                     characterData = regularData;
+                }
             } else {
                 // Continues to not crash!
-                if (character > 255) continue;
+                if (character > 255) {
+                    continue;
+                }
 
                 // The character data for the given character.
                 CharacterData charData = characterData[character];
@@ -613,7 +632,9 @@ public class TTFFontRenderer {
             int blue = (i & 1) * 170 + thingy;
 
             // Increments the red by 85, not sure why does this in minecraft's font renderer.
-            if (i == 6) red += 85;
+            if (i == 6) {
+                red += 85;
+            }
 
             // Used to make the shadow darker.
             if (i >= 16) {

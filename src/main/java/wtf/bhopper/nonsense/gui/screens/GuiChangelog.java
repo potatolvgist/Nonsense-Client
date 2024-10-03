@@ -21,7 +21,14 @@ public class GuiChangelog extends GuiScreen {
                     .getInputStream();
 
             Reader reader = new InputStreamReader(stream);
-            return gson.fromJson(reader, ChangeLog.class);
+            ChangeLog changeLog = gson.fromJson(reader, ChangeLog.class);
+            for (int i = 0; i < changeLog.changelog.length; i++) {
+                for (int j = 0; j < changeLog.changelog[i].changes.length; j++) {
+                    changeLog.changelog[i].changes[j] = changeLog.changelog[i].changes[j].replace('$', '\247');
+                }
+            }
+
+            return changeLog;
 
         } catch (Exception ignored) {}
 

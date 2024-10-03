@@ -1,6 +1,18 @@
 {
   "changelog": [
     {
+      "version": "Alpha-241003",
+      "changes": [
+        "Added $lAuto Block$r",
+        "Added $lFlight$r",
+        "Added $lPanic$r",
+        "Improved $lKill Aura$r to work more like vanilla attacking",
+        "Improved $lScaffold$r to works more like vanilla block placing",
+        "Sprinting now works while using items with $lNo Slow$r",
+        "Fixed a bug where Group Settings weren't saving properly"
+      ]
+    },
+    {
       "version": "Alpha-241002",
       "changes": [
         "Initial Alpha Release"

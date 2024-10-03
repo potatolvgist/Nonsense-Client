@@ -70,6 +70,7 @@ public class NonsenseMainMenu extends GuiScreen {
     private final TTFFontRenderer font;
     private final TTFFontRenderer titleFont;
     private final TTFFontRenderer buttonFont;
+    private final TTFFontRenderer changeLogFont;
 
     private ScaledResolution res;
 
@@ -103,6 +104,7 @@ public class NonsenseMainMenu extends GuiScreen {
         this.font = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 20);
         this.titleFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 72);
         this.buttonFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 22);
+        this.changeLogFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 12);
     }
 
     @Override
@@ -179,9 +181,9 @@ public class NonsenseMainMenu extends GuiScreen {
 
         if (this.latestVersionInfo != null) {
             this.drawString(this.font, "Changelog", 4, 4, 0xFFFF5555);
-            int count = 1;
+            int count = 0;
             for (String change : this.latestVersionInfo.changes) {
-                this.drawString(this.font, "- " + change, 4, 4 + (int)(this.stringHeight(font, "I") + 2) * count, 0xFFAAAAAA);
+                this.drawString(this.changeLogFont, "\247c- \247r" + change, 4, 8 + (int)this.stringHeight(font, "Changelog") + (int)(this.stringHeight(changeLogFont, "I") + 2) * count, -1);
                 ++count;
             }
         }
