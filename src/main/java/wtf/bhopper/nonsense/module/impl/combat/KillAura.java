@@ -8,8 +8,12 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.util.MovingObjectPosition;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventClickAction;
+import wtf.bhopper.nonsense.event.impl.EventMouseOverUpdate;
 import wtf.bhopper.nonsense.event.impl.EventPreMotion;
+import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.*;
 import wtf.bhopper.nonsense.module.setting.util.Description;
@@ -91,7 +95,7 @@ public class KillAura extends Module {
     }
 
     @EventHandler
-    public void onPreMotion(EventPreMotion event) {
+    public void onTick(EventPreTick event) {
         this.updateTargetList();
         this.selectTarget();
 
@@ -99,12 +103,59 @@ public class KillAura extends Module {
             return;
         }
 
-        this.rotate(event);
-        this.attack();
+        this.rotate();
 
     }
 
-    private void rotate(EventPreMotion event) {
+    @EventHandler
+    public void onPreMotion(EventPreMotion event) {
+        if (this.target != null && this.targetRotations != null) {
+            event.setRotations(this.targetRotations);
+        }
+    }
+
+    @EventHandler
+    public void onMouseOver(EventMouseOverUpdate event) {
+        if (this.target != null && this.canAttack) {
+            event.objectMouseOver = new MovingObjectPosition(this.target, this.targetRotations.hitVec);
+        }
+    }
+
+    @EventHandler
+    public void onClickAction(EventClickAction event) {
+        if (this.target == null) {
+            return;
+        }
+
+        if (!this.attackTimer.hasReached(this.nextAttackDelay)) {
+            return;
+        }
+
+        if (event.button == EventClickAction.Button.LEFT) {
+
+            this.updateAttackDelay();
+            this.attackTimer.reset();
+            event.click = true;
+
+            switch (this.swingMode.get()) {
+                case CLIENT:
+                    event.silentSwing = false;
+                    break;
+
+                case SILENT:
+                    event.silentSwing = true;
+                    break;
+
+                case ATTACK_ONLY:
+                    event.silentSwing = !this.canAttack;
+                    break;
+            }
+        }
+    }
+
+    private void rotate() {
+
+        this.prevRotations = this.targetRotations;
 
         switch (this.randomization.get()) {
             case SAMPLE:
@@ -119,50 +170,8 @@ public class KillAura extends Module {
                 this.targetRotations = RotationUtil.getRotationsOptimized(this.target.getEntityBoundingBox());
                 break;
         }
-
-        Rotation rotation;
-
-        switch (rotationMode.get()) {
-            default:
-                rotation = this.targetRotations;
-                break;
-        }
-
-        event.setRotations(rotation);
-        this.prevRotations = rotation;
     }
 
-    private void attack() {
-
-        if (!this.attackTimer.hasReached(this.nextAttackDelay)) {
-            return;
-        }
-        this.updateAttackDelay();
-        this.attackTimer.reset();
-
-        switch (this.swingMode.get()) {
-            case CLIENT:
-                mc.thePlayer.swingItem();
-                break;
-
-            case SILENT:
-                PacketUtil.send(new C0APacketAnimation());
-                break;
-
-            case ATTACK_ONLY:
-                if (this.canAttack) {
-                    mc.thePlayer.swingItem();
-                } else {
-                    PacketUtil.send(new C0APacketAnimation());
-                }
-                break;
-        }
-
-        if (this.canAttack) {
-            PacketUtil.send(new C02PacketUseEntity(this.target, C02PacketUseEntity.Action.ATTACK));
-        }
-
-    }
 
     private void updateAttackDelay() {
         if (this.minAps.get().equals(this.maxAps.get())) {

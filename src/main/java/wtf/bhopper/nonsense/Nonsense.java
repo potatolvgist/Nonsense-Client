@@ -10,6 +10,7 @@ import wtf.bhopper.nonsense.event.NonsenseEventBus;
 import wtf.bhopper.nonsense.gui.clickgui.ClickGui;
 import wtf.bhopper.nonsense.gui.font.FontManager;
 import wtf.bhopper.nonsense.gui.hud.Hud;
+import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.ModuleManager;
 import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
 
@@ -76,6 +77,10 @@ public class Nonsense {
                 module.toggle();
             }
         });
+    }
+
+    public static <T extends Module> T module(Class<T> clazz) {
+        return INSTANCE.moduleManager.get(clazz);
     }
 
 

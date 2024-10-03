@@ -14,8 +14,12 @@ public class RotationUtil {
 
     public static float serverYaw = 0.0F;
     public static float serverPitch = 0.0F;
+    public static float prevServerYaw = 0.0F;
+    public static float prevServerPitch = 0.0F;
 
     public static void updateServerRotations(float yaw, float pitch) {
+        prevServerYaw = serverYaw;
+        prevServerPitch = serverPitch;
         serverYaw = mc.thePlayer.renderYawOffset = mc.thePlayer.rotationYawHead = yaw;
         serverPitch = mc.thePlayer.rotationPitchHead = pitch;
     }
@@ -27,7 +31,7 @@ public class RotationUtil {
         double dist = MathHelper.sqrt_double(x * x + z * z);
         float yaw = (float)(Math.atan2(z, x) * 180.0 / Math.PI) - 90.0F;
         float pitch = (float)(-(Math.atan2(y, dist) * 180.0 / Math.PI));
-        return new Rotation(yaw, pitch);
+        return new Rotation(yaw, pitch, new Vec3(posX, posY, posZ));
     }
 
     public static Rotation getRotations(Vec3 vec) {
@@ -72,10 +76,35 @@ public class RotationUtil {
         return getRotations(hitVec);
     }
 
+    public static float rayCastRange(Vec3 pos, AxisAlignedBB boundingBox) {
+        Vec3 closestPoint = MathUtil.closestPoint(boundingBox, pos);
+        return (float)pos.distanceTo(closestPoint);
+    }
+
     public static float rayCastRange(AxisAlignedBB boundingBox) {
-        Vec3 eyes = PlayerUtil.eyesPos();
-        Vec3 closestPoint = MathUtil.closestPoint(boundingBox, eyes);
-        return (float)eyes.distanceTo(closestPoint);
+        return rayCastRange(PlayerUtil.eyesPos(), boundingBox);
+    }
+
+    public static Vec3 getRotationVec(Entity entity, float delta) {
+        return getRotationVec(entity.rotationYaw, entity.rotationPitch, entity.prevRotationYaw, entity.prevRotationPitch, delta);
+    }
+
+    public static Vec3 getRotationVec(float yaw, float pitch, float prevYaw, float prevPitch, float delta) {
+        if (delta == 1.0F) {
+            return getRotationVec(yaw, pitch);
+        }
+
+        float fixedYaw = MathUtil.lerp(prevYaw, yaw, delta);
+        float fixedPitch = MathUtil.lerp(prevPitch, pitch, delta);
+        return getRotationVec(fixedYaw, fixedPitch);
+    }
+
+    public static Vec3 getRotationVec(float yaw, float pitch) {
+        float f = MathHelper.cos(-yaw * MathHelper.deg2Rad - (float)Math.PI);
+        float f1 = MathHelper.sin(-yaw * MathHelper.deg2Rad - (float)Math.PI);
+        float f2 = -MathHelper.cos(-pitch * MathHelper.deg2Rad);
+        float f3 = MathHelper.sin(-pitch * MathHelper.deg2Rad);
+        return new Vec3(f1 * f2, f3, f * f2);
     }
 
     public static Vec3 getHitVec(BlockPos blockPos, EnumFacing facing) {

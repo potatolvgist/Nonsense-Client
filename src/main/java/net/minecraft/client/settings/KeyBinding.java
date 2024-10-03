@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IntHashMap;
+import org.lwjgl.input.Keyboard;
 
 public class KeyBinding implements Comparable<KeyBinding>
 {
-    private static final List<KeyBinding> keybindArray = Lists.<KeyBinding>newArrayList();
-    private static final IntHashMap<KeyBinding> hash = new IntHashMap();
-    private static final Set<String> keybindSet = Sets.<String>newHashSet();
+    private static final List<KeyBinding> keybindArray = Lists.newArrayList();
+    private static final IntHashMap<KeyBinding> hash = new IntHashMap<>();
+    private static final Set<String> keybindSet = Sets.newHashSet();
     private final String keyDescription;
     private final int keyCodeDefault;
     private final String keyCategory;
@@ -23,9 +24,9 @@ public class KeyBinding implements Comparable<KeyBinding>
 
     public static void onTick(int keyCode)
     {
-        if (keyCode != 0)
+        if (keyCode != Keyboard.KEY_NONE)
         {
-            KeyBinding keybinding = (KeyBinding)hash.lookup(keyCode);
+            KeyBinding keybinding = hash.lookup(keyCode);
 
             if (keybinding != null)
             {
@@ -36,7 +37,7 @@ public class KeyBinding implements Comparable<KeyBinding>
 
     public static void setKeyBindState(int keyCode, boolean pressed)
     {
-        if (keyCode != 0)
+        if (keyCode != Keyboard.KEY_NONE)
         {
             KeyBinding keybinding = hash.lookup(keyCode);
 

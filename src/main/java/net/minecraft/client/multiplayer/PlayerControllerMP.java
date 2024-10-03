@@ -28,6 +28,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 
 public class PlayerControllerMP
 {
@@ -373,7 +374,8 @@ public class PlayerControllerMP
      */
     private void syncCurrentPlayItem()
     {
-        int i = this.mc.thePlayer.inventory.currentItem;
+//        int i = this.mc.thePlayer.inventory.currentItem;
+        int i = InventoryUtil.serverItem;
 
         if (i != this.currentPlayerItem)
         {

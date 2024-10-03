@@ -11,6 +11,14 @@ public class MathUtil {
 
     private static final Random RANDOM = new Random();
 
+    public static float lerp(float a, float b, float f) {
+        return a + f * (b - a);
+    }
+
+    public static double lerp(double a, double b, double f) {
+        return a + f * (b - a);
+    }
+
     public static double distanceTo(double x1, double y1, double z1, double x2, double y2, double z2) {
         double x = x1 - x2;
         double y = y1 - y2;

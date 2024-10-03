@@ -36,6 +36,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventRender2D;
 import wtf.bhopper.nonsense.gui.hud.Hud;
+import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 
 import java.util.Collection;
 import java.util.List;
@@ -377,18 +378,18 @@ public class GuiIngame extends Gui
             float f = this.zLevel;
             this.zLevel = -90.0F;
             this.drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
-            this.drawTexturedModalRect(i - 91 - 1 + entityplayer.inventory.currentItem * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
+            this.drawTexturedModalRect(i - 91 - 1 + InventoryUtil.serverItem * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
             this.zLevel = f;
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
             RenderHelper.enableGUIStandardItemLighting();
 
-            for (int j = 0; j < 9; ++j)
+            for (int slot = 0; slot < 9; ++slot)
             {
-                int k = sr.getScaledWidth() / 2 - 90 + j * 20 + 2;
-                int l = sr.getScaledHeight() - 16 - 3;
-                this.renderHotbarItem(j, k, l, partialTicks, entityplayer);
+                int itemX = sr.getScaledWidth() / 2 - 90 + slot * 20 + 2;
+                int itemY = sr.getScaledHeight() - 16 - 3;
+                this.renderHotbarItem(slot, itemX, itemY, partialTicks, entityplayer);
             }
 
             RenderHelper.disableStandardItemLighting();

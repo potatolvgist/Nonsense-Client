@@ -106,7 +106,7 @@ public class BlockCauldron extends Block
             }
             else
             {
-                int i = ((Integer)state.getValue(LEVEL)).intValue();
+                int i = state.getValue(LEVEL);
                 Item item = itemstack.getItem();
 
                 if (item == Items.water_bucket)

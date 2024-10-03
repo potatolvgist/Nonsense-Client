@@ -3,6 +3,7 @@ package wtf.bhopper.nonsense.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import wtf.bhopper.nonsense.Nonsense;
 
 import java.io.File;
 import java.io.FileReader;
@@ -16,7 +17,9 @@ public class JsonUtil {
         if (element != null) {
             try {
                 callback.apply(element);
-            } catch (Exception ignored) {}
+            } catch (Exception exception) {
+                Nonsense.LOGGER.error(exception);
+            }
         }
     }
 

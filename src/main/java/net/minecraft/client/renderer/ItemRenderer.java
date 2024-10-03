@@ -376,8 +376,9 @@ public class ItemRenderer
     {
         if (!Config.isShaders() || !Shaders.isSkipRenderHand())
         {
-            float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             EntityPlayerSP player = this.mc.thePlayer;
+
+            float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             float swingProgress = player.getSwingProgress(partialTicks);
             float f2 = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTicks;
             float f3 = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTicks;
@@ -770,7 +771,8 @@ public class ItemRenderer
     {
         this.prevEquippedProgress = this.equippedProgress;
         EntityPlayer entityplayer = this.mc.thePlayer;
-        ItemStack itemstack = entityplayer.inventory.getCurrentItem();
+//        ItemStack itemstack = entityplayer.inventory.getCurrentItem();
+        ItemStack itemstack = entityplayer.inventory.getClientItem();
         boolean flag = false;
 
         if (this.itemToRender != null && itemstack != null)

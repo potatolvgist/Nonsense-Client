@@ -8,9 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import wtf.bhopper.nonsense.event.impl.EventPreMotion;
-import wtf.bhopper.nonsense.event.impl.EventPreUpdate;
+import wtf.bhopper.nonsense.event.impl.*;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
@@ -51,6 +51,7 @@ public class Scaffold extends Module {
     private BlockData blockData = null;
     private Vec3 hitVec = null;
     private Rotation rotations = null;
+    private int slot = -1;
 
     public Scaffold() {
         super("Scaffold", "Auto bridge", Category.PLAYER);
@@ -66,20 +67,48 @@ public class Scaffold extends Module {
     }
 
     @EventHandler
-    public void onPreUpdate(EventPreUpdate event) {
+    public void onTick(EventPreTick event) {
+        this.selectBlocks();
+        this.blockData = this.slot != -1 ? this.getBlockData() : null;
+    }
 
+    @EventHandler
+    public void onUpdate(EventPreUpdate event) {
         if (!sprint.get()) {
             mc.thePlayer.setSprinting(false);
         }
+    }
 
-        if (!this.selectBlocks()) {
-            return;
+    @EventHandler
+    public void onSelectItem(EventItemSelect event) {
+        if (this.slot != -1) {
+            event.slot = this.slot;
         }
+    }
 
-        this.blockData = this.getBlockData();
-
+    @EventHandler
+    public void onMouseOver(EventMouseOverUpdate event) {
         if (this.blockData != null) {
-            this.placeBlock();
+
+            switch (rotationsHitVec.get()) {
+                case CLOSEST:
+                    this.hitVec = RotationUtil.getHitVecOptimized(blockData.blockPos, blockData.facing);
+                    break;
+
+                default:
+                    this.hitVec = RotationUtil.getHitVec(blockData.blockPos, blockData.facing);
+                    break;
+            }
+
+            event.objectMouseOver = new MovingObjectPosition(this.hitVec, blockData.facing, blockData.blockPos);
+        }
+    }
+
+    @EventHandler
+    public void onClickAction(EventClickAction event) {
+        if (event.button == EventClickAction.Button.RIGHT && this.blockData != null) {
+            event.click = true;
+            event.silentSwing = !this.swing.get();
         }
     }
 
@@ -106,31 +135,6 @@ public class Scaffold extends Module {
 
         if (this.rotations != null) {
             event.setRotations(this.rotations);
-        }
-
-    }
-
-    private void placeBlock() {
-
-        BlockPos pos = blockData.blockPos;
-        EnumFacing face = blockData.facing;
-
-        switch (rotationsHitVec.get()) {
-            case CLOSEST:
-                this.hitVec = RotationUtil.getHitVecOptimized(pos, face);
-                break;
-
-            default:
-                this.hitVec = RotationUtil.getHitVec(pos, face);
-                break;
-        }
-
-        if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, face, this.hitVec)) {
-            if (swing.get()) {
-                mc.thePlayer.swingItem();
-            } else {
-                PacketUtil.send(new C0APacketAnimation());
-            }
         }
 
     }
@@ -175,14 +179,8 @@ public class Scaffold extends Module {
         return null;
     }
 
-    private boolean selectBlocks() {
-        int slot = this.getBlockSlot();
-        if (slot != -1) {
-            mc.thePlayer.inventory.currentItem = slot;
-            return true;
-        }
-
-        return false;
+    private void selectBlocks() {
+        this.slot = this.getBlockSlot();
     }
 
     private int getBlockSlot() {

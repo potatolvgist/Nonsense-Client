@@ -2,7 +2,9 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.Vec3;
+import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
 public class PlayerUtil {
 
@@ -14,6 +16,14 @@ public class PlayerUtil {
 
     public static Vec3 eyesPos() {
         return new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
+    }
+
+    public static void swing(boolean silent) {
+        if (silent) {
+            PacketUtil.send(new C0APacketAnimation());
+        } else {
+            mc.thePlayer.swingItem();
+        }
     }
 
     public static boolean isOnSameTeam(final EntityPlayer player) {

@@ -69,7 +69,7 @@ public class GroupSetting extends Setting<List<Setting<?>>> {
     public void serialize(JsonObject object) {
         JsonObject newObject = new JsonObject();
         for (Setting<?> setting : this.settings) {
-            setting.serialize(object);
+            setting.serialize(newObject);
         }
         object.add(this.name, newObject);
     }
@@ -77,6 +77,7 @@ public class GroupSetting extends Setting<List<Setting<?>>> {
     @Override
     public void deserialize(JsonObject object) {
         JsonUtil.getSafe(object, this.name, element -> {
+
             JsonObject jsonObject = element.getAsJsonObject();
             for (Setting<?> setting : this.settings) {
                 setting.deserialize(jsonObject);

@@ -60,6 +60,14 @@ public class NoSlow extends Module {
         return mode.getDisplayValue();
     }
 
+    public boolean usingItemFixed() {
+        if (this.isEnabled()) {
+            return false;
+        }
+
+        return mc.thePlayer.isUsingItem();
+    }
+
     public enum Mode {
         VANILLA,
         @DisplayName("NCP") NCP

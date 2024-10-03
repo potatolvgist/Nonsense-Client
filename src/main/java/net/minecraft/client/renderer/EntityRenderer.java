@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
@@ -9,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
@@ -97,8 +96,11 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventMouseOverUpdate;
 import wtf.bhopper.nonsense.event.impl.EventRender3D;
+import wtf.bhopper.nonsense.module.impl.movement.MovementFix;
 import wtf.bhopper.nonsense.module.impl.visual.NoRender;
+import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 public class EntityRenderer implements IResourceManagerReloadListener
 {
@@ -301,7 +303,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
             else if (Reflector.ForgeHooksClient_loadEntityShader.exists())
             {
-                Reflector.call(Reflector.ForgeHooksClient_loadEntityShader, new Object[] {entityIn, this});
+                Reflector.call(Reflector.ForgeHooksClient_loadEntityShader, entityIn, this);
             }
         }
     }
@@ -464,19 +466,24 @@ public class EntityRenderer implements IResourceManagerReloadListener
         {
             this.mc.mcProfiler.startSection("pick");
             this.mc.pointedEntity = null;
-            double d0 = this.mc.playerController.getBlockReachDistance();
-            this.mc.objectMouseOver = entity.rayTrace(d0, partialTicks);
-            double d1 = d0;
+            double reach = this.mc.playerController.getBlockReachDistance();
+
+            //            this.mc.objectMouseOver = entity.rayTrace(reach, partialTicks);
+            this.mc.objectMouseOver = entity.rayTraceCustom(reach, partialTicks,
+                    RotationUtil.serverYaw, RotationUtil.serverPitch,
+                    RotationUtil.prevServerYaw, RotationUtil.prevServerPitch);
+
+            double d1 = reach;
             Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;
             int i = 3;
 
             if (this.mc.playerController.extendedReach())
             {
-                d0 = 6.0D;
+                reach = 6.0D;
                 d1 = 6.0D;
             }
-            else if (d0 > 3.0D)
+            else if (reach > 3.0D)
             {
                 flag = true;
             }
@@ -487,11 +494,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
 
             Vec3 vec31 = entity.getLook(partialTicks);
-            Vec3 vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
+            Vec3 vec32 = vec3.addVector(vec31.xCoord * reach, vec31.yCoord * reach, vec31.zCoord * reach);
             this.pointedEntity = null;
             Vec3 vec33 = null;
             float f = 1.0F;
-            List<Entity> list = this.mc.theWorld.getEntitiesInAABBexcluding(entity, entity.getEntityBoundingBox().addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith));
+            List<Entity> list = this.mc.theWorld.getEntitiesInAABBexcluding(entity, entity.getEntityBoundingBox().addCoord(vec31.xCoord * reach, vec31.yCoord * reach, vec31.zCoord * reach).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith));
             double d2 = d1;
 
             for (Entity entity1 : list) {
@@ -546,6 +553,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
 
             this.mc.mcProfiler.endSection();
+
+            EventMouseOverUpdate event = new EventMouseOverUpdate(this.mc.objectMouseOver);
+            Nonsense.INSTANCE.eventBus.post(event);
+            this.mc.objectMouseOver = event.objectMouseOver;
+
         }
     }
 
@@ -1071,7 +1083,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
     {
         this.torchFlickerDX = (float)((double)this.torchFlickerDX + (Math.random() - Math.random()) * Math.random() * Math.random());
         this.torchFlickerDX = (float)((double)this.torchFlickerDX * 0.9D);
-        this.torchFlickerX += (this.torchFlickerDX - this.torchFlickerX) * 1.0F;
+        this.torchFlickerX += (this.torchFlickerDX - this.torchFlickerX);
         this.lightmapUpdateNeeded = true;
     }
 
@@ -2367,7 +2379,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
         if (Reflector.EntityViewRenderEvent_FogColors_Constructor.exists())
         {
-            Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_FogColors_Constructor, new Object[] {this, entity, block, Float.valueOf(partialTicks), Float.valueOf(this.fogColorRed), Float.valueOf(this.fogColorGreen), Float.valueOf(this.fogColorBlue)});
+            Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_FogColors_Constructor, this, entity, block, partialTicks, this.fogColorRed, this.fogColorGreen, this.fogColorBlue);
             Reflector.postForgeBusEvent(object);
             this.fogColorRed = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_FogColors_red, this.fogColorRed);
             this.fogColorGreen = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_FogColors_green, this.fogColorGreen);

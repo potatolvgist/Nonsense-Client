@@ -1,9 +1,7 @@
 package wtf.bhopper.nonsense.module;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
@@ -12,7 +10,6 @@ import wtf.bhopper.nonsense.util.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Module {

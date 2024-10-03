@@ -53,6 +53,7 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.*;
+import wtf.bhopper.nonsense.module.impl.movement.NoSlow;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 public class EntityPlayerSP extends AbstractClientPlayer
@@ -809,7 +810,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
             }
         }
 
-        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown())
+        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !Nonsense.module(NoSlow.class).usingItemFixed() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown())
         {
             this.setSprinting(true);
         }

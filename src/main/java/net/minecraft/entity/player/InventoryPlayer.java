@@ -2,6 +2,7 @@ package net.minecraft.entity.player;
 
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.inventory.IInventory;
@@ -15,6 +16,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ReportedException;
+import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 
 public class InventoryPlayer implements IInventory
 {
@@ -48,6 +50,14 @@ public class InventoryPlayer implements IInventory
      * Returns the item stack currently held by the player.
      */
     public ItemStack getCurrentItem()
+    {
+        if (this.player == Minecraft.getMinecraft().thePlayer) {
+            return InventoryUtil.currentItem() < 9 && InventoryUtil.currentItem() >= 0 ? this.mainInventory[InventoryUtil.currentItem()] : null;
+        }
+        return this.currentItem < 9 && this.currentItem >= 0 ? this.mainInventory[this.currentItem] : null;
+    }
+
+    public ItemStack getClientItem()
     {
         return this.currentItem < 9 && this.currentItem >= 0 ? this.mainInventory[this.currentItem] : null;
     }
@@ -121,19 +131,19 @@ public class InventoryPlayer implements IInventory
     public void setCurrentItem(Item itemIn, int metadataIn, boolean isMetaSpecific, boolean p_146030_4_)
     {
         ItemStack itemstack = this.getCurrentItem();
-        int i = isMetaSpecific ? this.getInventorySlotContainItemAndDamage(itemIn, metadataIn) : this.getInventorySlotContainItem(itemIn);
+        int slot = isMetaSpecific ? this.getInventorySlotContainItemAndDamage(itemIn, metadataIn) : this.getInventorySlotContainItem(itemIn);
 
-        if (i >= 0 && i < 9)
+        if (slot >= 0 && slot < 9)
         {
-            this.currentItem = i;
+            this.currentItem = slot;
         }
         else if (p_146030_4_ && itemIn != null)
         {
-            int j = this.getFirstEmptyStack();
+            int emptyStack = this.getFirstEmptyStack();
 
-            if (j >= 0 && j < 9)
+            if (emptyStack >= 0 && emptyStack < 9)
             {
-                this.currentItem = j;
+                this.currentItem = emptyStack;
             }
 
             if (itemstack == null || !itemstack.isItemEnchantable() || this.getInventorySlotContainItemAndDamage(itemstack.getItem(), itemstack.getItemDamage()) != this.currentItem)

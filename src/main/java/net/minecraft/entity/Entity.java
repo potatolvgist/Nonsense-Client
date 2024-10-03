@@ -46,6 +46,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 public abstract class Entity implements ICommandSender
 {
@@ -1475,11 +1476,11 @@ public abstract class Entity implements ICommandSender
      */
     protected final Vec3 getVectorForRotation(float pitch, float yaw)
     {
-        float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
+        float f = MathHelper.cos(-yaw * MathHelper.deg2Rad - (float)Math.PI);
+        float f1 = MathHelper.sin(-yaw * MathHelper.deg2Rad - (float)Math.PI);
+        float f2 = -MathHelper.cos(-pitch * MathHelper.deg2Rad);
+        float f3 = MathHelper.sin(-pitch * MathHelper.deg2Rad);
+        return new Vec3(f1 * f2, f3, f * f2);
     }
 
     public Vec3 getPositionEyes(float partialTicks)
@@ -1499,10 +1500,17 @@ public abstract class Entity implements ICommandSender
 
     public MovingObjectPosition rayTrace(double blockReachDistance, float partialTicks)
     {
-        Vec3 vec3 = this.getPositionEyes(partialTicks);
-        Vec3 vec31 = this.getLook(partialTicks);
-        Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
-        return this.worldObj.rayTraceBlocks(vec3, vec32, false, false, true);
+        Vec3 eyes = this.getPositionEyes(partialTicks);
+        Vec3 look = this.getLook(partialTicks);
+        Vec3 end = eyes.addVector(look.xCoord * blockReachDistance, look.yCoord * blockReachDistance, look.zCoord * blockReachDistance);
+        return this.worldObj.rayTraceBlocks(eyes, end, false, false, true);
+    }
+
+    public MovingObjectPosition rayTraceCustom(double blockReachDistance, float partialTicks, float yaw, float pitch, float prevYaw, float prevPitch) {
+        Vec3 eyes = this.getPositionEyes(partialTicks);
+        Vec3 look = RotationUtil.getRotationVec(yaw, pitch, prevYaw, prevPitch, partialTicks);
+        Vec3 end = eyes.addVector(look.xCoord * blockReachDistance, look.yCoord * blockReachDistance, look.zCoord * blockReachDistance);
+        return this.worldObj.rayTraceBlocks(eyes, end, false, false, true);
     }
 
     /**

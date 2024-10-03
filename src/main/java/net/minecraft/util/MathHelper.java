@@ -15,7 +15,7 @@ public class MathHelper
     public static final float PI2 = MathUtils.roundToFloat((Math.PI * 2D));
     public static final float PId2 = MathUtils.roundToFloat((Math.PI / 2D));
     private static final float radToIndex = MathUtils.roundToFloat(651.8986469044033D);
-    public static final float deg2Rad = MathUtils.roundToFloat(0.017453292519943295D);
+    public static final float deg2Rad = MathUtils.roundToFloat(Math.PI / 180.0);
     private static final float[] SIN_TABLE_FAST = new float[4096];
     public static boolean fastMath = false;
 
@@ -39,17 +39,17 @@ public class MathHelper
     /**
      * sin looked up in a table
      */
-    public static float sin(float p_76126_0_)
+    public static float sin(float x)
     {
-        return fastMath ? SIN_TABLE_FAST[(int)(p_76126_0_ * radToIndex) & 4095] : SIN_TABLE[(int)(p_76126_0_ * 10430.378F) & 65535];
+        return fastMath ? SIN_TABLE_FAST[(int)(x * radToIndex) & 4095] : SIN_TABLE[(int)(x * 10430.378F) & 65535];
     }
 
     /**
      * cos looked up in the sin table with the appropriate offset
      */
-    public static float cos(float value)
+    public static float cos(float x)
     {
-        return fastMath ? SIN_TABLE_FAST[(int)(value * radToIndex + 1024.0F) & 4095] : SIN_TABLE[(int)(value * 10430.378F + 16384.0F) & 65535];
+        return fastMath ? SIN_TABLE_FAST[(int)(x * radToIndex + 1024.0F) & 4095] : SIN_TABLE[(int)(x * 10430.378F + 16384.0F) & 65535];
     }
 
     public static float sqrt_float(float value)
@@ -379,16 +379,16 @@ public class MathHelper
 
     public static int func_180188_d(int p_180188_0_, int p_180188_1_)
     {
-        int i = (p_180188_0_ & 16711680) >> 16;
-        int j = (p_180188_1_ & 16711680) >> 16;
-        int k = (p_180188_0_ & 65280) >> 8;
-        int l = (p_180188_1_ & 65280) >> 8;
-        int i1 = (p_180188_0_ & 255) >> 0;
-        int j1 = (p_180188_1_ & 255) >> 0;
+        int i = (p_180188_0_ & 0xff0000) >> 16;
+        int j = (p_180188_1_ & 0xff0000) >> 16;
+        int k = (p_180188_0_ & 0xff00) >> 8;
+        int l = (p_180188_1_ & 0xff00) >> 8;
+        int i1 = (p_180188_0_ & 0xff) >> 0;
+        int j1 = (p_180188_1_ & 0xff) >> 0;
         int k1 = (int)((float)i * (float)j / 255.0F);
         int l1 = (int)((float)k * (float)l / 255.0F);
         int i2 = (int)((float)i1 * (float)j1 / 255.0F);
-        return p_180188_0_ & -16777216 | k1 << 16 | l1 << 8 | i2;
+        return p_180188_0_ & 0xff000000 | k1 << 16 | l1 << 8 | i2;
     }
 
     public static double func_181162_h(double p_181162_0_)

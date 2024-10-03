@@ -63,6 +63,7 @@ import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
+import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.profiler.IPlayerUsage;
 import net.minecraft.profiler.PlayerUsageSnooper;
@@ -94,8 +95,12 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.*;
 import org.lwjgl.util.glu.GLU;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventClickAction;
+import wtf.bhopper.nonsense.event.impl.EventItemSelect;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
+import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
+import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
 import javax.imageio.ImageIO;
@@ -1405,11 +1410,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
     }
 
-    private void clickMouse()
+    private void clickMouse(boolean silentSwing)
     {
         if (this.leftClickCounter <= 0)
         {
-            this.thePlayer.swingItem();
+            PlayerUtil.swing(silentSwing);
+//            this.thePlayer.swingItem();
 
             if (this.objectMouseOver == null)
             {
@@ -1453,7 +1459,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * Called when user clicked he's mouse right button (place)
      */
-    private void rightClickMouse()
+    private void rightClickMouse(boolean silentSwing)
     {
         if (!this.playerController.getIsHittingBlock())
         {
@@ -1486,12 +1492,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                         if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air)
                         {
-                            int i = itemstack != null ? itemstack.stackSize : 0;
+                            int stackSize = itemstack != null ? itemstack.stackSize : 0;
 
                             if (this.playerController.onPlayerRightClick(this.thePlayer, this.theWorld, itemstack, blockpos, this.objectMouseOver.sideHit, this.objectMouseOver.hitVec))
                             {
                                 flag = false;
-                                this.thePlayer.swingItem();
+                                PlayerUtil.swing(silentSwing);
+//                                this.thePlayer.swingItem();
                             }
 
                             if (itemstack == null)
@@ -1501,11 +1508,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                             if (itemstack.stackSize == 0)
                             {
-                                this.thePlayer.inventory.mainInventory[this.thePlayer.inventory.currentItem] = null;
+                                this.thePlayer.inventory.mainInventory[InventoryUtil.currentItem()] = null;
                             }
-                            else if (itemstack.stackSize != i || this.playerController.isInCreativeMode())
+                            else if (itemstack.stackSize != stackSize || this.playerController.isInCreativeMode())
                             {
-                                this.entityRenderer.itemRenderer.resetEquippedProgress();
+                                if (itemstack == this.thePlayer.inventory.getClientItem()) {
+                                    this.entityRenderer.itemRenderer.resetEquippedProgress();
+                                }
                             }
                         }
                 }
@@ -1517,7 +1526,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                 if (itemstack1 != null && this.playerController.sendUseItem(this.thePlayer, this.theWorld, itemstack1))
                 {
-                    this.entityRenderer.itemRenderer.resetEquippedProgress2();
+                    if (itemstack1 == this.thePlayer.inventory.getClientItem()) {
+                        this.entityRenderer.itemRenderer.resetEquippedProgress();
+                    }
                 }
             }
         }
@@ -1954,20 +1965,24 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 }
             }
 
-            for (int l = 0; l < 9; ++l)
+            for (int slot = 0; slot < 9; ++slot)
             {
-                if (this.gameSettings.keyBindsHotbar[l].isPressed())
+                if (this.gameSettings.keyBindsHotbar[slot].isPressed())
                 {
                     if (this.thePlayer.isSpectator())
                     {
-                        this.ingameGUI.getSpectatorGui().func_175260_a(l);
+                        this.ingameGUI.getSpectatorGui().func_175260_a(slot);
                     }
                     else
                     {
-                        this.thePlayer.inventory.currentItem = l;
+                        this.thePlayer.inventory.currentItem = slot;
                     }
                 }
             }
+
+            EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
+            Nonsense.INSTANCE.eventBus.post(eventItemSelect);
+            InventoryUtil.serverItem = eventItemSelect.slot;
 
             boolean chatVisible = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
 
@@ -1999,35 +2014,53 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             }
 
             if (this.thePlayer.isUsingItem()) {
-                if (!this.gameSettings.keyBindUse.isKeyDown()) {
+
+                EventClickAction eventRelease = new EventClickAction(EventClickAction.Button.RELEASE, this.gameSettings.keyBindUse.isKeyDown(), true);
+                Nonsense.INSTANCE.eventBus.post(eventRelease);
+                if (!eventRelease.click) {
                     this.playerController.onStoppedUsingItem(this.thePlayer);
                 }
 
-                while (this.gameSettings.keyBindAttack.isPressed()) {
-
+                EventClickAction eventLeft = new EventClickAction(EventClickAction.Button.LEFT, false, true);
+                Nonsense.INSTANCE.eventBus.post(eventLeft);
+                if (eventLeft.click) {
+                    this.clickMouse(eventLeft.silentSwing);
                 }
 
-                while (this.gameSettings.keyBindUse.isPressed())
-                {
 
-                }
+//                while (this.gameSettings.keyBindUse.isPressed())
+//                {
+//
+//                }
 
-                while (this.gameSettings.keyBindPickItem.isPressed())
-                {
-                    
-                }
+//                while (this.gameSettings.keyBindPickItem.isPressed())
+//                {
+//
+//                }
             }
             else
             {
-                while (this.gameSettings.keyBindAttack.isPressed())
-                {
-                    this.clickMouse();
+                EventClickAction eventLeft = new EventClickAction(EventClickAction.Button.LEFT, this.gameSettings.keyBindAttack.isPressed(), false);
+                Nonsense.INSTANCE.eventBus.post(eventLeft);
+                if (eventLeft.click) {
+                    this.clickMouse(eventLeft.silentSwing);
                 }
 
-                while (this.gameSettings.keyBindUse.isPressed())
-                {
-                    this.rightClickMouse();
+//                while (this.gameSettings.keyBindAttack.isPressed())
+//                {
+//                    this.clickMouse(false);
+//                }
+
+                EventClickAction eventRight = new EventClickAction(EventClickAction.Button.RIGHT, this.gameSettings.keyBindUse.isPressed(), false);
+                Nonsense.INSTANCE.eventBus.post(eventRight);
+                if (eventRight.click) {
+                    this.rightClickMouse(eventRight.silentSwing);
                 }
+
+//                while (this.gameSettings.keyBindUse.isPressed())
+//                {
+//                    this.rightClickMouse();
+//                }
 
                 while (this.gameSettings.keyBindPickItem.isPressed())
                 {
@@ -2035,9 +2068,15 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 }
             }
 
-            if (this.gameSettings.keyBindUse.isKeyDown() && this.rightClickDelayTimer == 0 && !this.thePlayer.isUsingItem())
+            EventClickAction event2ndRight = new EventClickAction(EventClickAction.Button.RIGHT,
+                    this.gameSettings.keyBindUse.isKeyDown() && this.rightClickDelayTimer == 0 && !this.thePlayer.isUsingItem(),
+                    this.thePlayer.isUsingItem());
+            Nonsense.INSTANCE.eventBus.post(event2ndRight);
+
+//            if (this.gameSettings.keyBindUse.isKeyDown() && this.rightClickDelayTimer == 0 && !this.thePlayer.isUsingItem())
+            if (event2ndRight.click)
             {
-                this.rightClickMouse();
+                this.rightClickMouse(event2ndRight.silentSwing);
             }
 
             this.sendClickBlockToController(this.currentScreen == null && this.gameSettings.keyBindAttack.isKeyDown() && this.inGameHasFocus);
@@ -2482,7 +2521,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     i = EntityList.getEntityID(this.objectMouseOver.entityHit);
                     flag1 = true;
 
-                    if (!EntityList.entityEggs.containsKey(Integer.valueOf(i)))
+                    if (!EntityList.entityEggs.containsKey(i))
                     {
                         return;
                     }

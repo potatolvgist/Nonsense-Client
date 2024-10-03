@@ -3,10 +3,7 @@ package wtf.bhopper.nonsense.module;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.combat.*;
 import wtf.bhopper.nonsense.module.impl.exploit.ServerLagger;
-import wtf.bhopper.nonsense.module.impl.movement.Flight;
-import wtf.bhopper.nonsense.module.impl.movement.NoSlow;
-import wtf.bhopper.nonsense.module.impl.movement.Speed;
-import wtf.bhopper.nonsense.module.impl.movement.Sprint;
+import wtf.bhopper.nonsense.module.impl.movement.*;
 import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
 import wtf.bhopper.nonsense.module.impl.other.Debugger;
 import wtf.bhopper.nonsense.module.impl.other.Derp;
@@ -37,6 +34,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new NoSlow());
         this.addModule(new Speed());
         this.addModule(new Flight());
+        this.addModule(new MovementFix());
 
         // Player
         this.addModule(new Scaffold());
