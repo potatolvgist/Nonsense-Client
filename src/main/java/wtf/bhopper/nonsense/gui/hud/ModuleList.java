@@ -2,7 +2,6 @@ package wtf.bhopper.nonsense.gui.hud;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import org.lwjgl.Sys;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.util.render.ColorUtil;

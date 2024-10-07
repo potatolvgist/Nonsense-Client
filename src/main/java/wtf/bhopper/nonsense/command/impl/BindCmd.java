@@ -1,6 +1,6 @@
 package wtf.bhopper.nonsense.command.impl;
 
-import org.lwjgl.input.Keyboard;
+import org.lwjglx.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.command.Command;
 import wtf.bhopper.nonsense.module.Module;

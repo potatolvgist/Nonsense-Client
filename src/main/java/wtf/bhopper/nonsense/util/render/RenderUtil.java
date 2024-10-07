@@ -11,10 +11,10 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import org.lwjgl.opengl.Display;
+import org.lwjglx.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjglx.util.glu.GLU;
+import org.lwjglx.util.glu.GLUtessellator;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -1198,9 +1198,9 @@ public class RenderUtil {
     private static final FloatBuffer vector = GLAllocation.createDirectFloatBuffer(4);
 
     public static javax.vecmath.Vector3d project2D(int scaleFactor, double x, double y, double z) {
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelView);
-        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
-        GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
+        GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, modelView);
+        GL11.glGetFloatv(GL11.GL_PROJECTION_MATRIX, projection);
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
         return GLU.gluProject((float) x, (float) y, (float) z, modelView, projection, viewport, vector) ? new Vector3d(vector.get(0) / (float) scaleFactor, ((float) Display.getHeight() - vector.get(1)) / (float) scaleFactor, vector.get(2)) : null;
     }
 

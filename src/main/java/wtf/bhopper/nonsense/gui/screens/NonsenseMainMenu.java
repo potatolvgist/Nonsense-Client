@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.Project;
+import org.lwjglx.util.glu.Project;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;

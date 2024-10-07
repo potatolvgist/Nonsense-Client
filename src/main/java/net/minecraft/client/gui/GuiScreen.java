@@ -42,8 +42,8 @@ import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjglx.input.Keyboard;
+import org.lwjglx.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 

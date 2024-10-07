@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.input.Mouse;
+import org.lwjglx.input.Mouse;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;

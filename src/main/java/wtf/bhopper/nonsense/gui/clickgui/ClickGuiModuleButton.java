@@ -1,7 +1,7 @@
 package wtf.bhopper.nonsense.gui.clickgui;
 
 import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Keyboard;
+import org.lwjglx.input.Keyboard;
 import wtf.bhopper.nonsense.gui.clickgui.settings.*;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.Setting;
