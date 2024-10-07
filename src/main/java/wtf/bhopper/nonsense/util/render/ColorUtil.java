@@ -1,5 +1,7 @@
 package wtf.bhopper.nonsense.util.render;
 
+import wtf.bhopper.nonsense.util.MathUtil;
+
 import java.awt.*;
 
 public class ColorUtil {
@@ -51,6 +53,44 @@ public class ColorUtil {
             awt = awt.brighter();
         }
         return awt.getRGB();
+    }
+
+    public static int lerp(int left, int right, float factor) {
+        int[] rgbLeft = separate(left);
+        int[] rgbRight = separate(right);
+
+        int r = MathUtil.lerp(rgbLeft[0], rgbRight[0], factor);
+        int g = MathUtil.lerp(rgbLeft[1], rgbRight[1], factor);
+        int b = MathUtil.lerp(rgbLeft[2], rgbRight[2], factor);
+        int a = MathUtil.lerp(rgbLeft[3], rgbRight[3], factor);
+
+        return merge(r, g, b, a);
+    }
+
+    public static Color lerp(Color left, Color right, float factor) {
+
+        int r = MathUtil.lerp(left.getRed(), right.getRed(), factor);
+        int g = MathUtil.lerp(left.getGreen(), right.getGreen(), factor);
+        int b = MathUtil.lerp(left.getBlue(), right.getBlue(), factor);
+        int a = MathUtil.lerp(left.getAlpha(), right.getAlpha(), factor);
+
+        return new Color(r, g, b, a);
+    }
+
+    public static int[] separate(int color) {
+        return new int[]{
+                    (color >> 16) & 0xFF,
+                    (color >> 8) & 0xFF,
+                    color & 0xFF,
+                    (color >> 24) & 0xFF
+        };
+    }
+
+    public static int merge(int r, int g, int b, int a) {
+        return  ((a & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8)  |
+                (b & 0xFF);
     }
 
 }

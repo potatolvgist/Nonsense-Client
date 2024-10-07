@@ -314,7 +314,7 @@ public class GuiIngame extends Gui
             this.mc.mcProfiler.endSection();
         }
 
-        Hud.moduleList.draw(partialTicks, scaledResolution);
+        int minY = Hud.moduleList.draw(partialTicks, scaledResolution);
 
         Scoreboard scoreboard = this.mc.theWorld.getScoreboard();
         ScoreObjective scoreobjective = null;
@@ -332,7 +332,7 @@ public class GuiIngame extends Gui
 
         ScoreObjective scoreobjective1 = scoreobjective != null ? scoreobjective : scoreboard.getObjectiveInDisplaySlot(1);
         if (scoreobjective1 != null) {
-            this.renderScoreboard(scoreobjective1, scaledResolution, 0);
+            this.renderScoreboard(scoreobjective1, scaledResolution, minY);
         }
 
         Nonsense.INSTANCE.eventBus.post(new EventRender2D(partialTicks, scaledResolution));
@@ -579,6 +579,9 @@ public class GuiIngame extends Gui
 
         int i1 = scores.size() * this.getFontRenderer().FONT_HEIGHT;
         int j1 = scaledRes.getScaledHeight() / 2 + i1 / 3;
+
+        j1 = Math.max(j1, minY);
+
         int k1 = 3;
         int l1 = scaledRes.getScaledWidth() - objectiveWidth - k1;
         int j = 0;

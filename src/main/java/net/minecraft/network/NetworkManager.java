@@ -50,6 +50,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventReceivePacket;
+import wtf.bhopper.nonsense.module.impl.other.Debugger;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 {
@@ -153,9 +154,11 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             try {
                 EventReceivePacket event = new EventReceivePacket(packet);
                 Nonsense.INSTANCE.eventBus.post(event);
-                if (!event.isCancelled()) {
+                boolean cancelled = event.isCancelled();
+                if (!cancelled) {
                     packet.processPacket(this.packetListener);
                 }
+                Nonsense.INSTANCE.eventBus.post(new Debugger.EventPacketDebug(packet, cancelled ? Debugger.State.CANCELED : Debugger.State.NORMAL, Debugger.EventPacketDebug.Direction.INCOMING));
             } catch (ThreadQuickExitException ignored) { }
         }
     }
@@ -166,7 +169,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
      */
     public void setNetHandler(INetHandler handler)
     {
-        Validate.notNull(handler, "packetListener", new Object[0]);
+        Validate.notNull(handler, "packetListener");
         logger.debug("Set listener of {} to {}", new Object[] {this, handler});
         this.packetListener = handler;
     }
@@ -178,7 +181,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         if (this.isChannelOpen())
         {
             this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, (GenericFutureListener <? extends Future <? super Void >> [])null);
+            this.dispatchPacket(packetIn, null);
         }
         else
         {

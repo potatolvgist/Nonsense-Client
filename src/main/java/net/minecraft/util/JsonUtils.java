@@ -169,39 +169,39 @@ public class JsonUtils
      * Gets the float value of the field on the JsonObject with the given name, or the given default value if the field
      * is missing.
      */
-    public static float getFloat(JsonObject p_151221_0_, String p_151221_1_, float p_151221_2_)
+    public static float getFloat(JsonObject json, String key, float p_151221_2_)
     {
-        return p_151221_0_.has(p_151221_1_) ? getFloat(p_151221_0_.get(p_151221_1_), p_151221_1_) : p_151221_2_;
+        return json.has(key) ? getFloat(json.get(key), key) : p_151221_2_;
     }
 
     /**
      * Gets the integer value of the given JsonElement.  Expects the second parameter to be the name of the element's
      * field if an error message needs to be thrown.
      */
-    public static int getInt(JsonElement p_151215_0_, String p_151215_1_)
+    public static int getInt(JsonElement json, String key)
     {
-        if (p_151215_0_.isJsonPrimitive() && p_151215_0_.getAsJsonPrimitive().isNumber())
+        if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber())
         {
-            return p_151215_0_.getAsInt();
+            return json.getAsInt();
         }
         else
         {
-            throw new JsonSyntaxException("Expected " + p_151215_1_ + " to be a Int, was " + toString(p_151215_0_));
+            throw new JsonSyntaxException("Expected " + key + " to be a Int, was " + toString(json));
         }
     }
 
     /**
      * Gets the integer value of the field on the JsonObject with the given name.
      */
-    public static int getInt(JsonObject p_151203_0_, String p_151203_1_)
+    public static int getInt(JsonObject json, String key)
     {
-        if (p_151203_0_.has(p_151203_1_))
+        if (json.has(key))
         {
-            return getInt(p_151203_0_.get(p_151203_1_), p_151203_1_);
+            return getInt(json.get(key), key);
         }
         else
         {
-            throw new JsonSyntaxException("Missing " + p_151203_1_ + ", expected to find a Int");
+            throw new JsonSyntaxException("Missing " + key + ", expected to find a Int");
         }
     }
 
@@ -212,6 +212,42 @@ public class JsonUtils
     public static int getInt(JsonObject p_151208_0_, String p_151208_1_, int p_151208_2_)
     {
         return p_151208_0_.has(p_151208_1_) ? getInt(p_151208_0_.get(p_151208_1_), p_151208_1_) : p_151208_2_;
+    }
+
+    public static long getLong(JsonElement json, String key)
+    {
+        if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber())
+        {
+            return json.getAsLong();
+        }
+        else
+        {
+            throw new JsonSyntaxException("Expected " + key + " to be a Int, was " + toString(json));
+        }
+    }
+
+    /**
+     * Gets the integer value of the field on the JsonObject with the given name.
+     */
+    public static long getLong(JsonObject json, String key)
+    {
+        if (json.has(key))
+        {
+            return getLong(json.get(key), key);
+        }
+        else
+        {
+            throw new JsonSyntaxException("Missing " + key + ", expected to find a Int");
+        }
+    }
+
+    /**
+     * Gets the integer value of the field on the JsonObject with the given name, or the given default value if the
+     * field is missing.
+     */
+    public static long getLong(JsonObject p_151208_0_, String p_151208_1_, long p_151208_2_)
+    {
+        return p_151208_0_.has(p_151208_1_) ? getLong(p_151208_0_.get(p_151208_1_), p_151208_1_) : p_151208_2_;
     }
 
     /**

@@ -1,10 +1,12 @@
 package wtf.bhopper.nonsense.module.impl.movement;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import wtf.bhopper.nonsense.event.impl.EventClickAction;
 import wtf.bhopper.nonsense.event.impl.EventPostMotion;
 import wtf.bhopper.nonsense.event.impl.EventPreMotion;
 import wtf.bhopper.nonsense.event.impl.EventSlowDown;
@@ -33,25 +35,21 @@ public class NoSlow extends Module {
         }
     }
 
-    @EventHandler
-    public void onPreMotion(EventPreMotion event) {
-        switch (mode.get()) {
-            case NCP:
-                if (mc.thePlayer.isBlocking()) {
-                    PacketUtil.send(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                }
-                break;
+    @EventHandler(priority = EventPriority.LOW)
+    public void onClick(EventClickAction event) {
+        if (this.mode.is(Mode.NCP)) {
+            if (mc.thePlayer.isBlocking() && event.click) {
+                PacketUtil.send(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            }
         }
     }
 
     @EventHandler
     public void onPostMotion(EventPostMotion event) {
-        switch (mode.get()) {
-            case NCP:
-                if (mc.thePlayer.isBlocking()) {
-                    PacketUtil.send(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                }
-                break;
+        if (this.mode.is(Mode.NCP)) {
+            if (mc.thePlayer.isBlocking()) {
+                PacketUtil.send(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+            }
         }
     }
 

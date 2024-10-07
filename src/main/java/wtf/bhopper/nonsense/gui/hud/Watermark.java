@@ -7,7 +7,7 @@ public class Watermark {
 
     public void draw(ScaledResolution res) {
 
-        if (!Hud.mod().isEnabled() || !Hud.mod().watermarkEnable.get()) {
+        if (!Hud.enabled() || !Hud.mod().watermarkEnable.get()) {
             return;
         }
 

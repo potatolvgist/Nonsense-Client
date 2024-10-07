@@ -11,6 +11,7 @@ import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
 import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
+import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,7 +24,7 @@ public class InfoDisplay {
     public void draw(ScaledResolution sr) {
 
         // Don't display if not in game or the chat is open
-        if (!PlayerUtil.canUpdate() || mc.currentScreen instanceof GuiChat) {
+        if (!Hud.enabled() || !PlayerUtil.canUpdate() || mc.currentScreen instanceof GuiChat) {
             return;
         }
 
@@ -60,19 +61,19 @@ public class InfoDisplay {
 
             switch (mc.thePlayer.getHorizontalFacing()) {
                 case NORTH:
-                    direction = "\2477[\247fZ-\2477] \247fnorth";
+                    direction = "\2477[\247fZ-\2477] \247fNorth";
                     break;
 
                 case SOUTH:
-                    direction = "\2477[\247fZ+\2477] \247fsouth";
+                    direction = "\2477[\247fZ+\2477] \247fSouth";
                     break;
 
                 case EAST:
-                    direction = "\2477[\247fX+\2477] \247feast";
+                    direction = "\2477[\247fX+\2477] \247fEast";
                     break;
 
                 case WEST:
-                    direction = "\2477[\247fX-\2477] \247fwest";
+                    direction = "\2477[\247fX-\2477] \247fWest";
                     break;
 
                 default:
@@ -81,6 +82,7 @@ public class InfoDisplay {
             }
 
             String text = String.format("Angles\247f: \2477(\247f%.1f \2477/ \247f%.1f\2477) \247f%s", yaw, pitch, direction);
+
             float textHeight = Hud.getStringHeight(text);
             Hud.drawString(text, 2, height - y - textHeight - 2, Hud.color(), true);
             y += textHeight + 2;
@@ -96,7 +98,7 @@ public class InfoDisplay {
                     break;
 
                 case KMPH:
-                    speed *= 72.0;// You can convert m/s to km/h by multiplying it by 3.6, we also need to multiply by 20 for the ticks
+                    speed *= 72.0; // You can convert m/s to km/h by multiplying it by 3.6, we also need to multiply by 20 for the ticks
                     suffix = " km/h";
                     break;
 

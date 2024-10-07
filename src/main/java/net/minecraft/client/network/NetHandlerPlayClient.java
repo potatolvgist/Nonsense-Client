@@ -215,6 +215,7 @@ import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventJoinGame;
 import wtf.bhopper.nonsense.event.impl.EventSendPacket;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
+import wtf.bhopper.nonsense.module.impl.other.Debugger;
 
 public class NetHandlerPlayClient implements INetHandlerPlayClient
 {
@@ -797,7 +798,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
      */
     public void onDisconnect(IChatComponent reason)
     {
-        this.gameController.loadWorld((WorldClient)null);
+        this.gameController.loadWorld(null);
 
         if (this.guiScreenServer != null)
         {
@@ -821,9 +822,13 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         EventSendPacket event = new EventSendPacket(packet);
         Nonsense.INSTANCE.eventBus.post(event);
 
-        if (!event.isCancelled()) {
+        boolean cancelled = event.isCancelled();
+
+        if (!cancelled) {
             this.netManager.sendPacket(event.packet);
         }
+
+        Nonsense.INSTANCE.eventBus.post(new Debugger.EventPacketDebug(packet, cancelled ? Debugger.State.CANCELED : Debugger.State.NORMAL, Debugger.EventPacketDebug.Direction.OUTGOING));
     }
 
     public void handleCollectItem(S0DPacketCollectItem packetIn)

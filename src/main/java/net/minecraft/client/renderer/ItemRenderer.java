@@ -377,6 +377,7 @@ public class ItemRenderer
         if (!Config.isShaders() || !Shaders.isSkipRenderHand())
         {
             EntityPlayerSP player = this.mc.thePlayer;
+            ItemAnimations animations = Nonsense.module(ItemAnimations.class);
 
             float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             float swingProgress = player.getSwingProgress(partialTicks);
@@ -396,9 +397,9 @@ public class ItemRenderer
                 }
                 else if (player.getItemInUseCount() > 0)
                 {
-                    EnumAction enumaction = this.itemToRender.getItemUseAction();
+                    EnumAction action = this.itemToRender.getItemUseAction();
 
-                    switch (enumaction)
+                    switch (action)
                     {
                         case NONE:
                             this.transformFirstPersonItem(equipProgress, 0.0F);
@@ -406,16 +407,20 @@ public class ItemRenderer
 
                         case EAT:
                         case DRINK:
+                            if (animations.isEnabled()) {
+                                GlStateManager.translate(animations.useX.get(), animations.useY.get(), animations.useZ.get());
+                            }
                             this.performDrinking(player, partialTicks);
                             this.transformFirstPersonItem(equipProgress, 0.0F);
                             break;
 
                         case BLOCK:
-                            if (Nonsense.INSTANCE.moduleManager.isEnabled(ItemAnimations.class)) {
+                            if (animations.isEnabled()) {
 
+                                GlStateManager.translate(animations.useX.get(), animations.useY.get(), animations.useZ.get());
                                 float animationThing = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * MathHelper.PI);
 
-                                switch (Nonsense.INSTANCE.moduleManager.get(ItemAnimations.class).blockAnimation.get()) {
+                                switch (animations.blockAnimation.get()) {
                                     case DEFAULT:
                                         this.transformFirstPersonItem(equipProgress, swingProgress);
                                         this.doBlockTransformations();
@@ -428,7 +433,7 @@ public class ItemRenderer
                                         this.doBlockTransformations();
                                         break;
 
-                                    case SWING:
+                                    case OLD:
                                         this.transformFirstPersonItem(equipProgress + 0.05f, swingProgress);
                                         GlStateManager.translate(-0.5F, 0.5F, 0.0F);
                                         GlStateManager.rotate(30.0F, 0.0F, 1.0F, 0.0F);
@@ -576,6 +581,9 @@ public class ItemRenderer
                 }
                 else
                 {
+                    if (animations.isEnabled()) {
+                        GlStateManager.translate(animations.tranformX.get(), animations.tranformY.get(), animations.tranformZ.get());
+                    }
                     this.doItemUsedTransformations(swingProgress);
                     this.transformFirstPersonItem(equipProgress, swingProgress);
                 }

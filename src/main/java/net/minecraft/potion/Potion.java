@@ -83,7 +83,7 @@ public class Potion
 
     /** The Id of a Potion object. */
     public final int id;
-    private final Map<IAttribute, AttributeModifier> attributeModifierMap = Maps.<IAttribute, AttributeModifier>newHashMap();
+    private final Map<IAttribute, AttributeModifier> attributeModifierMap = Maps.newHashMap();
 
     /**
      * This field indicated if the effect is 'bad' - negative - for the entity.
@@ -347,11 +347,11 @@ public class Potion
     {
         for (Entry<IAttribute, AttributeModifier> entry : this.attributeModifierMap.entrySet())
         {
-            IAttributeInstance iattributeinstance = p_111187_2_.getAttributeInstance((IAttribute)entry.getKey());
+            IAttributeInstance iattributeinstance = p_111187_2_.getAttributeInstance(entry.getKey());
 
             if (iattributeinstance != null)
             {
-                iattributeinstance.removeModifier((AttributeModifier)entry.getValue());
+                iattributeinstance.removeModifier(entry.getValue());
             }
         }
     }
@@ -360,11 +360,11 @@ public class Potion
     {
         for (Entry<IAttribute, AttributeModifier> entry : this.attributeModifierMap.entrySet())
         {
-            IAttributeInstance iattributeinstance = p_111185_2_.getAttributeInstance((IAttribute)entry.getKey());
+            IAttributeInstance iattributeinstance = p_111185_2_.getAttributeInstance(entry.getKey());
 
             if (iattributeinstance != null)
             {
-                AttributeModifier attributemodifier = (AttributeModifier)entry.getValue();
+                AttributeModifier attributemodifier = entry.getValue();
                 iattributeinstance.removeModifier(attributemodifier);
                 iattributeinstance.applyModifier(new AttributeModifier(attributemodifier.getID(), this.getName() + " " + amplifier, this.getAttributeModifierAmount(amplifier, attributemodifier), attributemodifier.getOperation()));
             }

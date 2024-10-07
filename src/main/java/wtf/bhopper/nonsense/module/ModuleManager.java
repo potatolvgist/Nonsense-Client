@@ -2,6 +2,7 @@ package wtf.bhopper.nonsense.module;
 
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.combat.*;
+import wtf.bhopper.nonsense.module.impl.exploit.PingSpoofer;
 import wtf.bhopper.nonsense.module.impl.exploit.ServerLagger;
 import wtf.bhopper.nonsense.module.impl.movement.*;
 import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
@@ -44,6 +45,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new AutoRespawn());
 
         // Exploit
+        this.addModule(new PingSpoofer());
         this.addModule(new ServerLagger());
 
         // Other

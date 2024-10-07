@@ -1,9 +1,11 @@
 package wtf.bhopper.nonsense;
 
+import com.google.gson.Gson;
 import meteordevelopment.orbit.IEventBus;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import wtf.bhopper.nonsense.alt.AltManager;
 import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
 import wtf.bhopper.nonsense.event.NonsenseEventBus;
@@ -23,6 +25,7 @@ public class Nonsense {
     public static final String VERSION = "Alpha-241002";
 
     public static final Logger LOGGER = LogManager.getLogger("Nonsense");
+    public static final Gson GSON = new Gson();
 
     public static Nonsense INSTANCE = null;
 
@@ -34,6 +37,7 @@ public class Nonsense {
     public CommandManager commandManager;
     public ConfigManager configManager;
     public FontManager fontManager;
+    public AltManager altManager;
 
     // Utility
     public TickRate tickRate;
@@ -63,6 +67,8 @@ public class Nonsense {
 
         this.configManager = new ConfigManager();
         this.configManager.init();
+
+        this.altManager = new AltManager();
 
         this.tickRate = new TickRate();
 

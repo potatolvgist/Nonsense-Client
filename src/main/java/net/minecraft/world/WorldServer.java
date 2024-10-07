@@ -365,7 +365,7 @@ public class WorldServer extends World implements IThreadListener
 
                 if (this.rand.nextInt(100000) == 0 && this.isRaining() && this.isThundering())
                 {
-                    this.updateLCG = this.updateLCG * 3 + 1013904223;
+                    this.updateLCG = this.updateLCG * 3 + DIST_HASH_MAGIC;
                     int i1 = this.updateLCG >> 2;
                     BlockPos blockpos = this.adjustPosToNearbyEntity(new BlockPos(k + (i1 & 15), 0, l + (i1 >> 8 & 15)));
 
@@ -379,7 +379,7 @@ public class WorldServer extends World implements IThreadListener
 
                 if (this.rand.nextInt(16) == 0)
                 {
-                    this.updateLCG = this.updateLCG * 3 + 1013904223;
+                    this.updateLCG = this.updateLCG * 3 + DIST_HASH_MAGIC;
                     int k2 = this.updateLCG >> 2;
                     BlockPos blockpos2 = this.getPrecipitationHeight(new BlockPos(k + (k2 & 15), 0, l + (k2 >> 8 & 15)));
                     BlockPos blockpos1 = blockpos2.down();
@@ -411,7 +411,7 @@ public class WorldServer extends World implements IThreadListener
                         {
                             for (int j1 = 0; j1 < l2; ++j1)
                             {
-                                this.updateLCG = this.updateLCG * 3 + 1013904223;
+                                this.updateLCG = this.updateLCG * 3 + DIST_HASH_MAGIC;
                                 int k1 = this.updateLCG >> 2;
                                 int l1 = k1 & 15;
                                 int i2 = k1 >> 8 & 15;

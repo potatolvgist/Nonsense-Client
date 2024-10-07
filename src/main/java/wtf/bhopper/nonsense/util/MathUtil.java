@@ -4,12 +4,17 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
+import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 
 import java.util.*;
 
 public class MathUtil {
 
     private static final Random RANDOM = new Random();
+
+    public static int lerp(int a, int b, float f) {
+        return a + (int)(f * (float)(b - a));
+    }
 
     public static float lerp(float a, float b, float f) {
         return a + f * (b - a);
@@ -28,6 +33,55 @@ public class MathUtil {
 
     public static double distanceTo(Vec3 pos1, Vec3 pos2) {
         return pos1.distanceTo(pos2);
+    }
+
+    public static boolean rayIntersection(AxisAlignedBB aabb, Vec3 pos, float yaw, float pitch, float range) {
+        Vec3 look = RotationUtil.getRotationVec(yaw, pitch);
+        Vec3 end = look.addVector(look.xCoord * range, look.yCoord * range, look.zCoord * range);
+        return rayIntersection(aabb, pos, end);
+    }
+
+    public static boolean rayIntersection(AxisAlignedBB aabb, Vec3 start, Vec3 end) {
+        double tMin = Double.NEGATIVE_INFINITY;
+        double tMax = Double.POSITIVE_INFINITY;
+
+        if (end.xCoord != 0) {
+            double t1 = (aabb.minX - start.xCoord) / end.xCoord;
+            double t2 = (aabb.maxX - start.xCoord) / end.xCoord;
+
+            tMin = Math.max(tMin, Math.min(t1, t2));
+            tMax = Math.min(tMax, Math.max(t1, t2));
+        } else {
+            if (start.xCoord < aabb.minX || start.xCoord > aabb.maxX) {
+                return false;
+            }
+        }
+
+        if (end.yCoord != 0) {
+            double t1 = (aabb.minY - start.yCoord) / end.yCoord;
+            double t2 = (aabb.maxY - start.yCoord) / end.yCoord;
+
+            tMin = Math.max(tMin, Math.min(t1, t2));
+            tMax = Math.min(tMax, Math.max(t1, t2));
+        } else {
+            if (start.yCoord < aabb.minY || start.yCoord > aabb.maxY) {
+                return false;
+            }
+        }
+
+        if (end.zCoord != 0) {
+            double t1 = (aabb.minZ - start.zCoord) / end.zCoord;
+            double t2 = (aabb.maxZ - start.zCoord) / end.zCoord;
+
+            tMin = Math.max(tMin, Math.min(t1, t2));
+            tMax = Math.min(tMax, Math.max(t1, t2));
+        } else {
+            if (start.zCoord < aabb.minZ || start.zCoord > aabb.maxZ) {
+                return false;
+            }
+        }
+
+        return tMin <= tMax && tMax >= 0;
     }
 
     public static Vec3 closestPoint(AxisAlignedBB aabb, double x, double y, double z) {

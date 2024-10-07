@@ -94,6 +94,10 @@ public class ClickGuiPanel {
         return this.x;
     }
 
+    public void offsetY(int y) {
+        this.y += y;
+    }
+
     private boolean mouseIntersecting(int mouseX, int mouseY) {
         return mouseX > x && mouseX < x + ClickGui.WIDTH && mouseY > y && mouseY < y + HEIGHT;
     }

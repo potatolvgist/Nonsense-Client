@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.input.Mouse;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
@@ -52,6 +53,14 @@ public class ClickGui extends GuiScreen {
 
     public static float stringHeight(String text) {
         return font.getHeight(text) * 2.0F;
+    }
+
+    @Override
+    public void updateScreen() {
+        int dWheel = Mouse.getDWheel() / 4;
+        for (ClickGuiPanel panel : PANELS) {
+            panel.offsetY(dWheel);
+        }
     }
 
     @Override

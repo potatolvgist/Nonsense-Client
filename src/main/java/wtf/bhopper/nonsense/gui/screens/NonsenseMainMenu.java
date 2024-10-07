@@ -16,6 +16,7 @@ import org.lwjgl.util.glu.Project;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
+import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
 import wtf.bhopper.nonsense.util.render.ColorUtil;
 import wtf.bhopper.nonsense.util.render.RenderUtil;
 
@@ -85,8 +86,7 @@ public class NonsenseMainMenu extends GuiScreen {
     private final Button[] buttons = new Button[]{
             new Button("Singleplayer", () -> this.mc.displayGuiScreen(new GuiSelectWorld(this))),
             new Button("Multiplayer", () -> this.mc.displayGuiScreen(new GuiMultiplayer(this))),
-            new Button("Alt Manager", () -> {
-            })
+            new Button("Alt Manager", () -> this.mc.displayGuiScreen(new GuiAltManager(this)))
     };
 
     private final IconButton[] iconButtons = new IconButton[]{

@@ -24,10 +24,10 @@ public class ModuleList {
         Nonsense.INSTANCE.moduleManager.values().forEach(module -> slots.add(new Slot(module)));
     }
 
-    public void draw(float delta, ScaledResolution sr) {
+    public int draw(float delta, ScaledResolution sr) {
 
         if (!Hud.enabled() || !Hud.mod().moduleListEnabled.get()) {
-            return;
+            return 0;
         }
 
         Hud.beginDraw(sr);
@@ -45,6 +45,7 @@ public class ModuleList {
 
         Hud.endDraw();
 
+        return (int)(this.offsetY / 2.0F);
     }
 
     public void updateSlots(float delta) {
