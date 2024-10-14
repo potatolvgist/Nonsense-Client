@@ -7,7 +7,6 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.*;
 import wtf.bhopper.nonsense.gui.hud.notification.Notification;
@@ -15,9 +14,8 @@ import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.*;
 import wtf.bhopper.nonsense.module.setting.util.Description;
-import wtf.bhopper.nonsense.util.Clock;
-import wtf.bhopper.nonsense.util.MathUtil;
-import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
+import wtf.bhopper.nonsense.util.misc.Clock;
+import wtf.bhopper.nonsense.util.misc.MathUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.Rotation;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
@@ -29,8 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KillAura extends Module {
-
-    private static final DecimalFormat FOV_FORMAT = new DecimalFormat("#0.##'\u00b0'");
 
     private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "targetting mode", Mode.SINGLE, value -> this.switchDelay.setDisplayed(value == Mode.SWITCH));
 
@@ -56,13 +52,13 @@ public class KillAura extends Module {
     });
 
     private final GroupSetting rotationsGroup = new GroupSetting("Rotations", "Rotations", this);
-    private final FloatSetting fov = new FloatSetting("FOV", "Fov check", 0.0F, 360.0F, 360.0F, FOV_FORMAT, null);
+    private final FloatSetting fov = new FloatSetting("FOV", "Fov check", 0.0F, 360.0F, 360.0F, new DecimalFormat("#0.##'\u00b0'"), null);
     private final EnumSetting<RotationMode> rotationMode = new EnumSetting<>("Mode", "Rotations mode", RotationMode.INSTANT);
-    private final EnumSetting<RotationRandomization> randomization = new EnumSetting<>("Random", "Randomizes rotations to help bypass anticheats", RotationRandomization.NONE);
+    private final EnumSetting<RotationRandomization> randomization = new EnumSetting<>("Random", "Randomizes rotations to help bypass anti-cheats", RotationRandomization.NONE);
 
-    private final FloatSetting attackRange = new FloatSetting("Attack Range", "Attacking range", 1.0F, 7.0F, 4.2F);
-    private final FloatSetting swingRange = new FloatSetting("Swing Range", "Swinging range", 1.0F, 10.0F, 5.2F);
-    private final FloatSetting rotateRange = new FloatSetting("Rotate Range", "Rotating range", 1.0F, 10.0F, 5.2F);
+    private final FloatSetting attackRange = new FloatSetting("Attack Range", "Attacking range", 1.0F, 10.0F, 4.2F);
+    private final FloatSetting swingRange = new FloatSetting("Swing Range", "Swinging range", 1.0F, 16.0F, 5.2F);
+    private final FloatSetting rotateRange = new FloatSetting("Rotate Range", "Rotating range", 1.0F, 16.0F, 5.2F);
     private final EnumSetting<TargetSorting> sorting = new EnumSetting<>("Sorting", "Target sorting", TargetSorting.DISTANCE);
     private final EnumSetting<SwingMode> swingMode = new EnumSetting<>("Swing Mode", "Swinging mode", SwingMode.ATTACK_ONLY);
     private final BooleanSetting walls = new BooleanSetting("Walls", "Allows Kill Aura to attack through walls", true);
@@ -79,10 +75,13 @@ public class KillAura extends Module {
     private final Clock attackTimer = new Clock();
     private int nextAttackDelay = 0;
     private boolean canAttack = false;
+    private boolean blockAttack = false;
 
     private Rotation rotations;
     private Rotation targetRotations = new Rotation();
     private Rotation prevRotations = new Rotation();
+
+    private int attacked = -1;
 
     public KillAura() {
         super("Kill Aura", "Automatically attacks nearby entities", Category.COMBAT);
@@ -102,6 +101,9 @@ public class KillAura extends Module {
 
     @EventHandler
     public void onTick(EventPreTick event) {
+
+        this.blockAttack = false;
+        this.attacked = -1;
 
         if (mc.thePlayer.getHealth() <= 0.0F && autoDisable.get()) {
             this.toggle(false);
@@ -135,7 +137,7 @@ public class KillAura extends Module {
 
     @EventHandler
     public void onClickAction(EventClickAction event) {
-        if (this.target == null) {
+        if (this.target == null || this.blockAttack) {
             return;
         }
 
@@ -342,6 +344,10 @@ public class KillAura extends Module {
         }
 
         return true;
+    }
+
+    public void blockAttack() {
+        this.blockAttack = true;
     }
 
     @Override

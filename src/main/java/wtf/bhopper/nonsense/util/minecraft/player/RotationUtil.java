@@ -3,8 +3,8 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
-import wtf.bhopper.nonsense.util.GeneralUtil;
-import wtf.bhopper.nonsense.util.MathUtil;
+import wtf.bhopper.nonsense.util.misc.GeneralUtil;
+import wtf.bhopper.nonsense.util.misc.MathUtil;
 
 import java.util.Set;
 

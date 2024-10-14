@@ -52,6 +52,11 @@ public class Derp extends Module {
                 pitch = ThreadLocalRandom.current().nextInt(-90, 90);
                 break;
 
+            case BACKWARDS:
+                yaw += 180.0F;
+                pitch = -pitch;
+                break;
+
             case DEATH:
                 pitch = 180.0F;
                 break;
@@ -79,6 +84,7 @@ public class Derp extends Module {
     public enum Mode {
         SPIN,
         CRAZY,
+        BACKWARDS,
         @Description("Will likely ban on most anticheats") DEATH
     }
 

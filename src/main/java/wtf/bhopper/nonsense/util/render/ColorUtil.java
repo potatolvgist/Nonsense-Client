@@ -1,10 +1,12 @@
 package wtf.bhopper.nonsense.util.render;
 
-import wtf.bhopper.nonsense.util.MathUtil;
+import wtf.bhopper.nonsense.util.misc.MathUtil;
 
 import java.awt.*;
 
 public class ColorUtil {
+
+    public static final int BLACK = 0xFF000000;
 
     private static final float RISE_FACTOR = 5.0F / 12.0F;
 
@@ -14,7 +16,7 @@ public class ColorUtil {
     }
 
     public static int wave(int color, long timeMS, int count) {
-        float factor = Math.abs((((timeMS * 2L) - count * 500L) % 4000) / 4000.0F - 0.5F) + 0.5F;
+        float factor = Math.abs((((timeMS * 2L) - count * 500L) % 8000) / 8000.0F - 0.5F) + 0.5F;
         Color awt = new Color(color);
         float[] hsb = Color.RGBtoHSB(awt.getRed(), awt.getGreen(), awt.getBlue(), null);
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2] * factor);
@@ -29,6 +31,14 @@ public class ColorUtil {
         float normalizedTime = (float) ((timeMS - count * 200L) % 2000) / 2000.0F;
         float hue = (Math.abs(normalizedTime - 0.5F) / 3.0F) + RISE_FACTOR;
         return Color.HSBtoRGB(hue, 1.0F, 1.0F);
+    }
+
+    public static int health(float factor) {
+        return Color.HSBtoRGB(factor / 3.0F, 1.0F, 1.0F);
+    }
+
+    public static int health(float health, float maxHealth) {
+        return health(health / maxHealth);
     }
 
     public static int darken(int color) {

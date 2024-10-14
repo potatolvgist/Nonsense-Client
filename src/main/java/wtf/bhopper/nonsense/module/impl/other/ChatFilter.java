@@ -135,6 +135,17 @@ public class ChatFilter extends Module {
                 }
                 return result;
             }
+
+            case MINIBLOX: {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < message.length(); i++) {
+                    builder.append(message.charAt(i));
+                    if (i % bypassFrequency.get() == 0)  {
+                        builder.append('\u200E');
+                    }
+                }
+                return builder.toString();
+            }
         }
 
         return message;
@@ -204,7 +215,8 @@ public class ChatFilter extends Module {
 
     private enum Mode {
         BYPASS,
-        @Description("Works on Hypixel") ACCENT
+        @Description("Works on Hypixel") ACCENT,
+        MINIBLOX
     }
 
 }

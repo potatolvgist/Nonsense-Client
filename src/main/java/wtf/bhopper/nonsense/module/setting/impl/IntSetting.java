@@ -1,7 +1,7 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 public class IntSetting extends NumberSetting<Integer> {
 

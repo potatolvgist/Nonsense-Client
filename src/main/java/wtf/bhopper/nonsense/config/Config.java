@@ -1,12 +1,9 @@
 package wtf.bhopper.nonsense.config;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.JsonUtils;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.Module;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.io.File;
 import java.io.IOException;

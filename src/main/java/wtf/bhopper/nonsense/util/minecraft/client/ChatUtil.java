@@ -8,6 +8,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import tv.twitch.chat.ChatBadgeData;
 
 public class ChatUtil {
 
@@ -31,7 +32,9 @@ public class ChatUtil {
     }
 
     public static void error(String message, Object... args) {
-        raw(CHAT_PREFIX + "\247c" + String.format(message, args));
+        Builder.of("%s\247r%s", CHAT_PREFIX, String.format(message, args))
+                .setColor(EnumChatFormatting.RED)
+                .send();
     }
 
     public static void style(ChatStyle style, String message, Object... args) {
@@ -43,6 +46,28 @@ public class ChatUtil {
     public static void send(String message, Object... args) {
         PacketUtil.send(new C01PacketChatMessage(String.format(message, args)));
     }
+
+    public static void debugTitle(String title) {
+        print("\247c\247l--- %s ---", title);
+    }
+
+    public static void debugItem(String name, Object value) {
+        Builder.of("%s\247c%s\2478: \2477%s", CHAT_PREFIX_SHORT, name, String.valueOf(value))
+                .setHoverEvent("Click to copy!")
+                .setClickEvent(ClickEvent.Action.RUN_COMMAND, ".copy " + value)
+                .send();
+    }
+
+    public static void debugList(String name, String... items) {
+        ChatUtil.print("\247c%s\2478:", name);
+        for (String item : items) {
+            if (item == null) {
+                continue;
+            }
+            ChatUtil.print("  \2477%s", item);
+        }
+    }
+
 
     /**
      * Utility class to easily build IChatComponents (Text).
@@ -82,6 +107,10 @@ public class ChatUtil {
 
         public static Builder of(String text) {
             return new Builder(text);
+        }
+
+        public static Builder of(String text, Object... args) {
+            return new Builder(String.format(text, args));
         }
 
         public Builder setColor(EnumChatFormatting color) {

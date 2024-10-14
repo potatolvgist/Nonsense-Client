@@ -3,8 +3,8 @@ package wtf.bhopper.nonsense.alt.loginthread;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.alt.mslogin.MSAuthException;
 import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
-import wtf.bhopper.nonsense.util.ErrorCallback;
-import wtf.bhopper.nonsense.util.Http;
+import wtf.bhopper.nonsense.util.misc.ErrorCallback;
+import wtf.bhopper.nonsense.util.net.Http;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,21 +43,21 @@ public class CookieLoginThread extends LoginThread {
                     .headers(headers)
                     .get();
             if (http1.status() != 302) {
-                throw new MSAuthException("Request to " + COOKIE_URL + " returned status " + http1.status());
+                throw new MSAuthException("(1) Request to " + COOKIE_URL + " returned status " + http1.status());
             }
 
             Http http2 = new Http(http1.getHeader("location"))
                     .headers(headers)
                     .get();
             if (http2.status() != 302) {
-                throw new MSAuthException("Request to " + http1.getHeader("location") + " returned status " + http1.status());
+                throw new MSAuthException("(2) Request to " + http1.getHeader("location") + " returned status " + http2.status());
             }
 
             Http http3 = new Http(http2.getHeader("location"))
                     .headers(headers)
                     .get();
             if (http3.status() != 302) {
-                throw new MSAuthException("Request to " + http2.getHeader("location") + " returned status " + http1.status());
+                throw new MSAuthException("(3) Request to " + http2.getHeader("location") + " returned status " + http3.status());
             }
 
             Nonsense.LOGGER.info(http3.getHeader("location"));
@@ -81,7 +81,7 @@ public class CookieLoginThread extends LoginThread {
             String data = scanner.nextLine();
             String[] parts = data.split("\t");
 
-            if (parts.length < 7) {
+            if (parts.length != 7 || parts[0].startsWith("#")) {
                 continue;
             }
 
@@ -89,10 +89,20 @@ public class CookieLoginThread extends LoginThread {
             String value = parts[6].trim().replace("\r", "");
             String domain = parts[0].trim();
             String path = parts[2].trim();
+            String sameSite = "Lax";
             boolean secure = parts[3].trim().equalsIgnoreCase("true");
-            double expires = Double.parseDouble(parts[4].trim());
+            double expires = Double.parseDouble(parts[4].trim()) * 1000;
 
-            cookies.add(new Cookie(name, value, domain, path, secure, expires));
+            if (domain.charAt(0) == '\ufeff') {
+                domain = domain.substring(1);
+            }
+            domain = domain.replaceAll("[^\\x20-\\x7E]", "");
+
+            if (name.startsWith("__Host-")) {
+                secure = true;
+            }
+
+            cookies.add(new Cookie(name, value, domain, path, sameSite, secure, expires));
         }
 
         return cookies;
@@ -110,14 +120,16 @@ public class CookieLoginThread extends LoginThread {
         public final String value;
         public final String domain;
         public final String path;
+        public final String sameSite;
         public final boolean secure;
         public final double expires;
 
-        public Cookie(String name, String value, String domain, String path, boolean secure, double expires) {
+        public Cookie(String name, String value, String domain, String path, String sameSite, boolean secure, double expires) {
             this.name = name;
             this.value = value;
             this.domain = domain;
             this.path = path;
+            this.sameSite = sameSite;
             this.secure = secure;
             this.expires = expires;
         }

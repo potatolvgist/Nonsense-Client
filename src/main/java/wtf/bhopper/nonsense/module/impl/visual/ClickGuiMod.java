@@ -2,18 +2,21 @@ package wtf.bhopper.nonsense.module.impl.visual;
 
 import org.lwjglx.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
-import wtf.bhopper.nonsense.gui.clickgui.ClickGui;
+import wtf.bhopper.nonsense.gui.clickgui.dropdown.DropdownClickGui;
+import wtf.bhopper.nonsense.gui.clickgui.imgui.ImGuiClickGui;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.ColorSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.util.Description;
+import wtf.bhopper.nonsense.module.setting.util.DisplayName;
 
 import java.awt.*;
 
 public class ClickGuiMod extends Module {
 
-    public final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.STATIC);
+    public final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.DROPDOWN);
+    public final EnumSetting<ColorMode> colorMode = new EnumSetting<>("Color Mode", "Color Mode", ColorMode.STATIC);
     public final ColorSetting color = new ColorSetting("Color", "Click GUI color", new Color(0xFFFF5555));
     public final BooleanSetting toolTips = new BooleanSetting("Tool Tips", "Enables tool tips", true);
     public final BooleanSetting keyBinds = new BooleanSetting("Key Binds", "Displays key binds next to module names", true);
@@ -24,7 +27,7 @@ public class ClickGuiMod extends Module {
     public ClickGuiMod() {
         super("Click GUI", "Click GUI properties", Category.VISUAL);
         this.setBind(Keyboard.KEY_RSHIFT);
-        this.addSettings(mode, color, toolTips, keyBinds, displayNames, background, showHidden);
+        this.addSettings(mode, colorMode, color, toolTips, keyBinds, displayNames, background, showHidden);
     }
 
     @Override
@@ -32,11 +35,24 @@ public class ClickGuiMod extends Module {
         this.toggle(false);
         Nonsense.INSTANCE.eventBus.unsubscribe(this);
         if (mc.currentScreen == null) {
-            mc.displayGuiScreen(new ClickGui());
+            switch (this.mode.get()) {
+                case DROPDOWN:
+                    mc.displayGuiScreen(new DropdownClickGui());
+                    break;
+
+                case IMGUI:
+                    mc.displayGuiScreen(new ImGuiClickGui());
+                    break;
+            }
         }
     }
 
     public enum Mode {
+        DROPDOWN,
+        @DisplayName("ImGui") IMGUI
+    }
+
+    public enum ColorMode {
         STATIC,
         @Description("test") CATEGORY,
         WAVY,

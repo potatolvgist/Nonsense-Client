@@ -22,7 +22,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiDisconnected;
 import net.minecraft.client.gui.GuiDownloadTerrain;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
@@ -1150,9 +1149,9 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
         EntityPlayer entityplayer = this.gameController.thePlayer;
 
-        if (packetIn.func_149175_c() == -1)
+        if (packetIn.getWindowID() == -1)
         {
-            entityplayer.inventory.setItemStack(packetIn.func_149174_e());
+            entityplayer.inventory.setItemStack(packetIn.getItem());
         }
         else
         {
@@ -1164,20 +1163,20 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
                 flag = guicontainercreative.getSelectedTabIndex() != CreativeTabs.tabInventory.getTabIndex();
             }
 
-            if (packetIn.func_149175_c() == 0 && packetIn.func_149173_d() >= 36 && packetIn.func_149173_d() < 45)
+            if (packetIn.getWindowID() == 0 && packetIn.getSlot() >= 36 && packetIn.getSlot() < 45)
             {
-                ItemStack itemstack = entityplayer.inventoryContainer.getSlot(packetIn.func_149173_d()).getStack();
+                ItemStack itemstack = entityplayer.inventoryContainer.getSlot(packetIn.getSlot()).getStack();
 
-                if (packetIn.func_149174_e() != null && (itemstack == null || itemstack.stackSize < packetIn.func_149174_e().stackSize))
+                if (packetIn.getItem() != null && (itemstack == null || itemstack.stackSize < packetIn.getItem().stackSize))
                 {
-                    packetIn.func_149174_e().animationsToGo = 5;
+                    packetIn.getItem().animationsToGo = 5;
                 }
 
-                entityplayer.inventoryContainer.putStackInSlot(packetIn.func_149173_d(), packetIn.func_149174_e());
+                entityplayer.inventoryContainer.putStackInSlot(packetIn.getSlot(), packetIn.getItem());
             }
-            else if (packetIn.func_149175_c() == entityplayer.openContainer.windowId && (packetIn.func_149175_c() != 0 || !flag))
+            else if (packetIn.getWindowID() == entityplayer.openContainer.windowId && (packetIn.getWindowID() != 0 || !flag))
             {
-                entityplayer.openContainer.putStackInSlot(packetIn.func_149173_d(), packetIn.func_149174_e());
+                entityplayer.openContainer.putStackInSlot(packetIn.getSlot(), packetIn.getItem());
             }
         }
     }
@@ -1215,11 +1214,11 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
         EntityPlayer entityplayer = this.gameController.thePlayer;
 
-        if (packetIn.func_148911_c() == 0)
+        if (packetIn.getWindowID() == 0)
         {
             entityplayer.inventoryContainer.putStacksInSlots(packetIn.getItemStacks());
         }
-        else if (packetIn.func_148911_c() == entityplayer.openContainer.windowId)
+        else if (packetIn.getWindowID() == entityplayer.openContainer.windowId)
         {
             entityplayer.openContainer.putStacksInSlots(packetIn.getItemStacks());
         }
@@ -1698,7 +1697,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public void handleTabComplete(S3APacketTabComplete packetIn)
     {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
-        String[] astring = packetIn.func_149630_c();
+        String[] astring = packetIn.getMatches();
 
         if (this.gameController.currentScreen instanceof GuiChat)
         {

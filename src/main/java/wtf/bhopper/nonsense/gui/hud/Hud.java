@@ -4,11 +4,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.nanovg.NVGColor;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.gui.components.RenderComponent;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
 import wtf.bhopper.nonsense.gui.hud.notification.NotificationManager;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
+
+import java.nio.DoubleBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hud {
 
@@ -18,6 +24,7 @@ public class Hud {
     public static final Watermark watermark = new Watermark();
     public static final InfoDisplay infoDisplay = new InfoDisplay();
     public static final NotificationManager notificationManager = new NotificationManager();
+    private static final List<RenderComponent> components = new ArrayList<>();
 
     private static FontRenderer font;
     private static TTFFontRenderer customFont;
@@ -28,6 +35,10 @@ public class Hud {
         customFont = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 18);
 
         moduleList.init();
+    }
+
+    public static void addComponent(RenderComponent component) {
+        components.add(component);
     }
 
     public static HudMod mod() {
@@ -58,6 +69,17 @@ public class Hud {
 
     public static void endDraw() {
         GlStateManager.popMatrix();
+    }
+
+    public static void drawComponents(ScaledResolution res, float delta) {
+        float inverseScale = 1.0F / res.getScaleFactor();
+        GlStateManager.scale(inverseScale, inverseScale, inverseScale);
+        for (RenderComponent component : components) {
+            if (component.isEnabled()) {
+                component.draw(res, delta);
+            }
+        }
+        GlStateManager.scale(res.getScaleFactor(), res.getScaleFactor(), res.getScaleFactor());
     }
 
     public static void drawString(String text, float x, float y, int color, boolean shadow) {

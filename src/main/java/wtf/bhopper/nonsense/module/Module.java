@@ -6,7 +6,7 @@ import net.minecraft.util.EnumChatFormatting;
 import org.lwjglx.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.setting.Setting;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,11 +43,11 @@ public abstract class Module {
         this.toggled = toggled;
 
         if (this.toggled) {
-            this.onEnable();
             Nonsense.INSTANCE.eventBus.subscribe(this);
+            this.onEnable();
         } else {
-            this.onDisable();
             Nonsense.INSTANCE.eventBus.unsubscribe(this);
+            this.onDisable();
         }
     }
 
@@ -81,6 +81,13 @@ public abstract class Module {
 
     public List<Setting<?>> getSettings() {
         return this.settings;
+    }
+
+    public Setting<?> getSetting(String name) {
+        return this.settings.stream()
+                .filter(setting -> setting.name.equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     public void serialize(JsonObject object) {

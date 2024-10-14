@@ -74,6 +74,11 @@ public class AntiBot extends Module {
         return EnumChatFormatting.getTextWithoutFormattingCodes(player.getDisplayName().getUnformattedText()).startsWith(prefix);
     }
 
+    @Override
+    public String getSuffix() {
+        return this.mode.getDisplayValue();
+    }
+
     private enum Mode {
         TAB,
         HYPIXEL

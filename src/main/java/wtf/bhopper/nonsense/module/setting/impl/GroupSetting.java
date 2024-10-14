@@ -1,14 +1,12 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.Setting;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GroupSetting extends Setting<List<Setting<?>>> {

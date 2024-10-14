@@ -87,20 +87,28 @@ public class MoveUtil {
         }
     }
 
-    public static void setVertical(EventMove event, double speed) {
+    public static void vertical(EventMove event, double speed) {
         mc.thePlayer.motionY = speed;
         if (event != null) {
             event.y = speed;
         }
     }
 
-    public static void setVertical(double speed) {
+    public static void vertical(double speed) {
         setSpeed(null, speed);
     }
 
     public static void jump(EventMove event, double motion) {
-        mc.thePlayer.jump(motion);
-        event.y = motion;
+        mc.thePlayer.jump(jumpHeight(motion));
+        event.y = jumpHeight(motion);
+    }
+
+    public static double jumpHeight(double height) {
+        if (mc.thePlayer.isPotionActive(Potion.jump)) {
+            int amplifier = mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier();
+            return height + (amplifier + 1) * 0.1F;
+        }
+        return height;
     }
 
     public static double lastDistance() {

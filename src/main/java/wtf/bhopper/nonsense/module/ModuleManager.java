@@ -2,18 +2,14 @@ package wtf.bhopper.nonsense.module;
 
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.combat.*;
-import wtf.bhopper.nonsense.module.impl.exploit.PingSpoofer;
-import wtf.bhopper.nonsense.module.impl.exploit.ServerLagger;
+import wtf.bhopper.nonsense.module.impl.exploit.*;
 import wtf.bhopper.nonsense.module.impl.movement.*;
 import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
 import wtf.bhopper.nonsense.module.impl.other.Debugger;
 import wtf.bhopper.nonsense.module.impl.other.Derp;
 import wtf.bhopper.nonsense.module.impl.other.Panic;
 import wtf.bhopper.nonsense.module.impl.player.*;
-import wtf.bhopper.nonsense.module.impl.visual.ClickGuiMod;
-import wtf.bhopper.nonsense.module.impl.visual.HudMod;
-import wtf.bhopper.nonsense.module.impl.visual.ItemAnimations;
-import wtf.bhopper.nonsense.module.impl.visual.NoRender;
+import wtf.bhopper.nonsense.module.impl.visual.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +24,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new AutoBlock());
         this.addModule(new AntiBot());
         this.addModule(new Velocity());
+        this.addModule(new Criticals());
         this.addModule(new NoClickDelay());
 
         // Movement
@@ -40,13 +37,17 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Player
         this.addModule(new Scaffold());
         this.addModule(new NoFall());
+        this.addModule(new FastMine());
         this.addModule(new GameSpeed());
         this.addModule(new NoRotate());
         this.addModule(new AutoRespawn());
 
         // Exploit
         this.addModule(new PingSpoofer());
+//        this.addModule(new Disabler());
+        this.addModule(new ItemSpoofer());
         this.addModule(new ServerLagger());
+        this.addModule(new Plugins());
 
         // Other
         this.addModule(new ChatFilter());
@@ -55,10 +56,14 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new Debugger());
 
         // Visual
+        this.addModule(new Esp());
         this.addModule(new HudMod());
         this.addModule(new ClickGuiMod());
         this.addModule(new NoRender());
         this.addModule(new ItemAnimations());
+        this.addModule(new Trajectories());
+        this.addModule(new Capes());
+        this.addModule(new DiscordRPCMod());
     }
 
     public void addModule(Module module) {
@@ -92,6 +97,13 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
                 .stream()
                 .filter(module -> module.category == category)
                 .collect(Collectors.toList());
+    }
+
+    public int amountEnabled() {
+        return (int) this.values()
+                .stream()
+                .filter(Module::isEnabled)
+                .count();
     }
 
 }

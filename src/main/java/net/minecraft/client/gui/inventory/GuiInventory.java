@@ -35,7 +35,7 @@ public class GuiInventory extends InventoryEffectRenderer
     {
         if (this.mc.playerController.isInCreativeMode())
         {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
+            this.mc.displayGuiScreen(GuiContainerCreative.newInstance(this.mc.thePlayer));
         }
 
         this.updateActivePotionEffects();
@@ -51,7 +51,7 @@ public class GuiInventory extends InventoryEffectRenderer
 
         if (this.mc.playerController.isInCreativeMode())
         {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
+            this.mc.displayGuiScreen(GuiContainerCreative.newInstance(this.mc.thePlayer));
         }
         else
         {

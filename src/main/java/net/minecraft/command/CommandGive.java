@@ -43,15 +43,15 @@ public class CommandGive extends CommandBase
     {
         if (args.length < 2)
         {
-            throw new WrongUsageException("commands.give.usage", new Object[0]);
+            throw new WrongUsageException("commands.give.usage");
         }
         else
         {
             EntityPlayer entityplayer = getPlayer(sender, args[0]);
             Item item = getItemByText(sender, args[1]);
-            int i = args.length >= 3 ? parseInt(args[2], 1, 64) : 1;
-            int j = args.length >= 4 ? parseInt(args[3]) : 0;
-            ItemStack itemstack = new ItemStack(item, i, j);
+            int amount = args.length >= 3 ? parseInt(args[2], 1, 64) : 1;
+            int meta = args.length >= 4 ? parseInt(args[3]) : 0;
+            ItemStack itemstack = new ItemStack(item, amount, meta);
 
             if (args.length >= 5)
             {
@@ -63,7 +63,7 @@ public class CommandGive extends CommandBase
                 }
                 catch (NBTException nbtexception)
                 {
-                    throw new CommandException("commands.give.tagError", new Object[] {nbtexception.getMessage()});
+                    throw new CommandException("commands.give.tagError", nbtexception.getMessage());
                 }
             }
 
@@ -78,7 +78,7 @@ public class CommandGive extends CommandBase
             if (flag && itemstack.stackSize <= 0)
             {
                 itemstack.stackSize = 1;
-                sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, i);
+                sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, amount);
                 EntityItem entityitem1 = entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
 
                 if (entityitem1 != null)
@@ -88,7 +88,7 @@ public class CommandGive extends CommandBase
             }
             else
             {
-                sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, i - itemstack.stackSize);
+                sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, amount - itemstack.stackSize);
                 EntityItem entityitem = entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
 
                 if (entityitem != null)
@@ -98,7 +98,7 @@ public class CommandGive extends CommandBase
                 }
             }
 
-            notifyOperators(sender, this, "commands.give.success", new Object[] {itemstack.getChatComponent(), Integer.valueOf(i), entityplayer.getName()});
+            notifyOperators(sender, this, "commands.give.success", itemstack.getChatComponent(), amount, entityplayer.getName());
         }
     }
 

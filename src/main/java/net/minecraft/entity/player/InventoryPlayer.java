@@ -1,5 +1,6 @@
 package net.minecraft.entity.player;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -563,9 +564,9 @@ public class InventoryPlayer implements IInventory
     {
         float f = 1.0F;
 
-        if (this.mainInventory[this.currentItem] != null)
+        if (this.mainInventory[InventoryUtil.serverItem] != null)
         {
-            f *= this.mainInventory[this.currentItem].getStrVsBlock(blockIn);
+            f *= this.mainInventory[InventoryUtil.serverItem].getStrVsBlock(blockIn);
         }
 
         return f;
@@ -680,7 +681,7 @@ public class InventoryPlayer implements IInventory
      */
     public IChatComponent getDisplayName()
     {
-        return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+        return this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]);
     }
 
     /**
@@ -699,7 +700,7 @@ public class InventoryPlayer implements IInventory
         }
         else
         {
-            ItemStack itemstack = this.getStackInSlot(this.currentItem);
+            ItemStack itemstack = this.getStackInSlot(InventoryUtil.serverItem);
             return itemstack != null ? itemstack.canHarvestBlock(blockIn) : false;
         }
     }
@@ -890,14 +891,7 @@ public class InventoryPlayer implements IInventory
 
     public void clear()
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
-        {
-            this.mainInventory[i] = null;
-        }
-
-        for (int j = 0; j < this.armorInventory.length; ++j)
-        {
-            this.armorInventory[j] = null;
-        }
+        Arrays.fill(this.mainInventory, null);
+        Arrays.fill(this.armorInventory, null);
     }
 }

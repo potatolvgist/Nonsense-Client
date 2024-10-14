@@ -57,7 +57,7 @@ public class CommandWeather extends CommandBase
                 worldinfo.setThunderTime(0);
                 worldinfo.setRaining(false);
                 worldinfo.setThundering(false);
-                notifyOperators(sender, this, "commands.weather.clear", new Object[0]);
+                notifyOperators(sender, this, "commands.weather.clear");
             }
             else if ("rain".equalsIgnoreCase(args[0]))
             {

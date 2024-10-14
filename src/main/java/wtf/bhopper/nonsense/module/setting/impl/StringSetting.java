@@ -1,9 +1,8 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 public class StringSetting extends Setting<String> {
 

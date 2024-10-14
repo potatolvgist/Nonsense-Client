@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.mojang.util.UUIDTypeAdapter;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.alt.loginthread.LoginThread;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.io.File;
 import java.io.IOException;

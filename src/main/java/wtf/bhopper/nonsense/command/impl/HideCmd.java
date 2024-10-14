@@ -1,6 +1,5 @@
 package wtf.bhopper.nonsense.command.impl;
 
-import net.minecraft.command.CommandBase;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.command.Command;
 import wtf.bhopper.nonsense.module.Module;

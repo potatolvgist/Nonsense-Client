@@ -6,7 +6,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 import wtf.bhopper.nonsense.gui.hud.Hud;
-import wtf.bhopper.nonsense.util.Clock;
+import wtf.bhopper.nonsense.util.misc.Clock;
 import wtf.bhopper.nonsense.util.render.ColorUtil;
 
 import java.text.DecimalFormat;

@@ -3,9 +3,12 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.Vec3;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
@@ -41,11 +44,11 @@ public class PlayerUtil {
         return false;
     }
 
-    public static List<Vec3> predictProjectilePath() {
+    public static PredictionResult predictProjectilePath() {
         return predictProjectilePath(1.0F);
     }
 
-    public static List<Vec3> predictProjectilePath(float delta) {
+    public static PredictionResult predictProjectilePath(float delta) {
 
         ItemStack stack = mc.thePlayer.getHeldItem();
         if (stack == null) {
@@ -91,11 +94,11 @@ public class PlayerUtil {
         return predictProjectilePath(eyes.xCoord, eyes.yCoord, eyes.zCoord, yaw, pitch, velocity, gravity);
     }
 
-    public static List<Vec3> predictProjectilePath(double x, double y, double z, float yaw, float pitch, double velocity, double gravity) {
+    public static PredictionResult predictProjectilePath(double x, double y, double z, float yaw, float pitch, double velocity, double gravity) {
         return predictProjectilePath(x, y, z, yaw, pitch, velocity, gravity, 100);
     }
 
-    public static List<Vec3> predictProjectilePath(double x, double y, double z, float yaw, float pitch, double velocity, double gravity, int maxPredictions) {
+    public static PredictionResult predictProjectilePath(double x, double y, double z, float yaw, float pitch, double velocity, double gravity, int maxPredictions) {
 
         x -= MathHelper.cos(yaw * MathHelper.deg2Rad) * 0.16;
         y -= 0.1;
@@ -113,6 +116,8 @@ public class PlayerUtil {
         List<Vec3> points = new ArrayList<>();
         points.add(new Vec3(x, y, z));
 
+        MovingObjectPosition rayCast = null;
+
         for (int i = 0; i < maxPredictions; i++) {
 
             Vec3 currentPos = new Vec3(x, y, z);
@@ -120,7 +125,7 @@ public class PlayerUtil {
 
             points.add(newPos);
 
-            MovingObjectPosition rayCast = mc.theWorld.rayTraceBlocks(currentPos, newPos);
+            rayCast = mc.theWorld.rayTraceBlocks(currentPos, newPos);
 
             if (rayCast != null && rayCast.typeOfHit != MovingObjectPosition.MovingObjectType.MISS) {
                 break;
@@ -137,7 +142,49 @@ public class PlayerUtil {
 
         }
 
-        return points;
+        return new PredictionResult(points, new Vec3(x, y, z), rayCast);
+    }
+
+    public static boolean selfDamage(double value, final boolean groundCheck, final boolean hurtTimeCheck) {
+        if (groundCheck && !mc.thePlayer.onGround) {
+            return false;
+        }
+
+        if (hurtTimeCheck && mc.thePlayer.hurtTime > 0) {
+            return false;
+        }
+
+        double x = mc.thePlayer.posX;
+        double y = mc.thePlayer.posY;
+        double z = mc.thePlayer.posZ;
+
+        double fallDistance = 3.1;
+        if (mc.thePlayer.isPotionActive(Potion.jump)) {
+            final int amplifier = mc.thePlayer.getActivePotionEffect(Potion.jump).getAmplifier();
+            fallDistance += (float) (amplifier + 1);
+        }
+
+        int packetCount = (int)Math.ceil(fallDistance / value);
+        for (int i = 0; i < packetCount; i++) {
+            PacketUtil.sendNoEvent(new C03PacketPlayer.C04PacketPlayerPosition(x, y + value, z, false));
+            PacketUtil.sendNoEvent(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
+        }
+
+        PacketUtil.sendNoEvent(new C03PacketPlayer(true));
+        return true;
+    }
+
+    public static class PredictionResult {
+        public final List<Vec3> path;
+        public final Vec3 pos;
+        public final MovingObjectPosition object;
+
+        public PredictionResult(List<Vec3> path, Vec3 pos, MovingObjectPosition object) {
+            this.path = path;
+            this.pos = pos;
+            this.object = object;
+        }
+
     }
 
 

@@ -7,7 +7,7 @@ import net.minecraft.util.ChatStyle;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.command.Command;
 import wtf.bhopper.nonsense.config.Config;
-import wtf.bhopper.nonsense.util.NonsenseException;
+import wtf.bhopper.nonsense.util.misc.NonsenseException;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 public class ConfigCmd extends Command {
@@ -85,7 +85,7 @@ public class ConfigCmd extends Command {
             for (Config config : Nonsense.INSTANCE.configManager.getConfigs()) {
                 ChatStyle style = new ChatStyle()
                         .setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ".config load " + config.getName()))
-                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to load config: " + config.getName())));
+                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to load config: \2477" + config.getName())));
                 ChatUtil.style(style,"\247f%d. \2477%s", count, config.getName());
                 ++count;
             }

@@ -98,6 +98,7 @@ import org.lwjglx.util.glu.GLU;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventClickAction;
 import wtf.bhopper.nonsense.event.impl.EventItemSelect;
+import wtf.bhopper.nonsense.event.impl.EventPreClick;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
 import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
@@ -479,6 +480,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.standardGalacticFontRenderer = new FontRenderer(this.gameSettings, new ResourceLocation("textures/font/ascii_sga.png"), this.renderEngine, false);
         this.mcResourceManager.registerReloadListener(this.fontRendererObj);
+        this.mcResourceManager.registerReloadListener(this.bitFontRenderer);
         this.mcResourceManager.registerReloadListener(this.standardGalacticFontRenderer);
         this.mcResourceManager.registerReloadListener(new GrassColorReloadListener());
         this.mcResourceManager.registerReloadListener(new FoliageColorReloadListener());
@@ -574,7 +576,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         Display.setTitle("Minecraft 1.8.9 - " + Nonsense.NAME + " (" + Nonsense.VERSION + ")");
 
         try {
-            Display.create((new PixelFormat()).withDepthBits(24));
+            Display.create(new PixelFormat()
+                    .withDepthBits(24)
+                    .withSamples(4));
         } catch (LWJGLException exception) {
             logger.error("Couldn't set pixel format", exception);
 
@@ -983,7 +987,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.mcProfiler.endSection();
         this.mcProfiler.startSection("render");
         GlStateManager.pushMatrix();
-        GlStateManager.clear(0x4100);
+        GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
         this.framebufferMc.bindFramebuffer(true);
         this.mcProfiler.startSection("display");
         GlStateManager.enableTexture2D();
@@ -1312,8 +1316,15 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         }
     }
 
-    private void clickMouse(boolean silentSwing) {
+    public void clickMouse(boolean silentSwing) {
         if (this.leftClickCounter <= 0) {
+
+            EventPreClick event = new EventPreClick(EventPreClick.Button.LEFT, this.objectMouseOver);
+            Nonsense.INSTANCE.eventBus.post(event);
+            if (event.isCancelled()) {
+                return;
+            }
+
             PlayerUtil.swing(silentSwing);
 //            this.thePlayer.swingItem();
 
@@ -1352,7 +1363,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     /**
      * Called when user clicked he's mouse right button (place)
      */
-    private void rightClickMouse(boolean silentSwing) {
+    public void rightClickMouse(boolean silentSwing) {
+
+        EventPreClick event = new EventPreClick(EventPreClick.Button.RIGHT, this.objectMouseOver);
+        Nonsense.INSTANCE.eventBus.post(event);
+        if (event.isCancelled()) {
+            return;
+        }
+
         if (!this.playerController.getIsHittingBlock()) {
             this.rightClickDelayTimer = 4;
             boolean flag = true;
@@ -1758,6 +1776,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
             Nonsense.INSTANCE.eventBus.post(eventItemSelect);
             InventoryUtil.serverItem = eventItemSelect.slot;
+            if (!eventItemSelect.silent) {
+                this.thePlayer.inventory.currentItem = eventItemSelect.slot;
+            }
 
             boolean chatVisible = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
 
@@ -2088,7 +2109,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.thePlayer.setReducedDebug(entityplayersp.hasReducedDebug());
 
         if (this.currentScreen instanceof GuiGameOver) {
-            this.displayGuiScreen((GuiScreen) null);
+            this.displayGuiScreen(null);
         }
     }
 

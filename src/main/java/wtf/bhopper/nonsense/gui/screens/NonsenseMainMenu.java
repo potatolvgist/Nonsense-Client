@@ -12,11 +12,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.lwjglx.input.Keyboard;
 import org.lwjglx.util.glu.Project;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
 import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
+import wtf.bhopper.nonsense.util.misc.GeneralUtil;
 import wtf.bhopper.nonsense.util.render.ColorUtil;
 import wtf.bhopper.nonsense.util.render.RenderUtil;
 
@@ -61,11 +63,29 @@ public class NonsenseMainMenu extends GuiScreen {
             "SKIDZ",
             "ok boomer",
             "Tear can't code",
-            "Sigma rule no3: consent is for pussies",
+            "Sigma rule no 3: consent is for pussies",
             "Opal client fell off",
             "How much wood could Alan Wood suck if Alan Wood could suck wood?",
             "People die of drinking and smoking, but nobody has ever died of gambling",
-            "If she leaves you on seen, put it all on green"
+            "If she leaves you on seen, put it all on green",
+            "sub to BrettHax",
+            "Now with 2% more bypass!",
+            "Jos\u00e9 de Chiterl, hack the bedwars",
+            "Unicouniuni",
+            "Housing mains are a strange species...",
+            "I'm not going to fix it.",
+            "Betting my car on black",
+            "MM makes my PC lag",
+            "If Diddy diddled dudes day by day, how many dudes did Diddy diddle?",
+            "#LiddellRestock",
+            "Sigma rule no 2: beat up homeless people",
+            "t = [proc(cfg, cj, mc, fname, c_data, tht, tdr) for fname, c_data in cj.items()]",
+            "extra L, you are smell",
+            "pee pee poo poo",
+            "Sigma rule no 8: reuse toilet paper",
+            "https://bhopper.wtf/hoa",
+            GeneralUtil.repeat("A", 333),
+            "I said a gas of juice, not gas the jews"
     };
 
     private final TTFFontRenderer font;
@@ -127,6 +147,14 @@ public class NonsenseMainMenu extends GuiScreen {
     @Override
     public void updateScreen() {
         ++this.panoramaTimer;
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        super.keyTyped(typedChar, keyCode);
+        if (keyCode == Keyboard.KEY_BACKSLASH) {
+            this.selectNewSplashText();
+        }
     }
 
     @Override
@@ -332,8 +360,7 @@ public class NonsenseMainMenu extends GuiScreen {
 
         do {
             splashText = SPLASHES[ThreadLocalRandom.current().nextInt(0, SPLASHES.length)];
-        }
-        while (prevSplash.equals(splashText));
+        } while (prevSplash.equals(splashText));
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

@@ -81,9 +81,9 @@ public class EntityEnderman extends EntityMob
     protected void entityInit()
     {
         super.entityInit();
-        this.dataWatcher.addObject(16, new Short((short)0));
-        this.dataWatcher.addObject(17, new Byte((byte)0));
-        this.dataWatcher.addObject(18, new Byte((byte)0));
+        this.dataWatcher.addObject(16, (short) 0);
+        this.dataWatcher.addObject(17, (byte) 0);
+        this.dataWatcher.addObject(18, (byte) 0);
     }
 
     /**
@@ -135,7 +135,7 @@ public class EntityEnderman extends EntityMob
             double d0 = vec31.lengthVector();
             vec31 = vec31.normalize();
             double d1 = vec3.dotProduct(vec31);
-            return d1 > 1.0D - 0.025D / d0 ? player.canEntityBeSeen(this) : false;
+            return d1 > 1.0D - 0.025D / d0 && player.canEntityBeSeen(this);
         }
     }
 
@@ -343,7 +343,7 @@ public class EntityEnderman extends EntityMob
      */
     public void setHeldBlockState(IBlockState state)
     {
-        this.dataWatcher.updateObject(16, Short.valueOf((short)(Block.getStateId(state) & 65535)));
+        this.dataWatcher.updateObject(16, (short) (Block.getStateId(state) & 0xffff));
     }
 
     /**
@@ -351,7 +351,7 @@ public class EntityEnderman extends EntityMob
      */
     public IBlockState getHeldBlockState()
     {
-        return Block.getStateById(this.dataWatcher.getWatchableObjectShort(16) & 65535);
+        return Block.getStateById(this.dataWatcher.getWatchableObjectShort(16) & 0xffff);
     }
 
     /**
@@ -418,7 +418,7 @@ public class EntityEnderman extends EntityMob
 
     public void setScreaming(boolean screaming)
     {
-        this.dataWatcher.updateObject(18, Byte.valueOf((byte)(screaming ? 1 : 0)));
+        this.dataWatcher.updateObject(18, (byte) (screaming ? 1 : 0));
     }
 
     static

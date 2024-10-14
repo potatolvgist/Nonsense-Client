@@ -9,6 +9,10 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventPreClick;
+import wtf.bhopper.nonsense.event.impl.EventPreTick;
+import wtf.bhopper.nonsense.gui.components.RenderTable;
+import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
@@ -16,19 +20,24 @@ import wtf.bhopper.nonsense.module.setting.impl.GroupSetting;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class Debugger extends Module {
 
     private final GroupSetting packetDebuggerClient = new GroupSetting("Client Packets", "Client packet debugger", this);
     private final GroupSetting packetDebuggerServer = new GroupSetting("Server Packets", "Server packet debugger", this);
 
+    private final BooleanSetting tableTestSet = new BooleanSetting("Table Test", "Table test", false);
+
     private final Map<Class<? extends Packet>, BooleanSetting> clientPacketSettings = new HashMap<>();
     private final Map<Class<? extends Packet>, BooleanSetting> serverPacketSettings = new HashMap<>();
 
-    private Queue<PacketInfo> packetCache = EvictingQueue.create(100);
+    private final Queue<PacketInfo> packetCache = EvictingQueue.create(100);
+
+    private final RenderTable<TableTest> tableTest = new RenderTable<>(TableTest.class, (o1, o2) -> 0, "A", 10, 10);
 
     public Debugger() {
         super("Debugger", "Helps with debugging", Category.OTHER);
@@ -63,8 +72,15 @@ public class Debugger extends Module {
             } catch (IllegalAccessException | InstantiationException ignored) {}
         }
 
-        this.addSettings(packetDebuggerClient, packetDebuggerServer);
+        Hud.addComponent(tableTest);
 
+        this.addSettings(packetDebuggerClient, packetDebuggerServer, tableTestSet);
+
+    }
+
+    @EventHandler
+    public void onTick(EventPreTick event) {
+        this.tableTest.setEnabled(this.tableTestSet.get());
     }
 
     @EventHandler
@@ -130,6 +146,10 @@ public class Debugger extends Module {
             return ((C07PacketPlayerDigging)packet).getStatus().name();
         }
 
+        if (packet instanceof C08PacketPlayerBlockPlacement) {
+            return String.valueOf(((C08PacketPlayerBlockPlacement)packet).getStack());
+        }
+
         if (packet instanceof C09PacketHeldItemChange) {
             return Integer.toString(((C09PacketHeldItemChange)packet).getSlotId());
         }
@@ -174,9 +194,12 @@ public class Debugger extends Module {
             this.fields = new FieldInfo[declaredFields.length];
             for (int i = 0; i < declaredFields.length; i++) {
                 Field field = declaredFields[i];
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
                 field.setAccessible(true);
                 try {
-                    this.fields[i] = new FieldInfo(field.getType().getSimpleName(), field.getName(), field.get(packet).toString());
+                    this.fields[i] = new FieldInfo(field.getType().getSimpleName(), field.getName(), String.valueOf(field.get(packet)));
                 } catch (IllegalAccessException | IllegalArgumentException exception) {
                     this.fields[i] = new FieldInfo(field.getType().getSimpleName(), field.getName(), "\247cError");
                 }
@@ -184,17 +207,19 @@ public class Debugger extends Module {
         }
 
         public void print() {
-            ChatUtil.print("%s--- Packet Info ---", EnumChatFormatting.AQUA);
-            ChatUtil.print("\247bClass\2478: \2477%s", this.clazz);
-            ChatUtil.print("\247bState\2478: \2477%s", state.getString());
+            ChatUtil.debugTitle("Packet Info");
+            ChatUtil.debugItem("Class", this.clazz);
+            ChatUtil.debugItem("State", state.getString());
 
-            if (this.fields.length == 0) {
-                ChatUtil.print("\247bFields\2478: \2477<NONE>");
-            } else {
-                ChatUtil.print("\247bFields\2478:");
-                for (FieldInfo field : this.fields) {
-                    ChatUtil.print("  \2478[\2473%s\2478] \247b%s\2478: \2477%s", field.type, field.name, field.value);
+            if (this.fields.length > 0) {
+                String[] printFields = new String[this.fields.length];
+                for (int i = 0; i < this.fields.length; i++) {
+                    if (this.fields[i] == null) {
+                        continue;
+                    }
+                    printFields[i] = String.format("  \2478[\2474%s\2478] \247c%s\2478: \2477%s", this.fields[i].type, this.fields[i].name, this.fields[i].value);
                 }
+                ChatUtil.debugList("Fields", printFields);
             }
         }
 
@@ -226,6 +251,11 @@ public class Debugger extends Module {
             INCOMING,
             OUTGOING
         }
+    }
+
+    public static class TableTest {
+        @RenderTable.TableColumn("Test 1") int x = 0;
+        @RenderTable.TableColumn("Test 69") int y = 69;
     }
 
 

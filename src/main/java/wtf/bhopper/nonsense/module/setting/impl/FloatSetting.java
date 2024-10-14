@@ -1,8 +1,7 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.text.DecimalFormat;
 
@@ -10,7 +9,7 @@ public class FloatSetting extends NumberSetting<Float> {
 
     private float value;
     public final float min, max;
-    public DecimalFormat format;
+    public final DecimalFormat format;
 
     private final ChangedCallback<Float> changedCallback;
 
@@ -57,7 +56,7 @@ public class FloatSetting extends NumberSetting<Float> {
 
     @Override
     public String getDisplayValue() {
-        return format.format(value);
+        return this.format.format(value);
     }
 
     @Override

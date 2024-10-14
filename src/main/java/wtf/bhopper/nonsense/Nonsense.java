@@ -5,16 +5,19 @@ import meteordevelopment.orbit.IEventBus;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.lwjglx.opengl.Display;
 import wtf.bhopper.nonsense.alt.AltManager;
 import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
 import wtf.bhopper.nonsense.event.NonsenseEventBus;
-import wtf.bhopper.nonsense.gui.clickgui.ClickGui;
+import wtf.bhopper.nonsense.gui.clickgui.dropdown.DropdownClickGui;
 import wtf.bhopper.nonsense.gui.font.FontManager;
 import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.ModuleManager;
+import wtf.bhopper.nonsense.util.minecraft.client.BlinkUtil;
 import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
+import wtf.bhopper.nonsense.gui.ImGuiHelper;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -22,12 +25,15 @@ import java.lang.invoke.MethodHandles;
 public class Nonsense {
 
     public static final String NAME = "Nonsense";
-    public static final String VERSION = "Alpha-241002";
+    public static final String VERSION = "Alpha-241010";
 
-    public static final Logger LOGGER = LogManager.getLogger("Nonsense");
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
     public static final Gson GSON = new Gson();
 
     public static Nonsense INSTANCE = null;
+
+    // Time at which the game was started (in millis)
+    public final long startTime;
 
     // Event bus
     public IEventBus eventBus;
@@ -45,12 +51,13 @@ public class Nonsense {
 
     public Nonsense() {
         INSTANCE = this;
+        this.startTime = System.currentTimeMillis();
     }
 
     public void init() {
         LOGGER.info("Loading {}:{}", NAME, VERSION);
 
-        this.dataDir = Minecraft.getMinecraft().mcDataDir.toPath().resolve("nonsense").toFile();
+        this.dataDir = new File(Minecraft.getMinecraft().mcDataDir, "nonsense");
         this.dataDir.mkdirs();
 
         this.eventBus = new NonsenseEventBus();
@@ -72,8 +79,11 @@ public class Nonsense {
 
         this.tickRate = new TickRate();
 
+        ImGuiHelper.init(Display.getWindow());
+
         Hud.init();
-        ClickGui.init();
+        DropdownClickGui.init();
+        BlinkUtil.init();
 
     }
 

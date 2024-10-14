@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
@@ -15,7 +14,9 @@ import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.impl.GroupSetting;
-import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
+import wtf.bhopper.nonsense.module.setting.util.DisplayName;
+import wtf.bhopper.nonsense.util.misc.Clock;
+import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.Rotation;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
 import wtf.bhopper.nonsense.util.minecraft.world.BlockUtil;
@@ -39,24 +40,32 @@ public class Scaffold extends Module {
             Blocks.jukebox
     );
 
-    private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.NORMAL);
+    private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.VANILLA);
 
     private final GroupSetting rotationGroup = new GroupSetting("Rotations", "Rotations", this);
     private final EnumSetting<RotationsMode> rotationsMode = new EnumSetting<>("Mode", "Rotations mode", RotationsMode.INSTANT);
     private final EnumSetting<RotationsHitVec> rotationsHitVec = new EnumSetting<>("Hit Vector", "Block placement vector", RotationsHitVec.CENTRE);
 
+    private final GroupSetting towerGroup = new GroupSetting("Tower", "Tower scaffold", this);
+    private final BooleanSetting towerEnable = new BooleanSetting("Enable", "enable tower", true);
+    private final EnumSetting<TowerMode> towerMode = new EnumSetting<>("Mode", "Tower mode", TowerMode.VANILLA);
+
     private final BooleanSetting sprint = new BooleanSetting("Sprint", "Allows you to sprint while scaffolding", true);
     private final BooleanSetting swing = new BooleanSetting("Swing", "Swings client side", true);
+    private final BooleanSetting silentSwap = new BooleanSetting("Silent Swap", "Swaps to the blocks silently", true);
 
     private BlockData blockData = null;
     private Vec3 hitVec = null;
     private Rotation rotations = null;
     private int slot = -1;
 
+    private Clock towerTimer = new Clock();
+
     public Scaffold() {
         super("Scaffold", "Auto bridge", Category.PLAYER);
         this.rotationGroup.add(rotationsMode, rotationsHitVec);
-        this.addSettings(mode, rotationGroup, sprint, swing);
+        this.towerGroup.add(towerEnable, towerMode);
+        this.addSettings(mode, rotationGroup, towerGroup, sprint, swing, silentSwap);
     }
 
     @Override
@@ -64,6 +73,8 @@ public class Scaffold extends Module {
         this.blockData = null;
         this.hitVec = null;
         this.rotations = null;
+
+        this.towerTimer.reset();
     }
 
     @EventHandler
@@ -83,7 +94,41 @@ public class Scaffold extends Module {
     public void onSelectItem(EventItemSelect event) {
         if (this.slot != -1) {
             event.slot = this.slot;
+            event.silent = this.silentSwap.get();
         }
+    }
+
+    @EventHandler
+    public void onMove(EventMove event) {
+
+        // Tower
+        if (this.towerEnable.get()) {
+
+            switch (this.towerMode.get()) {
+                case VANILLA:
+                    if (mc.gameSettings.keyBindJump.isKeyDown() && this.slot != -1) {
+                        MoveUtil.vertical(event, 0.42);
+                    }
+                    break;
+
+                case NCP:
+                    if (mc.gameSettings.keyBindJump.isKeyDown() && this.slot != -1) {
+                        if (mc.gameSettings.keyBindJump.isKeyDown()) {
+                            if (this.towerTimer.hasReached(130.0 / mc.timer.timerSpeed)) {
+                                MoveUtil.vertical(event, MoveUtil.jumpHeight(0.42));
+                                MoveUtil.setSpeed(MoveUtil.baseSpeed() * 0.8);
+                                this.towerTimer.reset();
+                            } else if (towerTimer.hasReached(120.0 / mc.timer.timerSpeed)) {
+                                MoveUtil.vertical(event, 0.0);
+                            }
+                        }
+                    }
+                    break;
+
+            }
+
+        }
+
     }
 
     @EventHandler
@@ -218,7 +263,7 @@ public class Scaffold extends Module {
     }
 
     private enum Mode {
-        NORMAL
+        VANILLA
     }
 
     private enum RotationsMode {
@@ -229,6 +274,16 @@ public class Scaffold extends Module {
     private enum RotationsHitVec {
         CENTRE,
         CLOSEST
+    }
+
+    private enum TowerMode {
+        VANILLA,
+        @DisplayName("NCP") NCP
+    }
+
+    private enum Swap {
+        CLIENT,
+        SILENT
     }
 
 }

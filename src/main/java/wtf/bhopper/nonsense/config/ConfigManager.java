@@ -1,14 +1,12 @@
 package wtf.bhopper.nonsense.config;
 
-import org.apache.logging.log4j.LogManager;
 import wtf.bhopper.nonsense.Nonsense;
-import wtf.bhopper.nonsense.util.NonsenseException;
+import wtf.bhopper.nonsense.util.misc.NonsenseException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class ConfigManager {

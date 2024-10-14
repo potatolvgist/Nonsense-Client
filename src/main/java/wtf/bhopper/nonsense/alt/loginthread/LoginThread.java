@@ -2,7 +2,7 @@ package wtf.bhopper.nonsense.alt.loginthread;
 
 import wtf.bhopper.nonsense.alt.Alt;
 import wtf.bhopper.nonsense.alt.mslogin.LoginData;
-import wtf.bhopper.nonsense.util.ErrorCallback;
+import wtf.bhopper.nonsense.util.misc.ErrorCallback;
 
 public abstract class LoginThread extends Thread {
 

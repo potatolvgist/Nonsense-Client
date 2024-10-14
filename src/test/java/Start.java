@@ -7,12 +7,13 @@ public class Start {
     public static void main(String[] args) {
         Main.main(concat(new String[] {
                 "--version", "Nonsense",
-                "--accessToken", "0",
                 "--assetsDir", "assets",
                 "--assetIndex", "1.8",
                 "--userProperties", "{}",
                 "--resourcePackDir", System.getenv("appdata").replace('\\', '/') + "/.minecraft/resourcepacks",
-                "--username", "Nonsense"
+
+                "--username", "Nonsense",
+                "--accessToken", "0",
         }, args));
     }
 

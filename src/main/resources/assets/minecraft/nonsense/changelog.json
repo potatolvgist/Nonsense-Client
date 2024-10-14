@@ -1,6 +1,17 @@
 {
   "changelog": [
     {
+      "version": "Alpha-241010",
+      "changes": [
+        "Added $lFast Mine$r",
+        "Added $lDebugger$r",
+        "Added $lItem Spoofer$r (experimental)",
+        "Added $lGive$r command",
+        "Added custom creative tabs",
+        "Improved $lAuto Block$r and $lNo Slow$r compatibility"
+      ]
+    },
+    {
       "version": "Alpha-241003",
       "changes": [
         "Added $lAuto Block$r",

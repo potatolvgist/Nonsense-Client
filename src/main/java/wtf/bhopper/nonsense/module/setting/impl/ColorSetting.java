@@ -1,9 +1,8 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.NBTTagCompound;
 import wtf.bhopper.nonsense.module.setting.Setting;
-import wtf.bhopper.nonsense.util.JsonUtil;
+import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.awt.*;
 
@@ -32,6 +31,15 @@ public class ColorSetting extends Setting<Color> {
 
     public float[] getHsb() {
         return Color.RGBtoHSB(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), null);
+    }
+
+    public float[] floatValues() {
+        return new float[]{
+                this.color.getRed() / 255.0F,
+                this.color.getGreen() / 255.0F,
+                this.color.getBlue() / 255.0F,
+                this.color.getAlpha() / 255.0F
+        };
     }
 
     @Override

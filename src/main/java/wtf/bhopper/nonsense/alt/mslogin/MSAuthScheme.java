@@ -1,9 +1,8 @@
 package wtf.bhopper.nonsense.alt.mslogin;
 
-import com.mojang.util.UUIDTypeAdapter;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
-import wtf.bhopper.nonsense.util.Http;
+import wtf.bhopper.nonsense.util.net.Http;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -122,7 +122,7 @@ public abstract class Container
 
     public Slot getSlot(int slotId)
     {
-        return (Slot)this.inventorySlots.get(slotId);
+        return this.inventorySlots.get(slotId);
     }
 
     /**

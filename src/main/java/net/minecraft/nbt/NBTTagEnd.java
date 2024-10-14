@@ -38,4 +38,5 @@ public class NBTTagEnd extends NBTBase
     {
         return new NBTTagEnd();
     }
+
 }

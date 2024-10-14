@@ -10,11 +10,12 @@ import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 public class NoRender extends Module {
 
     private final BooleanSetting hurtCam = new BooleanSetting("Hurt Camera", "Prevents your screen from shaking when you take damage", true);
+    private final BooleanSetting overlay = new BooleanSetting("Overlay", "Disables fire and pumpkin overlays", true);
     private final BooleanSetting weather = new BooleanSetting("Weather", "Disables rain and thunder", false);
 
     public NoRender() {
         super("No Render", "Prevents specific things from rendering", Category.VISUAL);
-        this.addSettings(hurtCam, weather);
+        this.addSettings(hurtCam, overlay, weather);
     }
 
     @EventHandler
@@ -38,6 +39,11 @@ public class NoRender extends Module {
 
     public boolean hurtCamera() {
         return this.isEnabled() && this.hurtCam.get();
+    }
+
+    public boolean overlay() {
+        return this.isEnabled() && this.overlay.get();
+
     }
 
 }
