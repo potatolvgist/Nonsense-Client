@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.module.Module;
+import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.util.Description;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
@@ -15,7 +16,7 @@ import java.awt.*;
 
 public class Capes extends Module {
 
-    public final EnumSetting<Cape> cape = new EnumSetting<>("Cape", "There's too many of them...", Cape.NONSENSE);
+    public final EnumSetting<Cape> cape = new EnumSetting<>("Cape", "There's too many of them...", Cape.NONSENSE, value -> this.frameCounter = 0);
 
     // Frame counter for animated capes
     private int frameCounter = 0;
@@ -44,6 +45,8 @@ public class Capes extends Module {
         DORTWARE,
         EXHIBITION(new OverlayCape("exhibition", () -> new Color(ColorUtil.rainbow(System.currentTimeMillis(), 0, 0.5F, 1.0F)))),
         FUTURE,
+        LIGHTNING(new AnimatedCape("lightning", 11, 3)),
+        MILLION,
         MINECON_2011,
         MINECON_2012,
         MINECON_2013,
@@ -59,7 +62,8 @@ public class Capes extends Module {
         RISE_6,
         SKIDWARE,
         @Description("Ok who tf would use this though?") TEMPLATE,
-        TENACITY;
+        TENACITY,
+        XYLANS;
 
         public final ICape cape;
 

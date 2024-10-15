@@ -32,7 +32,7 @@ public class ChatUtil {
     }
 
     public static void error(String message, Object... args) {
-        Builder.of("%s\247r%s", CHAT_PREFIX, String.format(message, args))
+        Builder.of("%s\247c%s", CHAT_PREFIX, String.format(message, args))
                 .setColor(EnumChatFormatting.RED)
                 .send();
     }

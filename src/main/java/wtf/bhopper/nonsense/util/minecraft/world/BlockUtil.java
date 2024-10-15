@@ -18,5 +18,8 @@ public class BlockUtil {
         return getBlock(blockPos).getMaterial() == Material.air;
     }
 
+    public static Block getRelativeBlock(double x, double y, double z) {
+        return getBlock(new BlockPos(mc.thePlayer).add(x, y, z));
+    }
 
 }

@@ -37,7 +37,7 @@ public abstract class Module {
 
     public void toggle(boolean toggled) {
         if (this.toggled == toggled) {
-            return;
+            return; // Avoid triggering onEnable/onDisable when not needed
         }
 
         this.toggled = toggled;

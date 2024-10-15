@@ -9,6 +9,11 @@ public class InventoryUtil {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
+    public static final int INCLUDE_ARMOR_BEGIN = 5;
+    public static final int EXCLUDE_ARMOR_BEGIN = 9;
+    public static final int ONLY_HOT_BAR_BEGIN = 36;
+    public static final int END = 45;
+
     public static int serverItem = 0;
 
     public static int currentItem() {
@@ -26,5 +31,18 @@ public class InventoryUtil {
 
         return false;
     }
+
+    public static void click(int slot, int mouseButton, boolean shiftClick) {
+        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, mouseButton, shiftClick ? 1 : 0, mc.thePlayer);
+    }
+
+    public static void drop(int slot) {
+        mc.playerController.windowClick(0, slot, 1, 4, mc.thePlayer);
+    }
+
+    public static void swap(int slot, int hSlot) {
+        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, hSlot, 2, mc.thePlayer);
+    }
+
 
 }

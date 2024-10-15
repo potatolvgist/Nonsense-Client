@@ -55,6 +55,14 @@ public class AltManager {
 
     }
 
+    public void tryLoad() {
+        try {
+            this.load();
+        } catch (IOException exception) {
+            Nonsense.LOGGER.error("Failed to load accounts", exception);
+        }
+    }
+
     public void save() throws IOException {
 
         File file = Nonsense.INSTANCE.dataDir.toPath().resolve("alts.json").toFile();

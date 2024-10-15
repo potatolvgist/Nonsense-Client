@@ -6,7 +6,13 @@ import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.Session;
+import wtf.bhopper.nonsense.alt.loginthread.CookieLoginThread;
+import wtf.bhopper.nonsense.alt.loginthread.LoginDataCallback;
 import wtf.bhopper.nonsense.alt.mslogin.LoginData;
+import wtf.bhopper.nonsense.gui.hud.notification.Notification;
+import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
+import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
+import wtf.bhopper.nonsense.util.misc.ErrorCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +106,22 @@ public class Alt {
     }
 
     public void refreshAccount() {
+
+        switch (type) {
+
+            case COOKIE:
+                new CookieLoginThread(this.meta, loginData -> {
+                    this.accessToken = loginData.accessToken;
+                    this.meta = loginData.meta;
+                    this.uuid = loginData.uuid;
+                    this.username = loginData.username;
+                    Notification.send("Alt Manager", "Refreshed account: " + loginData.username, NotificationType.SUCCESS, 3000);
+                }, error -> {
+                    GuiAltManager.lastError = error;
+                    Notification.send("Alt Manager", "Failed to refresh account: " + error.getMessage(), NotificationType.ERROR, 3000);
+                }).start();
+                break;
+        }
 
     }
 

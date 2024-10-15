@@ -31,6 +31,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
+import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
 import java.awt.*;
@@ -102,6 +103,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
         for (GuiLabel guiLabel : this.labelList) {
             guiLabel.drawLabel(this.mc, mouseX, mouseY);
         }
+
+        Hud.notificationManager.draw(partialTicks, new ScaledResolution(mc));
     }
 
     /**

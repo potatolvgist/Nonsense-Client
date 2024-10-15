@@ -339,8 +339,11 @@ public class GuiIngame extends Gui {
         }
 
         Hud.infoDisplay.draw(scaledResolution);
-        Hud.notificationManager.draw(partialTicks, scaledResolution);
         Hud.watermark.draw(scaledResolution);
+
+        if (mc.currentScreen == null) {
+            Hud.notificationManager.draw(partialTicks, scaledResolution);
+        }
 
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);

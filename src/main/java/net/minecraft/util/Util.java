@@ -8,13 +8,24 @@ import org.apache.logging.log4j.Logger;
 public class Util {
     public static Util.EnumOS getOSType() {
         String osName = System.getProperty("os.name").toLowerCase();
-        return osName.contains("win") ? Util.EnumOS.WINDOWS
-                : (osName.contains("mac") ? Util.EnumOS.OSX
-                : (osName.contains("solaris") ? Util.EnumOS.SOLARIS
-                : (osName.contains("sunos") ? Util.EnumOS.SOLARIS
-                : (osName.contains("linux") ? Util.EnumOS.LINUX
-                : (osName.contains("unix") ? Util.EnumOS.LINUX
-                : Util.EnumOS.UNKNOWN)))));
+
+        if (osName.contains("win")) {
+            return EnumOS.WINDOWS;
+        }
+
+        if (osName.contains("mac")) {
+            return EnumOS.OSX;
+        }
+
+        if (osName.contains("solaris") || osName.contains("sunos")) {
+            return EnumOS.SOLARIS;
+        }
+
+        if (osName.contains("linux") || osName.contains("unix")) {
+            return EnumOS.LINUX;
+        }
+
+        return EnumOS.UNKNOWN;
     }
 
     public static <V> V runTask(FutureTask<V> task, Logger logger) {
@@ -34,11 +45,11 @@ public class Util {
         return null;
     }
 
-    public static enum EnumOS {
+    public enum EnumOS {
         LINUX,
         SOLARIS,
         WINDOWS,
         OSX,
-        UNKNOWN;
+        UNKNOWN
     }
 }

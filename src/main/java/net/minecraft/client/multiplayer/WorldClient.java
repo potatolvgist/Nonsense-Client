@@ -39,6 +39,8 @@ import net.optifine.CustomGuis;
 import net.optifine.DynamicLights;
 import net.optifine.override.PlayerControllerOF;
 import net.optifine.reflect.Reflector;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.module.impl.visual.BarrierView;
 
 public class WorldClient extends World
 {
@@ -319,8 +321,14 @@ public class WorldClient extends World
         int i = 16;
         Random random = new Random();
         ItemStack itemstack = this.mc.thePlayer.getHeldItem();
-        boolean flag = this.mc.playerController.getCurrentGameType() == WorldSettings.GameType.CREATIVE && itemstack != null && Block.getBlockFromItem(itemstack.getItem()) == Blocks.barrier;
+        boolean barrierParticles = this.mc.playerController.getCurrentGameType() == WorldSettings.GameType.CREATIVE && itemstack != null && Block.getBlockFromItem(itemstack.getItem()) == Blocks.barrier;
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+        try {
+            if (Nonsense.module(BarrierView.class).isEnabled()) {
+                barrierParticles = true;
+            }
+        } catch (NullPointerException ignored) {}
 
         for (int j = 0; j < 1000; ++j)
         {
@@ -331,7 +339,7 @@ public class WorldClient extends World
             IBlockState iblockstate = this.getBlockState(blockpos$mutableblockpos);
             iblockstate.getBlock().randomDisplayTick(this, blockpos$mutableblockpos, iblockstate, random);
 
-            if (flag && iblockstate.getBlock() == Blocks.barrier)
+            if (barrierParticles && iblockstate.getBlock() == Blocks.barrier)
             {
                 this.spawnParticle(EnumParticleTypes.BARRIER, (double)((float)k + 0.5F), (double)((float)l + 0.5F), (double)((float)i1 + 0.5F), 0.0D, 0.0D, 0.0D, new int[0]);
             }

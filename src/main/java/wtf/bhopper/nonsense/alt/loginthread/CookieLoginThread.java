@@ -1,13 +1,18 @@
 package wtf.bhopper.nonsense.alt.loginthread;
 
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.alt.Alt;
+import wtf.bhopper.nonsense.alt.mslogin.LoginData;
 import wtf.bhopper.nonsense.alt.mslogin.MSAuthException;
+import wtf.bhopper.nonsense.alt.mslogin.MSAuthScheme;
 import wtf.bhopper.nonsense.gui.screens.altmanager.GuiAltManager;
 import wtf.bhopper.nonsense.util.misc.ErrorCallback;
 import wtf.bhopper.nonsense.util.net.Http;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -16,11 +21,17 @@ public class CookieLoginThread extends LoginThread {
     private static final String COOKIE_URL = "https://sisu.xboxlive.com/connect/XboxLive/?state=login&cobrandId=8058f65d-ce06-4c30-9559-473c9275a65d&tid=896928775&ru=https%3A%2F%2Fwww.minecraft.net%2Fen-us%2Flogin&aid=1142970254";
 
     private final File file;
-    private String cookieHeader;
+    private String cookieHeader = null;
 
     public CookieLoginThread(File file, LoginDataCallback loginDataCallback, ErrorCallback errorCallback) {
         super(loginDataCallback, errorCallback);
         this.file = file;
+    }
+
+    public CookieLoginThread(String header, LoginDataCallback loginDataCallback, ErrorCallback errorCallback) {
+        super(loginDataCallback, errorCallback);
+        this.file = null;
+        this.cookieHeader = header;
     }
 
     @Override
@@ -29,9 +40,12 @@ public class CookieLoginThread extends LoginThread {
 
             GuiAltManager.message = "Logging in to Cookie alt...";
 
-            List<Cookie> cookies = this.parseCookies();
-            this.cookieHeader = this.buildCookieHeader(cookies);
-            Nonsense.LOGGER.info("Cookie Header: {}", this.cookieHeader);
+            if (this.cookieHeader == null) {
+                List<Cookie> cookies = this.parseCookies();
+                this.cookieHeader = this.buildCookieHeader(cookies);
+                Nonsense.LOGGER.info("Cookie Header: {}", this.cookieHeader);
+            }
+
             Map<String, String> headers = new HashMap<>();
             headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
             headers.put("Accept-Encoding", "gzip, deflate, br");
@@ -46,11 +60,12 @@ public class CookieLoginThread extends LoginThread {
                 throw new MSAuthException("(1) Request to " + COOKIE_URL + " returned status " + http1.status());
             }
 
-            Http http2 = new Http(http1.getHeader("location"))
+            String location2 = http1.getHeader("location").replace(" ", "");
+            Http http2 = new Http(location2)
                     .headers(headers)
                     .get();
             if (http2.status() != 302) {
-                throw new MSAuthException("(2) Request to " + http1.getHeader("location") + " returned status " + http2.status());
+                throw new MSAuthException("(2) Request to " + location2 + " returned status " + http2.status());
             }
 
             Http http3 = new Http(http2.getHeader("location"))
@@ -60,9 +75,19 @@ public class CookieLoginThread extends LoginThread {
                 throw new MSAuthException("(3) Request to " + http2.getHeader("location") + " returned status " + http3.status());
             }
 
-            Nonsense.LOGGER.info(http3.getHeader("location"));
+            String accessToken = http3.getHeader("location").split("accessToken=")[1];
+            String decoded = new String(Base64.getDecoder().decode(accessToken), StandardCharsets.UTF_8).split("\"rp://api\\.minecraftservices.com/\",")[1];
+            String token = decoded.split("\"Token\":\"")[1].split("\"")[0];
+            String uhs = decoded.split("\\{\"DisplayClaims\":\\{\"xui\":\\[\\{\"uhs\":\"")[1].split("\"")[0];
 
+            MSAuthScheme.McResponse mcAuth = MSAuthScheme.minecraftAuth(uhs, token);
+            MSAuthScheme.GameOwnershipResponse gameOwnership = MSAuthScheme.checkGameOwnership(mcAuth.access_token);
+            if (!gameOwnership.hasGameOwnership()) {
+                throw new MSAuthException("That user does not own Minecraft");
+            }
 
+            MSAuthScheme.ProfileResponse profileResponse = MSAuthScheme.minecraftProfile(mcAuth.access_token);
+            loginDataCallback.accept(new LoginData(Alt.Type.COOKIE, mcAuth.access_token, profileResponse.id, profileResponse.name, this.cookieHeader));
 
         } catch (Exception exception) {
             this.errorCallback.onError(exception);
@@ -102,7 +127,9 @@ public class CookieLoginThread extends LoginThread {
                 secure = true;
             }
 
-            cookies.add(new Cookie(name, value, domain, path, sameSite, secure, expires));
+            if (name.contains("MS") && name.contains("AUTH")) {
+                cookies.add(new Cookie(name, value, domain, path, sameSite, secure, expires));
+            }
         }
 
         return cookies;

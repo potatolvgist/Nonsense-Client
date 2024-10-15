@@ -76,6 +76,7 @@ public class Nonsense {
         this.configManager.init();
 
         this.altManager = new AltManager();
+        this.altManager.tryLoad();
 
         this.tickRate = new TickRate();
 

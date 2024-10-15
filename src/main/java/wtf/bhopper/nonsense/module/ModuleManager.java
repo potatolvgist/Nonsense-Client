@@ -4,10 +4,7 @@ import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.combat.*;
 import wtf.bhopper.nonsense.module.impl.exploit.*;
 import wtf.bhopper.nonsense.module.impl.movement.*;
-import wtf.bhopper.nonsense.module.impl.other.ChatFilter;
-import wtf.bhopper.nonsense.module.impl.other.Debugger;
-import wtf.bhopper.nonsense.module.impl.other.Derp;
-import wtf.bhopper.nonsense.module.impl.other.Panic;
+import wtf.bhopper.nonsense.module.impl.other.*;
 import wtf.bhopper.nonsense.module.impl.player.*;
 import wtf.bhopper.nonsense.module.impl.visual.*;
 
@@ -32,6 +29,8 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new NoSlow());
         this.addModule(new Speed());
         this.addModule(new Flight());
+        this.addModule(new InventoryMove());
+        this.addModule(new AntiFall());
         this.addModule(new MovementFix());
 
         // Player
@@ -52,6 +51,9 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Other
         this.addModule(new ChatFilter());
         this.addModule(new Derp());
+        this.addModule(new PackSpoofer());
+        this.addModule(new AutoHypixel());
+        this.addModule(new PartySpammer());
         this.addModule(new Panic());
         this.addModule(new Debugger());
 
@@ -64,6 +66,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new Trajectories());
         this.addModule(new Capes());
         this.addModule(new DiscordRPCMod());
+        this.addModule(new BarrierView());
     }
 
     public void addModule(Module module) {

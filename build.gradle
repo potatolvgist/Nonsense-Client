@@ -94,6 +94,7 @@ dependencies {
     library 'org.lwjgl:lwjgl-openal:3.3.4'
     library 'org.lwjgl:lwjgl-glfw:3.3.4'
     library 'org.lwjgl:lwjgl-nanovg:3.3.4'
+    library 'org.lwjgl:lwjgl-nfd:3.3.4'
     library 'org.lwjgl:lwjgl-stb:3.3.4'
 
     library 'com.paulscode:codecjorbis:20101023'
@@ -116,6 +117,7 @@ dependencies {
     nativeLib "org.lwjgl:lwjgl:3.3.4:$lwjglNatives"
     nativeLib "org.lwjgl:lwjgl-glfw:3.3.4:$lwjglNatives"
     nativeLib "org.lwjgl:lwjgl-nanovg:3.3.4:$lwjglNatives"
+    nativeLib "org.lwjgl:lwjgl-nfd:3.3.4:$lwjglNatives"
     nativeLib "org.lwjgl:lwjgl-openal:3.3.4:$lwjglNatives"
     nativeLib "org.lwjgl:lwjgl-opengl:3.3.4:$lwjglNatives"
     nativeLib "org.lwjgl:lwjgl-stb:3.3.4:$lwjglNatives"

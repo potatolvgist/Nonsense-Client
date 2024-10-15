@@ -6,11 +6,9 @@ import net.minecraft.item.*;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Tuple;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
+import wtf.bhopper.nonsense.util.minecraft.world.BlockUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +31,33 @@ public class PlayerUtil {
         } else {
             mc.thePlayer.swingItem();
         }
+    }
+
+    public static boolean isBlockUnder(final double height) {
+        return isBlockUnder(height, true);
+    }
+
+    public static boolean isBlockUnder(final double height, final boolean boundingBox) {
+        if (boundingBox) {
+            for (int offset = 0; offset < height; offset += 2) {
+                final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, -offset, 0);
+
+                if (!mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty()) {
+                    return true;
+                }
+            }
+        } else {
+            for (int offset = 0; offset < height; offset++) {
+                if (BlockUtil.getRelativeBlock(0, -offset, 0).isFullBlock()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isBlockUnder() {
+        return isBlockUnder(mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
     }
 
     public static boolean isOnSameTeam(final EntityPlayer player) {

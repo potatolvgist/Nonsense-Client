@@ -6,7 +6,8 @@ import java.awt.*;
 
 public class ColorUtil {
 
-    public static final int BLACK = 0xFF000000;
+    public static final int BLACK = Color.BLACK.getRGB();
+    public static final int RED = Color.RED.getRGB();
 
     private static final float RISE_FACTOR = 5.0F / 12.0F;
 

@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.alt.Alt;
+import wtf.bhopper.nonsense.gui.hud.notification.Notification;
+import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
 import wtf.bhopper.nonsense.util.render.SkinCache;
 
 import java.io.IOException;
@@ -93,9 +95,14 @@ public class GuiAltManager extends GuiScreen {
             AccountListEntry entry = this.accountSelectionList.getSelected();
             if (entry != null) {
                 entry.account.login();
+                Notification.send("Alt Manager", "Logged into account: " + entry.account.getUsername(), NotificationType.SUCCESS, 3000);
             }
         } else if (button.id == 4) {
-            // Refresh account
+            AccountListEntry entry = this.accountSelectionList.getSelected();
+            if (entry != null) {
+                Notification.send("Alt Manager", "Refreshing: " + entry.account.getUsername(), NotificationType.INFO, 3000);
+                entry.account.refreshAccount();
+            }
         } else if (button.id == 3) {
             this.mc.displayGuiScreen(new GuiAddAlt(this));
         } else if (button.id == 7) {
@@ -103,7 +110,11 @@ public class GuiAltManager extends GuiScreen {
         } else if (button.id == 2) {
             // Ban Check Account
         } else if (button.id == 8) {
-            // Remove account
+            AccountListEntry entry = this.accountSelectionList.getSelected();
+            if (entry != null) {
+                Nonsense.INSTANCE.altManager.alts.remove(entry.account.getUuid());
+                Notification.send("Alt Manager", "Removed account: " + entry.account.getUsername(), NotificationType.SUCCESS, 3000);
+            }
         } else if (button.id == 0) {
             this.mc.displayGuiScreen(this.parentScreen);
         }
