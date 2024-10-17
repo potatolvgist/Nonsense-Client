@@ -6,6 +6,7 @@ public class EventClickAction {
     public boolean click;
     public boolean usingItem;
     public boolean silentSwing;
+    public boolean blockNext;
 
     public EventClickAction(Button button, boolean click, boolean usingItem) {
         this.button = button;

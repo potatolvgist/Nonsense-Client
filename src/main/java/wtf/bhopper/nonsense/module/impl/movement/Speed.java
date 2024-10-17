@@ -21,7 +21,6 @@ public class Speed extends Module {
     private int stage = 0;
     private double speed = 0.0;
     private double distance = 0.0;
-    private int lastJump = 10;
 
     public Speed() {
         super("Speed", "Makes you go zoom", Category.MOVEMENT);
@@ -33,7 +32,6 @@ public class Speed extends Module {
     public void onEnable() {
         this.stage = 0;
         this.speed = 0.0;
-        this.lastJump = 10;
     }
 
     @EventHandler
@@ -42,7 +40,6 @@ public class Speed extends Module {
     }
 
 
-    // TODO: add a player move event
     @EventHandler
     public void onMove(EventMove event) {
         switch (mode.get()) {
@@ -94,11 +91,6 @@ public class Speed extends Module {
             }
 
             case MINIBLOX: {
-
-                lastJump++;
-                if (mc.thePlayer.onGround) {
-                    lastJump = 0;
-                }
 
                 MoveUtil.setSpeed(event, 0.39);
                 if (mc.thePlayer.onGround && MoveUtil.isMoving()) {

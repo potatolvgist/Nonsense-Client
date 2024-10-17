@@ -57,6 +57,11 @@ public class AntiFall extends Module {
         return mc.thePlayer.fallDistance > this.height.get() && (!voidOnly.get() || !PlayerUtil.isBlockUnder());
     }
 
+    @Override
+    public String getSuffix() {
+        return this.mode.getDisplayValue();
+    }
+
     private enum Mode {
         SET_BACK,
         PACKET

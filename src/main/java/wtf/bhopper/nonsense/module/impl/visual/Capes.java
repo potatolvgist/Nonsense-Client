@@ -63,6 +63,7 @@ public class Capes extends Module {
         SKIDWARE,
         @Description("Ok who tf would use this though?") TEMPLATE,
         TENACITY,
+        VORACITY,
         XYLANS;
 
         public final ICape cape;

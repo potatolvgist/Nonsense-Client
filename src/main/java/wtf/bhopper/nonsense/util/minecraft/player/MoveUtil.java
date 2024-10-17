@@ -6,6 +6,7 @@ import net.minecraft.util.MathHelper;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventMove;
 import wtf.bhopper.nonsense.event.impl.EventSlowDown;
+import wtf.bhopper.nonsense.event.impl.EventSpeed;
 
 public class MoveUtil {
 
@@ -46,7 +47,15 @@ public class MoveUtil {
         setSpeed(event, speed, mc.thePlayer.rotationYaw, mc.thePlayer.moveForward, mc.thePlayer.moveStrafing);
     }
 
-    public static void setSpeed(EventMove event, double speed, float yaw, double forward, double strafe) {
+    public static void setSpeed(EventMove event, double speedIn, float yawIn, double forwardIn, double strafeIn) {
+
+        EventSpeed eventSpeed = new EventSpeed(speedIn, yawIn, forwardIn, strafeIn);
+        Nonsense.INSTANCE.eventBus.post(eventSpeed);
+
+        double speed = eventSpeed.speed;
+        float yaw = eventSpeed.yaw;
+        double forward = eventSpeed.forward;
+        double strafe = eventSpeed.strafe;
 
         if (mc.thePlayer.isUsingItem() && !mc.thePlayer.isRiding()) {
             EventSlowDown eventSlowDown = new EventSlowDown(0.2F);
@@ -56,11 +65,8 @@ public class MoveUtil {
             }
         }
 
-        double motion = speed;
-
         if (forward == 0.0 && strafe == 0.0) {
-            mc.thePlayer.motionX = 0.0;
-            mc.thePlayer.motionZ = 0.0;
+            setSpeed(event, 0.0, 0.0);
         } else {
             if (forward != 0.0) {
                 if (strafe > 0.0) {
@@ -79,11 +85,16 @@ public class MoveUtil {
 
         double mx = Math.cos(Math.toRadians(yaw + 90.0F));
         double mz = Math.sin(Math.toRadians(yaw + 90.0F));
-        mc.thePlayer.motionX = forward * motion * mx + strafe * motion * mz;
-        mc.thePlayer.motionZ = forward * motion * mz - strafe * motion * mx;
+
+        setSpeed(event, forward * speed * mx + strafe * speed * mz, forward * speed * mz - strafe * speed * mx);
+    }
+
+    public static void setSpeed(EventMove event, double x, double z) {
+        mc.thePlayer.motionX = x;
+        mc.thePlayer.motionZ = z;
         if (event != null) {
-            event.x = mc.thePlayer.motionX;
-            event.y = mc.thePlayer.motionY;
+            event.x = x;
+            event.z = z;
         }
     }
 

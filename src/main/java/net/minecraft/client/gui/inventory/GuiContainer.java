@@ -654,4 +654,8 @@ public abstract class GuiContainer extends GuiScreen {
             this.mc.thePlayer.closeScreen();
         }
     }
+
+    public boolean isClientSide() {
+        return false;
+    }
 }

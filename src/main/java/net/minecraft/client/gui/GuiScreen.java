@@ -70,7 +70,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
      * The height of the screen object.
      */
     public int height;
-    protected List<GuiButton> buttonList = Lists.newArrayList();
+    protected List<GuiButton> buttonList = Lists.newCopyOnWriteArrayList();
     protected List<GuiLabel> labelList = Lists.newArrayList();
     public boolean allowUserInput;
 

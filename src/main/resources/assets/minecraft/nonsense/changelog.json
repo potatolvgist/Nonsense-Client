@@ -1,6 +1,15 @@
 {
   "changelog": [
     {
+      "version": "Alphe-241016",
+      "changes": [
+        "Added $lAnti Fall$r",
+        "Added $lMiniblox$r mode to $lSpeed$r, $lFlight$r and $lNo Fall$r",
+        "Added $lSwitch$r mode to $lNo Slow$r",
+        "Added more modes to $lCapes$r"
+      ]
+    },
+    {
       "version": "Alpha-241010",
       "changes": [
         "Added $lFast Mine$r",

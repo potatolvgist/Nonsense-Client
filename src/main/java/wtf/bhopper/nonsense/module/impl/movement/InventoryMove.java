@@ -40,7 +40,7 @@ public class InventoryMove extends Module {
         }
 
         if (mode.is(Mode.VANILLA) && clientSideOnly.get()) {
-            if (mc.currentScreen instanceof GuiContainer) {
+            if (mc.currentScreen instanceof GuiContainer && !((GuiContainer) mc.currentScreen).isClientSide()) {
                 return;
             }
         }

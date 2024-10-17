@@ -24,6 +24,8 @@ import net.minecraft.world.World;
 import net.optifine.entity.model.IEntityRenderer;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.event.impl.EventRenderNameTag;
 
 public abstract class Render<T extends Entity> implements IEntityRenderer
 {
@@ -359,9 +361,17 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
     /**
      * Renders an entity's name above its head
      */
-    protected void renderLivingLabel(T entityIn, String str, double x, double y, double z, int maxDistance)
+    protected void renderLivingLabel(T entityIn, String strIn, double x, double y, double z, int maxDistance)
     {
         double d0 = entityIn.getDistanceSqToEntity(this.renderManager.livingPlayer);
+
+        EventRenderNameTag event = new EventRenderNameTag(entityIn, strIn);
+        Nonsense.INSTANCE.eventBus.post(event);
+        if (event.isCancelled()) {
+            return;
+        }
+
+        String str = event.name;
 
         if (d0 <= (double)(maxDistance * maxDistance))
         {

@@ -23,6 +23,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new Velocity());
         this.addModule(new Criticals());
         this.addModule(new NoClickDelay());
+        this.addModule(new AutoCopsAndCrims());
 
         // Movement
         this.addModule(new Sprint());
@@ -36,6 +37,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Player
         this.addModule(new Scaffold());
         this.addModule(new NoFall());
+        this.addModule(new InventoryManager());
         this.addModule(new FastMine());
         this.addModule(new GameSpeed());
         this.addModule(new NoRotate());

@@ -85,7 +85,8 @@ public class NonsenseMainMenu extends GuiScreen {
             "Sigma rule no 8: reuse toilet paper",
             "https://bhopper.wtf/hoa",
             GeneralUtil.repeat("A", 333),
-            "I said a gas of juice, not gas the jews"
+            "I said a gas of juice, not gas the jews",
+            "You need six hammer the ice cream to monkey of eleven dizzy."
     };
 
     private final TTFFontRenderer font;

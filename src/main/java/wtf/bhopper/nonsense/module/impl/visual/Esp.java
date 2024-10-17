@@ -18,6 +18,7 @@ import net.minecraft.util.Vec3;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.event.impl.EventRender2D;
+import wtf.bhopper.nonsense.event.impl.EventRenderNameTag;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.impl.combat.AntiBot;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
@@ -103,6 +104,16 @@ public class Esp extends Module {
 
         GlStateManager.popMatrix();
 
+    }
+
+    @EventHandler
+    public void onRenderNameTag(EventRenderNameTag event) {
+        for (RenderEntity renderEntity : this.renderEntities) {
+            if (renderEntity.entity == event.entity) {
+                event.cancel();
+                break;
+            }
+        }
     }
 
     private boolean isValidEntity(EntityLivingBase entity) {

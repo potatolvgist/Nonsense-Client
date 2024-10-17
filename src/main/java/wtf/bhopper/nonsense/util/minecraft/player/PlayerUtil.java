@@ -61,6 +61,11 @@ public class PlayerUtil {
     }
 
     public static boolean isOnSameTeam(final EntityPlayer player) {
+
+        if (player == null) {
+            return false;
+        }
+
         if (player.getTeam() != null && mc.thePlayer.getTeam() != null) {
             final char c1 = player.getDisplayName().getFormattedText().charAt(1);
             final char c2 = mc.thePlayer.getDisplayName().getFormattedText().charAt(1);

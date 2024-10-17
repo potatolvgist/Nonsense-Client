@@ -9,6 +9,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreClick;
+import wtf.bhopper.nonsense.event.impl.EventPreMotion;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.event.impl.EventSendPacket;
 import wtf.bhopper.nonsense.module.Module;
@@ -26,6 +27,8 @@ public class Criticals extends Module {
     private final BooleanSetting safe = new BooleanSetting("Safe", "Doesn't crit if target is hurt", false);
 
     private int ticks = 0;
+    private boolean attacked = true;
+    private int stage = 0;
 
     public Criticals() {
         super("Criticals", "Makes you do critical hits", Category.COMBAT);
@@ -66,11 +69,41 @@ public class Criticals extends Module {
                     PacketUtil.send(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.0625, mc.thePlayer.posZ, false));
                     PacketUtil.send(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, false));
                     break;
-
+                    
+                    
+                case LOW:
+                    attacked = true;
+                    break;
             }
 
-
         }
+    }
+
+    @EventHandler
+    public void onPreMotion(EventPreMotion event) {
+
+        switch (mode.get()) {
+            case LOW:
+                if (mc.thePlayer.onGround && attacked) {
+
+                    switch (stage) {
+                        case 0:
+                            event.y += 5.0E-4;
+                            break;
+
+                        case 1:
+                            event.y += 1.0E-4;
+                            attacked = false;
+                            break;
+                    }
+
+                } else {
+                    attacked = false;
+                    stage = 0;
+                }
+                break;
+        }
+
     }
 
     @Override
@@ -80,6 +113,7 @@ public class Criticals extends Module {
 
     private enum Mode {
         PACKET,
+        LOW
     }
 
 }

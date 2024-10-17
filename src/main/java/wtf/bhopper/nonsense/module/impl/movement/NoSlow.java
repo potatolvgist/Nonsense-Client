@@ -19,6 +19,7 @@ import wtf.bhopper.nonsense.module.impl.combat.KillAura;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
+import wtf.bhopper.nonsense.util.minecraft.client.BlinkUtil;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
@@ -35,18 +36,11 @@ public class NoSlow extends Module {
     @EventHandler
     public void onSlow(EventSlowDown event) {
 
-        ItemStack heldItem = mc.thePlayer.getHeldItem();
-
         switch (mode.get()) {
             case VANILLA:
             case NCP:
+            case SWITCH:
                 event.cancel();
-                break;
-
-            case BLINK:
-                if (heldItem != null && heldItem.getItemUseAction() == EnumAction.BLOCK) {
-                    event.cancel();
-                }
                 break;
         }
     }
@@ -59,16 +53,7 @@ public class NoSlow extends Module {
             }
 
         }
-    }
 
-    @EventHandler
-    public void onClick(EventClickAction event) {
-        if (this.mode.is(Mode.BLINK)) {
-            if (event.button == EventClickAction.Button.RELEASE && event.usingItem) {
-                event.click = false;
-                Nonsense.module(KillAura.class).blockAttack();
-            }
-        }
     }
 
     @EventHandler
@@ -106,8 +91,7 @@ public class NoSlow extends Module {
     public enum Mode {
         VANILLA,
         @DisplayName("NCP") NCP,
-        SWITCH,
-        BLINK
+        SWITCH
     }
 
 }

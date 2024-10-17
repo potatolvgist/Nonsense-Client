@@ -1234,7 +1234,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.fontRendererObj.drawStringWithShadow(s = decimalformat.format(profiler$result.field_76330_b) + "%", (float) (j + i - this.fontRendererObj.getStringWidth(s)), (float) (k - i / 2 - 16), l2);
 
             for (int k2 = 0; k2 < list.size(); ++k2) {
-                Profiler.Result profiler$result2 = (Profiler.Result) list.get(k2);
+                Profiler.Result profiler$result2 = list.get(k2);
                 String s1 = "";
 
                 if (profiler$result2.field_76331_c.equals("unspecified")) {
@@ -1815,7 +1815,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
                 EventClickAction eventLeft = new EventClickAction(EventClickAction.Button.LEFT, false, true);
                 Nonsense.INSTANCE.eventBus.post(eventLeft);
-                if (eventLeft.click) {
+                if (eventLeft.click && !eventRelease.blockNext) {
                     this.clickMouse(eventLeft.silentSwing);
                 }
 
