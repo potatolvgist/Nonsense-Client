@@ -18,6 +18,7 @@ public class NoFall extends Module {
     public NoFall() {
         super("No Fall", "Prevents fall damage", Category.PLAYER);
         this.addSettings(mode, timer);
+        this.mode.updateChange();
     }
 
     private boolean timerSetback = false;

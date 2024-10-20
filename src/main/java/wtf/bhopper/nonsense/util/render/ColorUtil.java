@@ -24,7 +24,7 @@ public class ColorUtil {
     }
 
     public static int astolfo(long timeMS, int count) {
-        float hue = (Math.abs((((timeMS * 2L) - count * 500L) % 8000) / 8000.0F) - 0.5F) + 0.5F;
+        float hue = Math.abs(((((timeMS * 2L) - count * 500L) % 8000) / 8000.0F) - 0.5f) + 0.5F;
         return Color.HSBtoRGB(hue, 0.5F, 1.0F);
     }
 

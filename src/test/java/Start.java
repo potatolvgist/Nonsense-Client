@@ -10,7 +10,8 @@ public class Start {
                 "--assetsDir", "assets",
                 "--assetIndex", "1.8",
                 "--userProperties", "{}",
-                "--resourcePackDir", System.getenv("appdata").replace('\\', '/') + "/.minecraft/resourcepacks",
+                "--gameDir", System.getenv("appdata").replace('\\', '/') + "/.minecraft",
+//                "--resourcePackDir", System.getenv("appdata").replace('\\', '/') + "/.minecraft/resourcepacks",
 
                 "--username", "Nonsense",
                 "--accessToken", "0",

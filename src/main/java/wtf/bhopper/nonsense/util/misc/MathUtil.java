@@ -256,4 +256,14 @@ public class MathUtil {
         return result;
     }
 
+    public static Vec3 floor(Vec3 vec3) {
+        return new Vec3(Math.floor(vec3.xCoord), Math.floor(vec3.yCoord), Math.floor(vec3.zCoord));
+    }
+
+    public static boolean vecEquals(Vec3 vecA, Vec3 vecB) {
+        return vecA.xCoord == vecB.xCoord &&
+                vecA.yCoord == vecB.yCoord &&
+                vecA.zCoord == vecB.zCoord;
+    }
+
 }

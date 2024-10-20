@@ -18,12 +18,13 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
 
         // Combat
         this.addModule(new KillAura());
-        this.addModule(new AutoBlock());
-        this.addModule(new AntiBot());
         this.addModule(new Velocity());
+        this.addModule(new AntiBot());
+        this.addModule(new AutoBlock());
         this.addModule(new Criticals());
+        this.addModule(new Reach());
         this.addModule(new NoClickDelay());
-        this.addModule(new AutoCopsAndCrims());
+//        this.addModule(new AutoCopsAndCrims());
 
         // Movement
         this.addModule(new Sprint());
@@ -46,6 +47,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         // Exploit
         this.addModule(new PingSpoofer());
 //        this.addModule(new Disabler());
+        this.addModule(new Teleport());
         this.addModule(new ItemSpoofer());
         this.addModule(new ServerLagger());
         this.addModule(new Plugins());

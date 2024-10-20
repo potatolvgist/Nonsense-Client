@@ -1,16 +1,14 @@
 package wtf.bhopper.nonsense.util.minecraft.player;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventMove;
 import wtf.bhopper.nonsense.event.impl.EventSlowDown;
 import wtf.bhopper.nonsense.event.impl.EventSpeed;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 
-public class MoveUtil {
-
-    private static final Minecraft mc = Minecraft.getMinecraft();
+public class MoveUtil implements MinecraftInstance {
 
     public static boolean isMoving() {
         return mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F;

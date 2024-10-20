@@ -24,14 +24,18 @@ public class RotationUtil {
         serverPitch = mc.thePlayer.rotationPitchHead = pitch;
     }
 
-    public static Rotation getRotations(double posX, double posY, double posZ) {
-        double x = posX - mc.thePlayer.posX;
-        double y = posY - (mc.thePlayer.posY + (double)mc.thePlayer.getEyeHeight());
-        double z = posZ - mc.thePlayer.posZ;
+    public static Rotation getRotations(double rotX, double rotY, double rotZ, double startX, double startY, double startZ) {
+        double x = rotX - startX;
+        double y = rotY - startY;
+        double z = rotZ - startZ;
         double dist = MathHelper.sqrt_double(x * x + z * z);
         float yaw = (float)(Math.atan2(z, x) * 180.0 / Math.PI) - 90.0F;
         float pitch = (float)(-(Math.atan2(y, dist) * 180.0 / Math.PI));
-        return new Rotation(yaw, pitch, new Vec3(posX, posY, posZ));
+        return new Rotation(yaw, pitch, new Vec3(rotX, rotY, rotZ));
+    }
+
+    public static Rotation getRotations(double posX, double posY, double posZ) {
+        return getRotations(posX, posY, posZ, mc.thePlayer.posX, mc.thePlayer.posY + (double)mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
     }
 
     public static Rotation getRotations(Vec3 vec) {
@@ -48,6 +52,9 @@ public class RotationUtil {
 
     public static Rotation getRotations(Entity entity) {
         return getRotations(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
+    }
+    public static Rotation getRotations(Entity target, Entity entity) {
+        return getRotations(target.posX, target.posY + target.getEyeHeight(), target.posZ, entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
     }
 
     public static Rotation getRotationsOptimized(AxisAlignedBB boundingBox) {

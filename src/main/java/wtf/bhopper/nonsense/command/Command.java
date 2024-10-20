@@ -1,11 +1,9 @@
 package wtf.bhopper.nonsense.command;
 
-import net.minecraft.client.Minecraft;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 
-public abstract class Command {
-
-    public static final Minecraft mc = Minecraft.getMinecraft();
+public abstract class Command implements MinecraftInstance {
 
     public final String name;
     public final String description;

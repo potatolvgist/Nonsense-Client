@@ -65,6 +65,9 @@ public class DropdownModuleButton {
 
         if (this.expanded) {
             this.components.forEach(settingButton -> settingButton.draw(mouseX, mouseY, partialTicks));
+            Gui.drawRect(this.x, this.panel.drawY, this.x + DropdownClickGui.WIDTH, this.panel.drawY + 2, 0xFF111111);
+            Gui.drawRect(this.x + 3, this.panel.drawY, this.x + DropdownClickGui.WIDTH - 3, this.panel.drawY + 2, 0xFF171717);
+            this.panel.drawY += 2;
         }
 
         if (this.mouseIntersecting(mouseX, mouseY)) {

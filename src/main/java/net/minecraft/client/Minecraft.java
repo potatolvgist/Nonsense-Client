@@ -101,6 +101,7 @@ import wtf.bhopper.nonsense.event.impl.EventItemSelect;
 import wtf.bhopper.nonsense.event.impl.EventPreClick;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
+import wtf.bhopper.nonsense.module.impl.movement.InventoryMove;
 import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
@@ -1577,7 +1578,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             }
         }
 
-        if (this.currentScreen == null || this.currentScreen.allowUserInput) {
+        if (this.currentScreen == null || this.currentScreen.allowUserInput || Nonsense.module(InventoryMove.class).allowMove()) {
+
             this.mcProfiler.endStartSection("mouse");
 
             while (Mouse.next()) {
@@ -1616,7 +1618,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                         if (!this.inGameHasFocus && Mouse.getEventButtonState()) {
                             this.setIngameFocus();
                         }
-                    } else if (this.currentScreen != null) {
+                    } else {
                         this.currentScreen.handleMouseInput();
                     }
                 }
@@ -1773,11 +1775,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                 }
             }
 
-            EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
-            Nonsense.INSTANCE.eventBus.post(eventItemSelect);
-            InventoryUtil.serverItem = eventItemSelect.slot;
-            if (!eventItemSelect.silent) {
-                this.thePlayer.inventory.currentItem = eventItemSelect.slot;
+            if (!this.thePlayer.isSpectator()) {
+                EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
+                Nonsense.INSTANCE.eventBus.post(eventItemSelect);
+                InventoryUtil.serverItem = eventItemSelect.slot;
+                if (!eventItemSelect.silent) {
+                    this.thePlayer.inventory.currentItem = eventItemSelect.slot;
+                }
             }
 
             boolean chatVisible = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
@@ -1954,7 +1958,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
      * Arguments: World foldername,  World ingame name, WorldSettings
      */
     public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {
-        this.loadWorld((WorldClient) null);
+        this.loadWorld(null);
         System.gc();
         ISaveHandler isavehandler = this.saveLoader.getSaveLoader(folderName, false);
         WorldInfo worldinfo = isavehandler.loadWorldInfo();

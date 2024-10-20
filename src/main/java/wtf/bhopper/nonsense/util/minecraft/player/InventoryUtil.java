@@ -1,21 +1,33 @@
 package wtf.bhopper.nonsense.util.minecraft.player;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.*;
 import net.minecraft.network.play.client.C10PacketCreativeInventoryAction;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
-public class InventoryUtil {
+import java.util.List;
 
-    private static final Minecraft mc = Minecraft.getMinecraft();
+public class InventoryUtil implements MinecraftInstance {
 
     public static final int INCLUDE_ARMOR_BEGIN = 5;
     public static final int EXCLUDE_ARMOR_BEGIN = 9;
     public static final int ONLY_HOT_BAR_BEGIN = 36;
     public static final int END = 45;
+
+    public static final ScoreCheck NO_SCORE = stack -> 0.0F;
+    public static final ScoreCheck STACK_SIZE_SCORE = stack -> stack.stackSize;
+    public static final ScoreCheck DURABILITY_SCORE = stack -> {
+        if (!stack.getItem().isDamageable()) {
+            return Float.MAX_VALUE;
+        }
+        return stack.getMaxDamage() - stack.getItemDamage();
+    };
 
     public static int serverItem = 0;
 
@@ -35,6 +47,18 @@ public class InventoryUtil {
         return false;
     }
 
+    public static ItemStack getStackInSlot(int slot) {
+        return mc.thePlayer.inventoryContainer.getSlot(slot).getStack();
+    }
+
+    public static ItemStack[] getStacks() {
+        ItemStack[] stacks = new ItemStack[END - EXCLUDE_ARMOR_BEGIN];
+        for (int i = EXCLUDE_ARMOR_BEGIN; i < END; i++) {
+            stacks[i - EXCLUDE_ARMOR_BEGIN] = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
+        }
+        return stacks;
+    }
+
     public static void click(int slot, int mouseButton, boolean shiftClick) {
         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, mouseButton, shiftClick ? 1 : 0, mc.thePlayer);
     }
@@ -43,8 +67,8 @@ public class InventoryUtil {
         mc.playerController.windowClick(0, slot, 1, 4, mc.thePlayer);
     }
 
-    public static void swap(int slot, int hSlot) {
-        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, hSlot, 2, mc.thePlayer);
+    public static void swap(int srcSlot, int dstSlot) {
+        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, srcSlot, dstSlot, 2, mc.thePlayer);
     }
 
     public static float getSwordScore(ItemStack stack) {
@@ -192,12 +216,144 @@ public class InventoryUtil {
         return item.damageReduceAmount + protection + thorns + depthStrider + featherFalling;
     }
 
+    public static float getBowScore(ItemStack stack) {
+        checkItem(stack, item -> item instanceof ItemBow);
+
+        ItemBow item = (ItemBow)stack.getItem();
+
+//        if (stack.isItemStackDamageable()) {
+//            int damageLeft = stack.getMaxDamage() - stack.getItemDamage();
+//            if (damageLeft < 50) {
+//                return 0.0F;
+//            }
+//        }
+
+        float power = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack) * 1.25F;
+        float punch = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack) * 0.5F;
+
+        return power + punch;
+    }
+
+    public static float getRodScore(ItemStack stack) {
+        checkItem(stack, item -> item instanceof ItemFishingRod);
+
+        ItemFishingRod item = (ItemFishingRod)stack.getItem();
+
+//        if (stack.isItemStackDamageable()) {
+//            int damageLeft = stack.getMaxDamage() - stack.getItemDamage();
+//            if (damageLeft < 50) {
+//                return 0.0F;
+//            }
+//        }
+
+        float kb = EnchantmentHelper.getEnchantmentLevel(Enchantment.knockback.effectId, stack) * 1.25F;
+
+        return kb;
+    }
+
+    public static float getPotionScore(ItemStack stack, Potion potion) {
+        checkItem(stack, item -> item instanceof ItemPotion);
+
+        ItemPotion item = (ItemPotion)stack.getItem();
+        List<PotionEffect> effects = item.getEffects(stack);
+        for (PotionEffect effect : effects) {
+            if (effect.getPotionID() == potion.id) {
+                return effect.getAmplifier() + 1.0F;
+            }
+        }
+
+        return 0.0F;
+    }
+
+    public static int getAmountOfStacks(StackCheck check, boolean includeArmor) {
+        int amount = 0;
+        for (int i = includeArmor ? INCLUDE_ARMOR_BEGIN : EXCLUDE_ARMOR_BEGIN; i < END; i++) {
+            ItemStack stack = getStackInSlot(i);
+            if (stack != null && check.check(stack)) {
+                amount++;
+            }
+        }
+        return amount;
+    }
+
+    public static int getBest(StackCheck check, ScoreCheck score, boolean includeArmor) {
+        int bestSlot = -1;
+        float bestScore = 0.0F;
+        for (int i = includeArmor ? INCLUDE_ARMOR_BEGIN : EXCLUDE_ARMOR_BEGIN; i < END; i++) {
+            ItemStack stack = getStackInSlot(i);
+            if (stack != null && check.check(stack)) {
+                float stackScore = score.getScore(stack);
+                if (stackScore > bestScore) {
+                    bestScore = stackScore;
+                    bestSlot = i;
+                }
+            }
+        }
+        return bestSlot;
+    }
+
     private static void checkItem(ItemStack stack, ItemCheck check) {
         if (stack == null) {
             throw new IllegalArgumentException("stack cannot be null");
         }
 
         check.check(stack.getItem());
+    }
+
+    public static boolean isArmor(ItemStack stack, int type) {
+        if (stack.getItem() instanceof ItemArmor) {
+            return ((ItemArmor) stack.getItem()).armorType == type;
+        }
+        return false;
+    }
+
+    public static boolean isBlock(ItemStack stack, Block... blocks) {
+        if (stack.getItem() instanceof ItemBlock) {
+            for (Block block : blocks) {
+                if (((ItemBlock) stack.getItem()).getBlock() == block) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isPotion(ItemStack stack, Potion... effects) {
+        if (stack.getItem() instanceof ItemPotion) {
+            List<PotionEffect> stackEffects = ((ItemPotion) stack.getItem()).getEffects(stack);
+            for (Potion effect : effects) {
+                for (PotionEffect stackEffect : stackEffects) {
+                    if (effect.id == stackEffect.getPotionID()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static class StackSlotPair {
+        public ItemStack stack;
+        public int slot;
+
+        public StackSlotPair(ItemStack stack, int slot) {
+            this.stack = stack;
+            this.slot = slot;
+        }
+
+        public boolean valid() {
+            return this.slot != -1;
+        }
+    }
+
+    public interface StackCheck {
+        boolean check(ItemStack stack);
+    }
+
+    public interface ScoreCheck {
+        float getScore(ItemStack stack);
     }
 
     private interface ItemCheck {

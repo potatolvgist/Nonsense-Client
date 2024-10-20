@@ -1,7 +1,26 @@
 {
   "changelog": [
     {
-      "version": "Alphe-241016",
+      "version": "Alpha-241020",
+      "changes": [
+        "Added $lInventory Manager$r",
+        "Fixed a bug in $lNo Rotate$r that prevented it from working",
+        "Improved $lMiniblox$r mode in $lFlight$r"
+      ]
+    },
+    {
+      "version": "Alpha-241019",
+      "changes": [
+        "Added $lTeleport$r",
+        "Added $lPriority$r mode to $lKill Aura$r",
+        "Added $lOptimize$r option to $lVanilla No Slow$r",
+        "Added $lSet$r command",
+        "Added $lTarget Strade$r option to $lKill Aura$r",
+        "Improved $lMiniblox$r mode in $lFlight$r"
+      ]
+    },
+    {
+      "version": "Alpha-241016",
       "changes": [
         "Added $lAnti Fall$r",
         "Added $lMiniblox$r mode to $lSpeed$r, $lFlight$r and $lNo Fall$r",

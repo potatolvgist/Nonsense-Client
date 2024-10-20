@@ -23,14 +23,16 @@ import wtf.bhopper.nonsense.util.minecraft.client.BlinkUtil;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 
-public class NoSlow extends Module {
+public class
+NoSlow extends Module {
 
     private final EnumSetting<Mode> mode = new EnumSetting<>("Mode", "Mode", Mode.VANILLA, value -> this.optimize.setDisplayed(value == Mode.VANILLA));
     private final BooleanSetting optimize = new BooleanSetting("Optimize", "HvH optimizations", false);
 
     public NoSlow() {
         super("No Slow", "Prevents you from being slowed while using items", Category.MOVEMENT);
-        this.addSettings(this.mode);
+        this.addSettings(this.mode, this.optimize);
+        this.mode.updateChange();
     }
 
     @EventHandler

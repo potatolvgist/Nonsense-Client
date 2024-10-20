@@ -25,7 +25,7 @@ import java.lang.invoke.MethodHandles;
 public class Nonsense {
 
     public static final String NAME = "Nonsense";
-    public static final String VERSION = "Alpha-241010";
+    public static final String VERSION = "Alpha-241019";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
     public static final Gson GSON = new Gson();

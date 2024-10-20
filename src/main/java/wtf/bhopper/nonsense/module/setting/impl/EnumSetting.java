@@ -117,7 +117,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
             String valueStr = element.getAsString();
             for (T value : values) {
                 if (value.name().equalsIgnoreCase(valueStr)) {
-                    currentValue = value;
+                    this.set(value);
                     break;
                 }
             }

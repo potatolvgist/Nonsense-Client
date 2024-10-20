@@ -1,20 +1,18 @@
 package wtf.bhopper.nonsense.module;
 
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjglx.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.setting.Setting;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 import wtf.bhopper.nonsense.util.misc.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class Module {
-
-    public static final Minecraft mc = Minecraft.getMinecraft();
+public abstract class Module implements MinecraftInstance {
 
     public final String name;
     public final String displayName;

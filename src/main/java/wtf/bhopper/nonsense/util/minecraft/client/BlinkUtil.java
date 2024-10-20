@@ -28,6 +28,10 @@ public class BlinkUtil {
 
     public static void disableBlink() {
         blink = false;
+        poll();
+    }
+
+    public static void poll() {
         while (!chokedPackets.isEmpty()) {
             PacketUtil.sendNoEvent(chokedPackets.poll());
         }

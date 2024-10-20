@@ -14,6 +14,7 @@ import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.*;
 import wtf.bhopper.nonsense.module.setting.util.Description;
+import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
 import wtf.bhopper.nonsense.util.misc.Clock;
 import wtf.bhopper.nonsense.util.misc.MathUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
@@ -56,10 +57,17 @@ public class KillAura extends Module {
     private final EnumSetting<RotationMode> rotationMode = new EnumSetting<>("Mode", "Rotations mode", RotationMode.INSTANT);
     private final EnumSetting<RotationRandomization> randomization = new EnumSetting<>("Random", "Randomizes rotations to help bypass anti-cheats", RotationRandomization.NONE);
 
+    private final GroupSetting strafeGroup = new GroupSetting("Target Strafe", "Strafe around targets", this);
+    private final BooleanSetting enableStrafe = new BooleanSetting("Enable", "Enable target strafe", false);
+    private final BooleanSetting onSpace = new BooleanSetting("On Jump", "Only strafe while holding jump", true);
+    private final EnumSetting<StrafeMode> strafeMode = new EnumSetting<>("Mode", "Strafe mode", StrafeMode.CIRCLE);
+    private final FloatSetting strafeRadius = new FloatSetting("Radius", "Strafe radius", 0.1F, 4.0F, 1.0F);
+
     private final FloatSetting attackRange = new FloatSetting("Attack Range", "Attacking range", 1.0F, 10.0F, 4.2F);
     private final FloatSetting swingRange = new FloatSetting("Swing Range", "Swinging range", 1.0F, 16.0F, 5.2F);
     private final FloatSetting rotateRange = new FloatSetting("Rotate Range", "Rotating range", 1.0F, 16.0F, 5.2F);
     private final EnumSetting<TargetSorting> sorting = new EnumSetting<>("Sorting", "Target sorting", TargetSorting.DISTANCE);
+    private final EnumSetting<AttackMode> attackMode = new EnumSetting<>("Attack Mode", "Attack mode", AttackMode.VANILLA);
     private final EnumSetting<SwingMode> swingMode = new EnumSetting<>("Swing Mode", "Swinging mode", SwingMode.ATTACK_ONLY);
     private final BooleanSetting walls = new BooleanSetting("Walls", "Allows Kill Aura to attack through walls", true);
     private final IntSetting ticksExisted = new IntSetting("Ticks Existed", "Amount of ticks an entity has to have existed for before attacking", 0, 100, 15);
@@ -83,12 +91,21 @@ public class KillAura extends Module {
 
     private int attacked = -1;
 
+    private boolean strafing = false;
+    private int strafeDirection = 1;
+    private int strafeTicks = 0;
+
     public KillAura() {
         super("Kill Aura", "Automatically attacks nearby entities", Category.COMBAT);
         this.targetsGroup.add(players, mobs, animals, others, invis, dead, teams);
         this.attackSpeed.add(minAps, maxAps);
         this.rotationsGroup.add(fov, rotationMode, randomization);
-        this.addSettings(mode, targetsGroup, attackSpeed, rotationsGroup, attackRange, swingRange, rotateRange, sorting, swingMode, walls, ticksExisted, autoDisable, switchDelay);
+        this.strafeGroup.add(enableStrafe, onSpace, strafeMode, strafeRadius);
+        this.addSettings(mode,
+                targetsGroup, attackSpeed, rotationsGroup, strafeGroup,
+                attackRange, swingRange, rotateRange,
+                sorting, attackMode, swingMode,
+                walls, ticksExisted, autoDisable, switchDelay);
         this.mode.updateChange();
     }
 
@@ -97,6 +114,7 @@ public class KillAura extends Module {
         this.prevRotations.yaw = mc.thePlayer.rotationYaw;
         this.prevRotations.pitch = mc.thePlayer.rotationPitch;
         this.updateAttackDelay();
+        this.strafing = false;
     }
 
     @EventHandler
@@ -104,6 +122,13 @@ public class KillAura extends Module {
 
         this.blockAttack = false;
         this.attacked = -1;
+
+        if (mc.thePlayer.isCollidedHorizontally && strafeTicks >= 4) {
+            strafeDirection = -strafeDirection;
+            strafeTicks = 0;
+        } else {
+            ++strafeTicks;
+        }
 
         if (mc.thePlayer.getHealth() <= 0.0F && autoDisable.get()) {
             this.toggle(false);
@@ -137,7 +162,7 @@ public class KillAura extends Module {
 
     @EventHandler
     public void onClickAction(EventClickAction event) {
-        if (this.target == null || this.blockAttack) {
+        if (!this.attackMode.is(AttackMode.VANILLA) || this.target == null || this.blockAttack) {
             return;
         }
 
@@ -167,11 +192,92 @@ public class KillAura extends Module {
     }
 
     @EventHandler
+    public void onPostMotion(EventPostMotion event) {
+        if (!this.attackMode.is(AttackMode.POST) || this.target == null) {
+            return;
+        }
+
+        if (!this.attackTimer.hasReached(this.nextAttackDelay)) {
+            return;
+        }
+
+        this.updateAttackDelay();
+        this.attackTimer.reset();
+
+        boolean silentSwing = false;
+
+        switch (this.swingMode.get()) {
+            case CLIENT:
+                silentSwing = false;
+                break;
+
+            case SILENT:
+                silentSwing = true;
+                break;
+
+            case ATTACK_ONLY:
+                silentSwing = !this.canAttack;
+                break;
+        }
+
+        mc.clickMouse(silentSwing);
+    }
+
+    @EventHandler
     public void onJoin(EventJoinGame event) {
         if (autoDisable.get()) {
             this.toggle(false);
             Notification.send("Kill Aura", "Kill Aura was automatically disabled", NotificationType.WARNING, 3000);
         }
+    }
+
+    @EventHandler
+    public void onSpeed(EventSpeed event) {
+
+        if (!this.canStrafe()) {
+            this.strafing = false;
+            return;
+        }
+
+        this.strafing = true;
+
+        switch (strafeMode.get()) {
+            case CIRCLE: {
+                Rotation rotation = RotationUtil.getRotations(this.target);
+
+                event.yaw = rotation.yaw;
+                event.strafe = strafeDirection;
+                if (Math.hypot(mc.thePlayer.posX - target.posX, mc.thePlayer.posZ - target.posZ) > this.strafeRadius.get()) {
+                    event.forward = 1.0;
+                } else {
+                    event.forward = 0.0;
+                }
+
+                break;
+            }
+
+            case BACK: {
+                Rotation rotation = RotationUtil.getRotations(this.target);
+                Rotation targetRot = RotationUtil.getRotations(mc.thePlayer, this.target);
+
+                event.yaw = rotation.yaw;
+
+                if (targetRot.yaw - target.rotationYaw > 0.0F) {
+                    event.strafe = 1.0;
+                } else {
+                    event.strafe = -1.0;
+                }
+
+                if (Math.hypot(mc.thePlayer.posX - target.posX, mc.thePlayer.posZ - target.posZ) > this.strafeRadius.get()) {
+                    event.forward = 1.0;
+                } else {
+                    event.forward = 0.0;
+                }
+
+                break;
+            }
+        }
+
     }
 
     private void rotate() {
@@ -231,6 +337,12 @@ public class KillAura extends Module {
 
         switch (mode.get()) {
             case SINGLE: {
+
+                if (this.target != null && this.targets.contains(this.target)) {
+                    this.canAttack = true;
+                    return;
+                }
+
                 if (!this.targets.isEmpty()) {
                     this.target = this.targets.get(0);
                     this.canAttack = true;
@@ -265,6 +377,21 @@ public class KillAura extends Module {
                     }
                 }
 
+                break;
+            }
+
+            case PRIORITY: {
+                if (!this.targets.isEmpty()) {
+                    this.target = this.targets.get(0);
+                    this.canAttack = true;
+                } else {
+                    if (!this.invalidTargets.isEmpty()) {
+                        this.target = this.invalidTargets.get(0);
+                    } else {
+                        this.target = null;
+                    }
+                    this.canAttack = false;
+                }
                 break;
             }
         }
@@ -350,6 +477,22 @@ public class KillAura extends Module {
         this.blockAttack = true;
     }
 
+    private boolean canStrafe() {
+        if (!enableStrafe.get()) {
+            return false;
+        }
+
+        if (this.onSpace.get() && !mc.gameSettings.keyBindJump.isKeyDown()) {
+            return false;
+        }
+
+        if (this.target == null || !MoveUtil.isMoving()) {
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public String getSuffix() {
         return this.mode.getDisplayValue();
@@ -357,7 +500,8 @@ public class KillAura extends Module {
 
     private enum Mode {
         @Description("Selects a target and keeps attacking it until it dies or becomes invalid") SINGLE,
-        @Description("Switches between multiple targets") SWITCH
+        @Description("Switches between multiple targets") SWITCH,
+        @Description("Attacks the best target") PRIORITY
     }
 
     private enum RotationMode {
@@ -371,9 +515,19 @@ public class KillAura extends Module {
         NONE
     }
 
+    private enum StrafeMode {
+        CIRCLE,
+        BACK
+    }
+
     private enum TargetSorting {
         DISTANCE,
         HEALTH
+    }
+
+    private enum AttackMode {
+        VANILLA,
+        POST
     }
 
     private enum SwingMode {

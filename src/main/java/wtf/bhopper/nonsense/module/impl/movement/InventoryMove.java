@@ -31,24 +31,37 @@ public class InventoryMove extends Module {
     @EventHandler
     public void onPreMotion(EventPreMotion event) {
 
-        if (mc.currentScreen == null || mc.currentScreen instanceof GuiChat) {
+        if (!this.allowMove()) {
             return;
         }
 
-        if (mc.isSingleplayer() && mc.currentScreen.doesGuiPauseGame()) {
+        if (mc.currentScreen instanceof GuiChat) {
             return;
-        }
-
-        if (mode.is(Mode.VANILLA) && clientSideOnly.get()) {
-            if (mc.currentScreen instanceof GuiContainer && !((GuiContainer) mc.currentScreen).isClientSide()) {
-                return;
-            }
         }
 
         for (KeyBinding bind : this.binds) {
             bind.setPressed(Keyboard.isKeyDown(bind.getKeyCode()));
         }
 
+    }
+
+    public boolean allowMove() {
+
+        if (!this.isEnabled() || mc.thePlayer == null) {
+            return false;
+        }
+
+        if (mc.isSingleplayer() && mc.currentScreen != null && mc.currentScreen.doesGuiPauseGame()) {
+            return false;
+        }
+
+        if (mode.is(Mode.VANILLA) && clientSideOnly.get()) {
+            if (mc.currentScreen instanceof GuiContainer && !((GuiContainer) mc.currentScreen).isClientSide()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private enum Mode {

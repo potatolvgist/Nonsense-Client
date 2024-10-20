@@ -1,6 +1,8 @@
 package wtf.bhopper.nonsense.command;
 
-public class SubCommand {
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
+
+public class SubCommand implements MinecraftInstance {
 
     public final String name;
     public final String description;

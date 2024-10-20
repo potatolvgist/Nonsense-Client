@@ -1,6 +1,5 @@
 package wtf.bhopper.nonsense.util.net;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import org.apache.http.HttpException;
 import wtf.bhopper.nonsense.Nonsense;

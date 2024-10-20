@@ -8,9 +8,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-import tv.twitch.chat.ChatBadgeData;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 
-public class ChatUtil {
+public class ChatUtil implements MinecraftInstance {
 
     public static final String CHAT_PREFIX = "\2478\247l[\247c\247lNonsense\2478\247l] \247r\2477";
     public static final String CHAT_PREFIX_SHORT = "\247f> \2477";
@@ -20,7 +20,7 @@ public class ChatUtil {
     }
 
     public static void raw(IChatComponent message) {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(message);
+        mc.thePlayer.addChatMessage(message);
     }
 
     public static void print(String message, Object... args) {

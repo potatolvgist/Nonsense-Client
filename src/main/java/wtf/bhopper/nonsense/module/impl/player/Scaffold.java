@@ -59,7 +59,7 @@ public class Scaffold extends Module {
     private Rotation rotations = null;
     private int slot = -1;
 
-    private Clock towerTimer = new Clock();
+    private final Clock towerTimer = new Clock();
 
     public Scaffold() {
         super("Scaffold", "Auto bridge", Category.PLAYER);
@@ -122,6 +122,12 @@ public class Scaffold extends Module {
                                 MoveUtil.vertical(event, 0.0);
                             }
                         }
+                    }
+                    break;
+
+                case VERUS:
+                    if (mc.gameSettings.keyBindJump.isKeyDown() && this.slot != -1 && mc.thePlayer.ticksExisted % 2 == 0) {
+                        MoveUtil.vertical(event, 0.42);
                     }
                     break;
 
@@ -244,7 +250,7 @@ public class Scaffold extends Module {
         return slot;
     }
 
-    private boolean isValid(ItemStack itemStack) {
+    public static boolean isValid(ItemStack itemStack) {
         if (itemStack.getItem() instanceof ItemBlock) {
             ItemBlock block = (ItemBlock)itemStack.getItem();
             return !BAD_BLOCKS.contains(block.getBlock()) && block.getBlock().isNormalCube() && block.getBlock().isCollidable();
@@ -278,12 +284,8 @@ public class Scaffold extends Module {
 
     private enum TowerMode {
         VANILLA,
-        @DisplayName("NCP") NCP
-    }
-
-    private enum Swap {
-        CLIENT,
-        SILENT
+        @DisplayName("NCP") NCP,
+        VERUS
     }
 
 }

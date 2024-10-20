@@ -1,21 +1,22 @@
 package wtf.bhopper.nonsense.util.minecraft.player;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 import wtf.bhopper.nonsense.util.minecraft.client.PacketUtil;
 import wtf.bhopper.nonsense.util.minecraft.world.BlockUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerUtil {
-
-    private static final Minecraft mc = Minecraft.getMinecraft();
+public class PlayerUtil implements MinecraftInstance {
 
     public static boolean canUpdate() {
         return mc != null && mc.thePlayer != null && mc.theWorld != null;
