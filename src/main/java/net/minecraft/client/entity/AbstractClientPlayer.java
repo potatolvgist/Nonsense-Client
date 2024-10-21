@@ -1,6 +1,8 @@
 package net.minecraft.client.entity;
 
 import com.mojang.authlib.GameProfile;
+
+import java.awt.*;
 import java.io.File;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -22,6 +24,9 @@ import net.minecraft.world.WorldSettings;
 import net.optifine.player.CapeUtils;
 import net.optifine.player.PlayerConfigurations;
 import net.optifine.reflect.Reflector;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.module.impl.visual.Capes;
+import wtf.bhopper.nonsense.util.render.CapeLocation;
 
 public abstract class AbstractClientPlayer extends EntityPlayer
 {
@@ -91,28 +96,23 @@ public abstract class AbstractClientPlayer extends EntityPlayer
         return networkplayerinfo == null ? DefaultPlayerSkin.getDefaultSkin(this.getUniqueID()) : networkplayerinfo.getLocationSkin();
     }
 
-    public ResourceLocation getLocationCape()
+    public CapeLocation getLocationCape()
     {
-        if (!Config.isShowCapes())
-        {
+        if (!Config.isShowCapes()) {
             return null;
-        }
-        else
-        {
-            if (this.reloadCapeTimeMs != 0L && System.currentTimeMillis() > this.reloadCapeTimeMs)
-            {
+        } else if (Nonsense.module(Capes.class).isEnabled() && this.isClientPlayer()) {
+            return Nonsense.module(Capes.class).cape.get().getResource();
+        } else {
+            if (this.reloadCapeTimeMs != 0L && System.currentTimeMillis() > this.reloadCapeTimeMs) {
                 CapeUtils.reloadCape(this);
                 this.reloadCapeTimeMs = 0L;
             }
 
-            if (this.locationOfCape != null)
-            {
-                return this.locationOfCape;
-            }
-            else
-            {
+            if (this.locationOfCape != null) {
+                return new CapeLocation(this.locationOfCape, null, Color.WHITE);
+            } else {
                 NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-                return networkplayerinfo == null ? null : networkplayerinfo.getLocationCape();
+                return networkplayerinfo == null ? null : new CapeLocation(networkplayerinfo.getLocationCape(), null, Color.WHITE);
             }
         }
     }
@@ -124,7 +124,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer
 
         if (itextureobject == null)
         {
-            itextureobject = new ThreadDownloadImageData((File)null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", new Object[] {StringUtils.stripControlCodes(username)}), DefaultPlayerSkin.getDefaultSkin(getOfflineUUID(username)), new ImageBufferDownload());
+            itextureobject = new ThreadDownloadImageData(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringUtils.stripControlCodes(username)), DefaultPlayerSkin.getDefaultSkin(getOfflineUUID(username)), new ImageBufferDownload());
             texturemanager.loadTexture(resourceLocationIn, itextureobject);
         }
 
@@ -199,8 +199,8 @@ public abstract class AbstractClientPlayer extends EntityPlayer
 
     public boolean hasElytraCape()
     {
-        ResourceLocation resourcelocation = this.getLocationCape();
-        return resourcelocation == null ? false : (resourcelocation == this.locationOfCape ? this.elytraOfCape : true);
+        CapeLocation locationCape = this.getLocationCape();
+        return locationCape != null && (locationCape.cape != this.locationOfCape || this.elytraOfCape);
     }
 
     public void setElytraOfCape(boolean p_setElytraOfCape_1_)

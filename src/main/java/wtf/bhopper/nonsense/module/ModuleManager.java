@@ -66,10 +66,12 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new ClickGuiMod());
         this.addModule(new NoRender());
         this.addModule(new ItemAnimations());
+        this.addModule(new BlockOverlay());
         this.addModule(new Trajectories());
         this.addModule(new Capes());
         this.addModule(new DiscordRPCMod());
         this.addModule(new BarrierView());
+        this.addModule(new ItemPhysics());
     }
 
     public void addModule(Module module) {

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -18,6 +19,9 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.module.impl.combat.KillAura;
+import wtf.bhopper.nonsense.module.impl.player.InventoryManager;
 
 public abstract class GuiContainer extends GuiScreen
 {
@@ -75,6 +79,9 @@ public abstract class GuiContainer extends GuiScreen
     private boolean doubleClick;
     private ItemStack shiftClickedSlot;
 
+    private GuiButton disableAura;
+    private GuiButton disableInvManager;
+
     public GuiContainer(Container inventorySlotsIn)
     {
         this.inventorySlots = inventorySlotsIn;
@@ -91,6 +98,23 @@ public abstract class GuiContainer extends GuiScreen
         this.mc.thePlayer.openContainer = this.inventorySlots;
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
+
+        this.buttonList.add(this.disableAura = new GuiButton(10001, 2, 2, "Disable Kill Aura"));
+        this.buttonList.add(this.disableInvManager = new GuiButton(10002, 2, 24, "Disable Inventory Manager"));
+        this.disableAura.enabled = Nonsense.module(KillAura.class).isEnabled();
+        this.disableInvManager.enabled = Nonsense.module(InventoryManager.class).isEnabled();
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        super.actionPerformed(button);
+        if (button.id == 10001) {
+            Nonsense.module(KillAura.class).toggle(false);
+        }
+
+        if (button.id == 10002) {
+            Nonsense.module(InventoryManager.class).toggle(false);
+        }
     }
 
     /**
@@ -294,7 +318,7 @@ public abstract class GuiContainer extends GuiScreen
         {
             if (flag)
             {
-                drawRect(i, j, i + 16, j + 16, -2130706433);
+                drawRect(i, j, i + 16, j + 16, 0x80ffffff);
             }
 
             GlStateManager.enableDepth();
@@ -756,6 +780,9 @@ public abstract class GuiContainer extends GuiScreen
      */
     public void updateScreen()
     {
+        this.disableAura.enabled = Nonsense.module(KillAura.class).isEnabled();
+        this.disableInvManager.enabled = Nonsense.module(InventoryManager.class).isEnabled();
+
         super.updateScreen();
 
         if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead)

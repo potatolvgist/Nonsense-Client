@@ -97,6 +97,8 @@ public class GuiMerchant extends GuiContainer
      */
     protected void actionPerformed(GuiButton button) throws IOException
     {
+        super.actionPerformed(button);
+
         boolean flag = false;
 
         if (button == this.nextButton)

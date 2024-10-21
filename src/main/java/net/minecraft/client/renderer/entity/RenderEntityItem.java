@@ -1,6 +1,8 @@
 package net.minecraft.client.renderer.entity;
 
 import java.util.Random;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -10,6 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.module.impl.visual.ItemPhysics;
 
 public class RenderEntityItem extends Render<EntityItem>
 {
@@ -90,6 +94,11 @@ public class RenderEntityItem extends Render<EntityItem>
      */
     public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
+        if (Minecraft.getMinecraft().thePlayer != null && Nonsense.module(ItemPhysics.class).isEnabled()) {
+            ItemPhysics.doRender(this, entity, x, y, z, entityYaw, partialTicks);
+            return;
+        }
+
         ItemStack itemstack = entity.getEntityItem();
         this.field_177079_e.setSeed(187L);
         boolean flag = false;

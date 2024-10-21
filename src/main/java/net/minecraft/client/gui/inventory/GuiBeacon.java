@@ -130,6 +130,8 @@ public class GuiBeacon extends GuiContainer
      */
     protected void actionPerformed(GuiButton button) throws IOException
     {
+        super.actionPerformed(button);
+
         if (button.id == -2)
         {
             this.mc.displayGuiScreen((GuiScreen)null);

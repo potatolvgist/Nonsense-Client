@@ -5,7 +5,6 @@ import meteordevelopment.orbit.IEventBus;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.lwjgl.opengl.Display;
 import wtf.bhopper.nonsense.alt.AltManager;
 import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
@@ -21,15 +20,14 @@ import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 
-public class Nonsense {
+public enum Nonsense {
+    INSTANCE;
 
     public static final String NAME = "Nonsense";
     public static final String VERSION = "Alpha-241021";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
     public static final Gson GSON = new Gson();
-
-    public static Nonsense INSTANCE = null;
 
     // Time at which the game was started (in millis)
     public final long startTime;
@@ -48,8 +46,7 @@ public class Nonsense {
     public TickRate tickRate;
     public File dataDir;
 
-    public Nonsense() {
-        INSTANCE = this;
+    Nonsense() {
         this.startTime = System.currentTimeMillis();
     }
 

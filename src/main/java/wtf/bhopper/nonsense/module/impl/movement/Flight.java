@@ -132,16 +132,16 @@ public class Flight extends Module {
             case MINIBLOX: {
                 if (this.stage >= 6) {
                     MoveUtil.setSpeed(event, 0.0);
+                    MoveUtil.vertical(event, 0.0);
                 } else {
                     MoveUtil.setSpeed(event, vanillaHorizontal.get());
-                }
-
-                if (mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindSneak.isKeyDown()) {
-                    MoveUtil.vertical(event, vanillaVertical.get());
-                } else if (!mc.gameSettings.keyBindJump.isKeyDown() && mc.gameSettings.keyBindSneak.isKeyDown()) {
-                    MoveUtil.vertical(event, -vanillaVertical.get());
-                } else {
-                    MoveUtil.vertical(event, 0.0);
+                    if (mc.gameSettings.keyBindJump.isKeyDown() && !mc.gameSettings.keyBindSneak.isKeyDown()) {
+                        MoveUtil.vertical(event, vanillaVertical.get());
+                    } else if (!mc.gameSettings.keyBindJump.isKeyDown() && mc.gameSettings.keyBindSneak.isKeyDown()) {
+                        MoveUtil.vertical(event, -vanillaVertical.get());
+                    } else {
+                        MoveUtil.vertical(event, 0.0);
+                    }
                 }
 
                 break;
@@ -240,7 +240,6 @@ public class Flight extends Module {
     public void onReceivePacket(EventReceivePacket event) {
         if (mode.is(Mode.MINIBLOX) && event.packet instanceof S08PacketPlayerPosLook) {
             stage = 0;
-            mc.thePlayer.motionX = mc.thePlayer.motionZ = 0.0;
         }
     }
 

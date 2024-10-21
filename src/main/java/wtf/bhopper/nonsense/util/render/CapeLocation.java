@@ -1,5 +1,6 @@
 package wtf.bhopper.nonsense.util.render;
 
+import com.google.common.base.Objects;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
@@ -16,4 +17,12 @@ public class CapeLocation {
         this.overlayColor = overlayColor;
     }
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("cape", this.cape)
+                .add("overlay", this.overlay)
+                .add("overlayColor", this.overlayColor)
+                .toString();
+    }
 }

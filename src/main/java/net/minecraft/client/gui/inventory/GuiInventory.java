@@ -33,6 +33,8 @@ public class GuiInventory extends InventoryEffectRenderer
      */
     public void updateScreen()
     {
+        super.updateScreen();
+
         if (this.mc.playerController.isInCreativeMode())
         {
             this.mc.displayGuiScreen(GuiContainerCreative.newInstance(this.mc.thePlayer));
@@ -138,6 +140,8 @@ public class GuiInventory extends InventoryEffectRenderer
      */
     protected void actionPerformed(GuiButton button) throws IOException
     {
+        super.actionPerformed(button);
+
         if (button.id == 0)
         {
             this.mc.displayGuiScreen(new GuiAchievements(this, this.mc.thePlayer.getStatFileWriter()));

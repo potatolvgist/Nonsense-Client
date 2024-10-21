@@ -1,5 +1,6 @@
 package wtf.bhopper.nonsense.gui.hud;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
@@ -40,13 +41,13 @@ public class InfoDisplay implements MinecraftInstance {
             return;
         }
 
-        int left = sr.getScaledWidth() / 2 + 91;
+        int left = sr.getScaledWidth() / 2 + 85;
 
         int offset = 16;
         for (ItemStack stack : mc.thePlayer.inventory.armorInventory) {
             if (stack != null) {
                 int x = left - offset;
-                int y = sr.getScaledHeight() - 64;
+                int y = sr.getScaledHeight() - (mc.thePlayer.capabilities.isCreativeMode ? 40 : mc.thePlayer.isInsideOfMaterial(Material.water) ? 68 : 56);
                 mc.getRenderItem().renderItemAndEffectIntoGUI(stack, x, y);
                 mc.getRenderItem().renderItemOverlayIntoGUI(mc.bitFontRenderer, stack, x, y, null);
                 offset += 18;

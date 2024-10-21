@@ -318,16 +318,16 @@ public class RenderUtil {
                 entityBox.maxZ - entity.posZ + z + 0.05D
         );
 
+        if (box) {
+            glColor(color.getRed(), color.getGreen(), color.getBlue(), outline ? 26 : 35);
+            drawFilledBox(axisAlignedBB);
+        }
+
         if (outline) {
             glLineWidth(outlineWidth);
             enableGlCap(GL_LINE_SMOOTH);
             glColor(color.getRed(), color.getGreen(), color.getBlue(), box ? 170 : 255);
             drawSelectionBoundingBox(axisAlignedBB);
-        }
-
-        if (box) {
-            glColor(color.getRed(), color.getGreen(), color.getBlue(), outline ? 26 : 35);
-            drawFilledBox(axisAlignedBB);
         }
 
         GlStateManager.resetColor();
@@ -344,16 +344,16 @@ public class RenderUtil {
         glDepthMask(false);
         glColor(color);
 
-        if (outline) {
-            glLineWidth(outlineWidth);
-            enableGlCap(GL_LINE_SMOOTH);
-            glColor(color.getRed(), color.getGreen(), color.getBlue(), 95);
-            drawSelectionBoundingBox(axisAlignedBB);
-        }
-
         if (box) {
             glColor(color.getRed(), color.getGreen(), color.getBlue(), outline ? 26 : 35);
             drawFilledBox(axisAlignedBB);
+        }
+
+        if (outline) {
+            glLineWidth(outlineWidth);
+            enableGlCap(GL_LINE_SMOOTH);
+            glColor(color);
+            drawSelectionBoundingBox(axisAlignedBB);
         }
 
         GlStateManager.resetColor();
@@ -1190,6 +1190,17 @@ public class RenderUtil {
             color = colorIn;
             width = lineWidth;
         }
+    }
+
+    public static AxisAlignedBB toRender(AxisAlignedBB axisAlignedBB) {
+        return new AxisAlignedBB(
+                axisAlignedBB.minX - mc.getRenderManager().viewerPosX,
+                axisAlignedBB.minY - mc.getRenderManager().viewerPosY,
+                axisAlignedBB.minZ - mc.getRenderManager().viewerPosZ,
+                axisAlignedBB.maxX - mc.getRenderManager().viewerPosX,
+                axisAlignedBB.maxY - mc.getRenderManager().viewerPosY,
+                axisAlignedBB.maxZ - mc.getRenderManager().viewerPosZ
+        );
     }
 
     private static final IntBuffer viewport = GLAllocation.createDirectIntBuffer(16);
