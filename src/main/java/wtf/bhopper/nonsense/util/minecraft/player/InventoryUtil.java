@@ -276,20 +276,22 @@ public class InventoryUtil implements MinecraftInstance {
         return amount;
     }
 
-    public static int getBest(StackCheck check, ScoreCheck score, boolean includeArmor) {
+    public static SearchResult getBest(StackCheck check, ScoreCheck score, boolean includeArmor) {
         int bestSlot = -1;
         float bestScore = 0.0F;
+        ItemStack bestStack = null;
         for (int i = includeArmor ? INCLUDE_ARMOR_BEGIN : EXCLUDE_ARMOR_BEGIN; i < END; i++) {
             ItemStack stack = getStackInSlot(i);
             if (stack != null && check.check(stack)) {
                 float stackScore = score.getScore(stack);
-                if (stackScore > bestScore) {
+                if (stackScore > bestScore || bestSlot == -1) {
                     bestScore = stackScore;
                     bestSlot = i;
+                    bestStack = stack;
                 }
             }
         }
-        return bestSlot;
+        return new SearchResult(bestStack, bestSlot, bestScore);
     }
 
     private static void checkItem(ItemStack stack, ItemCheck check) {
@@ -334,13 +336,15 @@ public class InventoryUtil implements MinecraftInstance {
         return false;
     }
 
-    public static class StackSlotPair {
+    public static class SearchResult {
         public ItemStack stack;
         public int slot;
+        public float score;
 
-        public StackSlotPair(ItemStack stack, int slot) {
+        public SearchResult(ItemStack stack, int slot, float score) {
             this.stack = stack;
             this.slot = slot;
+            this.score = score;
         }
 
         public boolean valid() {

@@ -258,6 +258,11 @@ public class Scaffold extends Module {
         return false;
     }
 
+    @Override
+    public String getSuffix() {
+        return this.mode.getDisplayValue();
+    }
+
     private static class BlockData {
         public final BlockPos blockPos;
         public final EnumFacing facing;

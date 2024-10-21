@@ -375,11 +375,11 @@ public class GuiIngame extends Gui {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.mc.getTextureManager().bindTexture(widgetsTexPath);
             EntityPlayer entityplayer = (EntityPlayer) this.mc.getRenderViewEntity();
-            int i = sr.getScaledWidth() / 2;
+            int centerX = sr.getScaledWidth() / 2;
             float f = this.zLevel;
             this.zLevel = -90.0F;
-            this.drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
-            this.drawTexturedModalRect(i - 91 - 1 + InventoryUtil.serverItem * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
+            this.drawTexturedModalRect(centerX - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
+            this.drawTexturedModalRect(centerX - 91 - 1 + InventoryUtil.serverItem * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
             this.zLevel = f;
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableBlend();
@@ -392,9 +392,12 @@ public class GuiIngame extends Gui {
                 this.renderHotbarItem(slot, itemX, itemY, partialTicks, entityplayer);
             }
 
+            Hud.infoDisplay.drawArmor(sr);
+
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableRescaleNormal();
             GlStateManager.disableBlend();
+
         }
     }
 

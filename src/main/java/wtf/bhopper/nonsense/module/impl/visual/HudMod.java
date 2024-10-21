@@ -30,6 +30,7 @@ public class HudMod extends Module {
     public final StringSetting watermarkText = new StringSetting("Text", "Watermark text", Nonsense.NAME);
 
     public final GroupSetting infoGroup = new GroupSetting("Information", "Display information", this);
+    public final BooleanSetting infoArmor = new BooleanSetting("Armor", "Displays your armor above the hotbar", true);
     public final EnumSetting<Coordinates> infoCoordinates = new EnumSetting<>("Coordinates", "Displays your coordinates", Coordinates.NORMAL);
     public final BooleanSetting infoAngles = new BooleanSetting("Angles", "Displays your pitch and yaw", false);
     public final EnumSetting<Speed> infoSpeed = new EnumSetting<>("Speed", "Displays your speed", Speed.MPS);
@@ -67,6 +68,7 @@ public class HudMod extends Module {
                 this.watermarkText
         );
         this.infoGroup.add(
+                this.infoArmor,
                 this.infoCoordinates,
                 this.infoAngles,
                 this.infoSpeed,
@@ -79,7 +81,7 @@ public class HudMod extends Module {
                 this.notificationEnabled,
                 this.notificationSound
         );
-        this.addSettings(this.moduleListGroup, this.watermarkGroup, this.infoGroup, this.notificationGroup, this.customFont, this.hidef3);
+        this.addSettings(this.moduleListGroup, this.watermarkGroup, this.infoGroup, this.notificationGroup, this.color, this.customFont, this.hidef3);
 
         this.toggle(true);
     }

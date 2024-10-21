@@ -3,12 +3,15 @@ package wtf.bhopper.nonsense.gui.hud;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
@@ -17,9 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class InfoDisplay {
-
-    private static final Minecraft mc = Minecraft.getMinecraft();
+public class InfoDisplay implements MinecraftInstance {
 
     public void draw(ScaledResolution sr) {
 
@@ -32,6 +33,27 @@ public class InfoDisplay {
         this.drawLeft(sr);
         this.drawRight(sr);
         Hud.endDraw();
+    }
+
+    public void drawArmor(ScaledResolution sr) {
+        if (!Hud.enabled() || !PlayerUtil.canUpdate()) {
+            return;
+        }
+
+        int left = sr.getScaledWidth() / 2 + 91;
+
+        int offset = 16;
+        for (ItemStack stack : mc.thePlayer.inventory.armorInventory) {
+            if (stack != null) {
+                int x = left - offset;
+                int y = sr.getScaledHeight() - 64;
+                mc.getRenderItem().renderItemAndEffectIntoGUI(stack, x, y);
+                mc.getRenderItem().renderItemOverlayIntoGUI(mc.bitFontRenderer, stack, x, y, null);
+                offset += 18;
+            }
+        }
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
     }
 
     public void drawLeft(ScaledResolution sr) {

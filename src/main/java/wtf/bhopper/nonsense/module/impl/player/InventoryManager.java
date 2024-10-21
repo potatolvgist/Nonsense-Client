@@ -9,6 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.potion.Potion;
+import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreUpdate;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
@@ -65,6 +66,7 @@ public class InventoryManager extends Module {
 
     private final IntSetting delay = new IntSetting("Delay", "Delay", 0, 10000, 100, "%dms", null);
     private final BooleanSetting guiCheck = new BooleanSetting("Gui Check", "Check that that inventory is open", false);
+    private final BooleanSetting actionCheck = new BooleanSetting("Action Check", "Check for conflictions with other modules", true);
 
     private final Clock timer = new Clock();
 
@@ -136,7 +138,7 @@ public class InventoryManager extends Module {
 
         this.dropMasterSettings = Arrays.asList(dropSwords, dropBows, dropTools, dropArmor, dropUtil, dropFood, dropBlocks, dropPotions);
 
-        this.addSettings(this.slotsGroup, this.autoArmorGroup, this.stealerGroup, this.drops, this.armorGroup, this.toolsGroup, this.utilsGroup, this.potionsGroup, this.delay, this.guiCheck);
+        this.addSettings(this.slotsGroup, this.autoArmorGroup, this.stealerGroup, this.drops, this.armorGroup, this.toolsGroup, this.utilsGroup, this.potionsGroup, this.delay, this.guiCheck, this.actionCheck);
     }
 
     @EventHandler
@@ -144,6 +146,12 @@ public class InventoryManager extends Module {
 
         if (mc.currentScreen instanceof GuiContainerCreative) {
             return;
+        }
+
+        if (this.actionCheck.get()) {
+            if (Nonsense.module(Scaffold.class).isEnabled()) {
+                return;
+            }
         }
 
         if (!this.timer.hasReached(this.delay.get())) {
@@ -224,7 +232,8 @@ public class InventoryManager extends Module {
                             continue;
                         }
 
-                        if (dropSetting.get() == 0 || (InventoryUtil.getBest(dropSetting.check, dropSetting.score, true) != i && InventoryUtil.getAmountOfStacks(dropSetting.check, true) > dropSetting.get())) {
+                        InventoryUtil.SearchResult best = InventoryUtil.getBest(dropSetting.check, dropSetting.score, true);
+                        if (dropSetting.get() == 0 || (best.slot != i && InventoryUtil.getAmountOfStacks(dropSetting.check, true) > dropSetting.get())) {
                             InventoryUtil.drop(i);
                             return true;
                         }
@@ -271,24 +280,29 @@ public class InventoryManager extends Module {
 
         for (int i = 0; i < 9; i++) {
 
-            int best = this.slotSettings[i].get().findBest();
-            if (best == -1) {
+            InventoryUtil.SearchResult best = this.slotSettings[i].get().findBest();
+            if (best.slot == -1) {
                 // Best slot not found
                 continue;
             }
 
-            if (best == InventoryUtil.ONLY_HOT_BAR_BEGIN + i) {
+            float scoreInPlace = 0.0F;
+            try {
+                scoreInPlace = this.slotSettings[i].get().scoreCheck.getScore(InventoryUtil.getStackInSlot(i + InventoryUtil.ONLY_HOT_BAR_BEGIN));
+            } catch (IllegalArgumentException ignored) {}
+
+            if (scoreInPlace == best.score || best.slot == InventoryUtil.ONLY_HOT_BAR_BEGIN + i) {
                 // Item is already in the best slot
-                blocked.add(best);
+                blocked.add(best.slot);
                 continue;
             }
 
-            if (blocked.contains(best)) {
+            if (blocked.contains(best.slot)) {
                 // Previous slot contains that item
                 continue;
             }
 
-            InventoryUtil.swap(best, i);
+            InventoryUtil.swap(best.slot, i);
             return true;
 
         }
@@ -298,7 +312,7 @@ public class InventoryManager extends Module {
     }
 
     private boolean autoArmor(int type, InventoryUtil.ScoreCheck scoreCheck) {
-        InventoryUtil.StackSlotPair bestArmor = this.getBestArmor(type, scoreCheck);
+        InventoryUtil.SearchResult bestArmor = InventoryUtil.getBest(stack -> stack.getItem() instanceof ItemArmor && ((ItemArmor) stack.getItem()).armorType == type, scoreCheck, true);
         if (!bestArmor.valid()) {
             return false;
         }
@@ -347,34 +361,38 @@ public class InventoryManager extends Module {
         return true;
     }
 
-    public InventoryUtil.StackSlotPair getBestArmor(int armorType, InventoryUtil.ScoreCheck scoreCheck) {
-        int bestIndex = -1;
-        ItemStack bestStack = null;
-        for (int i = InventoryUtil.INCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
-            ItemStack stack = InventoryUtil.getStackInSlot(i);
-            if (stack == null) {
-                continue;
-            }
-
-            if (!(stack.getItem() instanceof ItemArmor && ((ItemArmor) stack.getItem()).armorType == armorType)) {
-                continue;
-            }
-
-            if (bestStack == null) {
-                bestIndex = i;
-                bestStack = stack;
-                continue;
-            }
-
-            if (Float.compare(scoreCheck.getScore(stack), scoreCheck.getScore(bestStack)) > 0) {
-                bestIndex = i;
-                bestStack = stack;
-            }
-
-        }
-
-        return new InventoryUtil.StackSlotPair(bestStack, bestIndex);
-    }
+//    public InventoryUtil.SearchResult getBestArmor(int armorType, InventoryUtil.ScoreCheck scoreCheck) {
+//        int bestIndex = -1;
+//        ItemStack bestStack = null;
+//        float bestScore = 0.0F;
+//        for (int i = InventoryUtil.INCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
+//            ItemStack stack = InventoryUtil.getStackInSlot(i);
+//            if (stack == null) {
+//                continue;
+//            }
+//
+//            if (!(stack.getItem() instanceof ItemArmor && ((ItemArmor) stack.getItem()).armorType == armorType)) {
+//                continue;
+//            }
+//
+//            float score = scoreCheck.getScore(stack);
+//            if (bestStack == null) {
+//                bestIndex = i;
+//                bestStack = stack;
+//                bestScore = score;
+//                continue;
+//            }
+//
+//            if (score > bestScore) {
+//                bestIndex = i;
+//                bestStack = stack;
+//                bestScore = score;
+//            }
+//
+//        }
+//
+//        return new InventoryUtil.SearchResult(bestStack, bestIndex, bestScore);
+//    }
 
     public enum ActionMode {
         ALWAYS,
@@ -387,7 +405,7 @@ public class InventoryManager extends Module {
         SWORD(stack -> stack.getItem() instanceof ItemSword, InventoryUtil::getSwordScore),
         BOW(stack -> stack.getItem() == Items.bow, InventoryUtil::getBowScore),
         ROD(stack -> stack.getItem() == Items.fishing_rod, InventoryUtil::getRodScore),
-        PEARL(stack -> stack.getItem() == Items.ender_pearl, InventoryUtil.STACK_SIZE_SCORE),
+        ENDER_PEARL(stack -> stack.getItem() == Items.ender_pearl, InventoryUtil.STACK_SIZE_SCORE),
         GOLDEN_APPLE(stack -> stack.getItem() == Items.golden_apple, InventoryUtil.STACK_SIZE_SCORE),
         GOLDEN_HEAD(stack -> stack.getItem() == Items.skull && stack.hasDisplayName() && stack.getDisplayName().toLowerCase().contains("golden head"), InventoryUtil.STACK_SIZE_SCORE),
         BLOCKS(Scaffold::isValid, InventoryUtil.STACK_SIZE_SCORE),
@@ -411,9 +429,10 @@ public class InventoryManager extends Module {
             return this.stackCheck.check(stack);
         }
 
-        public int findBest() {
+        public InventoryUtil.SearchResult findBest() {
             int bestIndex = -1;
             float bestScore = 0.0F;
+            ItemStack bestStack = null;
             for (int i = InventoryUtil.EXCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
                 ItemStack stack = InventoryUtil.getStackInSlot(i);
                 if (!this.check(stack)) {
@@ -425,17 +444,19 @@ public class InventoryManager extends Module {
                 if (bestIndex == -1) {
                     bestIndex = i;
                     bestScore = score;
+                    bestStack = stack;
                     continue;
                 }
 
                 if (score > bestScore) {
                     bestIndex = i;
                     bestScore = score;
+                    bestStack = stack;
                 }
 
             }
 
-            return bestIndex;
+            return new InventoryUtil.SearchResult(bestStack, bestIndex, bestScore);
         }
 
     }
