@@ -2,7 +2,7 @@ package wtf.bhopper.nonsense.module;
 
 import com.google.gson.JsonObject;
 import net.minecraft.util.EnumChatFormatting;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;

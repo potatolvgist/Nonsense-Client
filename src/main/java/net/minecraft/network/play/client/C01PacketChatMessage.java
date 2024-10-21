@@ -15,7 +15,8 @@ public class C01PacketChatMessage implements Packet<INetHandlerPlayServer>
 
     public C01PacketChatMessage(String messageIn)
     {
-        if (messageIn.length() > 100) {
+        if (messageIn.length() > 100)
+        {
             messageIn = messageIn.substring(0, 100);
         }
 

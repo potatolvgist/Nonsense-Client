@@ -1,9 +1,8 @@
 package wtf.bhopper.nonsense.module.impl.visual;
 
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.clickgui.dropdown.DropdownClickGui;
-import wtf.bhopper.nonsense.gui.clickgui.imgui.ImGuiClickGui;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.ColorSetting;
@@ -40,16 +39,12 @@ public class ClickGuiMod extends Module {
                     mc.displayGuiScreen(new DropdownClickGui());
                     break;
 
-                case IMGUI:
-                    mc.displayGuiScreen(new ImGuiClickGui());
-                    break;
             }
         }
     }
 
     public enum Mode {
         DROPDOWN,
-        @DisplayName("ImGui") IMGUI
     }
 
     public enum ColorMode {

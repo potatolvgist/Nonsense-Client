@@ -5,7 +5,7 @@ import meteordevelopment.orbit.IEventBus;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.lwjglx.opengl.Display;
+import org.lwjgl.opengl.Display;
 import wtf.bhopper.nonsense.alt.AltManager;
 import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
@@ -17,7 +17,6 @@ import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.ModuleManager;
 import wtf.bhopper.nonsense.util.minecraft.client.BlinkUtil;
 import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
-import wtf.bhopper.nonsense.gui.ImGuiHelper;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -25,7 +24,7 @@ import java.lang.invoke.MethodHandles;
 public class Nonsense {
 
     public static final String NAME = "Nonsense";
-    public static final String VERSION = "Alpha-241019";
+    public static final String VERSION = "Alpha-241021";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
     public static final Gson GSON = new Gson();
@@ -79,8 +78,6 @@ public class Nonsense {
         this.altManager.tryLoad();
 
         this.tickRate = new TickRate();
-
-        ImGuiHelper.init(Display.getWindow());
 
         Hud.init();
         DropdownClickGui.init();

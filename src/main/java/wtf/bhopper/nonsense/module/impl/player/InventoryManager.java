@@ -288,7 +288,10 @@ public class InventoryManager extends Module {
 
             float scoreInPlace = 0.0F;
             try {
-                scoreInPlace = this.slotSettings[i].get().scoreCheck.getScore(InventoryUtil.getStackInSlot(i + InventoryUtil.ONLY_HOT_BAR_BEGIN));
+                ItemStack stack = InventoryUtil.getStackInSlot(i + InventoryUtil.ONLY_HOT_BAR_BEGIN);
+                if (stack != null) {
+                    scoreInPlace = this.slotSettings[i].get().scoreCheck.getScore(stack);
+                }
             } catch (IllegalArgumentException ignored) {}
 
             if (scoreInPlace == best.score || best.slot == InventoryUtil.ONLY_HOT_BAR_BEGIN + i) {

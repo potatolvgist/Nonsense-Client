@@ -449,7 +449,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
             }
 
             this.brightnessBuffer.flip();
-            GL11.glTexEnvfv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, (FloatBuffer)this.brightnessBuffer);
+            GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, (FloatBuffer)this.brightnessBuffer);
             GlStateManager.setActiveTexture(OpenGlHelper.GL_TEXTURE2);
             GlStateManager.enableTexture2D();
             GlStateManager.bindTexture(textureBrightness.getGlTextureId());
@@ -642,7 +642,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
                 if (d0 < (double)(f * f))
                 {
-                    String s =  entity.getDisplayName().getFormattedText();
+                    String s = entity.getDisplayName().getFormattedText();
                     float f1 = 0.02666667F;
                     GlStateManager.alphaFunc(516, 0.1F);
 
@@ -671,11 +671,11 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                         int i = fontrenderer.getStringWidth(s) / 2;
                         Tessellator tessellator = Tessellator.getInstance();
                         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                        worldrenderer.pos(-i - 1, -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-                        worldrenderer.pos(-i - 1, 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-                        worldrenderer.pos(i + 1, 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-                        worldrenderer.pos(i + 1, -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+                        worldrenderer.pos((double)(-i - 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                        worldrenderer.pos((double)(-i - 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                        worldrenderer.pos((double)(i + 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                        worldrenderer.pos((double)(i + 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
                         tessellator.draw();
                         GlStateManager.enableTexture2D();
                         GlStateManager.depthMask(true);
@@ -694,7 +694,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
             if (Reflector.RenderLivingEvent_Specials_Post_Constructor.exists())
             {
-                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Post_Constructor, entity, this, x, y, z);
+                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Post_Constructor, new Object[] {entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z)});
             }
         }
     }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IntHashMap;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 
 public class KeyBinding implements Comparable<KeyBinding>
 {

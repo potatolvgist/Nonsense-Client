@@ -26,8 +26,8 @@ import net.minecraft.world.World;
 
 public class ItemPotion extends Item
 {
-    private Map<Integer, List<PotionEffect>> effectCache = Maps.newHashMap();
-    private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.newLinkedHashMap();
+    private Map<Integer, List<PotionEffect>> effectCache = Maps.<Integer, List<PotionEffect>>newHashMap();
+    private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.<List<PotionEffect>, Integer>newLinkedHashMap();
 
     public ItemPotion()
     {
@@ -41,7 +41,7 @@ public class ItemPotion extends Item
     {
         if (stack.hasTagCompound() && stack.getTagCompound().hasKey("CustomPotionEffects", 9))
         {
-            List<PotionEffect> list1 = Lists.newArrayList();
+            List<PotionEffect> list1 = Lists.<PotionEffect>newArrayList();
             NBTTagList nbttaglist = stack.getTagCompound().getTagList("CustomPotionEffects", 10);
 
             for (int i = 0; i < nbttaglist.tagCount(); ++i)
@@ -59,7 +59,7 @@ public class ItemPotion extends Item
         }
         else
         {
-            List<PotionEffect> list = this.effectCache.get(stack.getMetadata());
+            List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(stack.getMetadata()));
 
             if (list == null)
             {
@@ -73,7 +73,7 @@ public class ItemPotion extends Item
 
     public List<PotionEffect> getEffects(int meta)
     {
-        List<PotionEffect> list = this.effectCache.get(meta);
+        List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(meta));
 
         if (list == null)
         {
@@ -173,7 +173,7 @@ public class ItemPotion extends Item
      */
     public static boolean isSplash(int meta)
     {
-        return (meta & 0x4000) != 0;
+        return (meta & 16384) != 0;
     }
 
     public int getColorFromDamage(int meta)

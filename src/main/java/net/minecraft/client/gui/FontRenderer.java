@@ -160,7 +160,10 @@ public class FontRenderer implements IResourceManagerReloadListener
     {
         this.locationFontTexture = FontUtils.getHdFontLocation(this.locationFontTextureBase);
 
-        Arrays.fill(unicodePageLocations, null);
+        for (int i = 0; i < unicodePageLocations.length; ++i)
+        {
+            unicodePageLocations[i] = null;
+        }
 
         this.readFontTexture();
         this.readGlyphSizes();
@@ -457,7 +460,7 @@ public class FontRenderer implements IResourceManagerReloadListener
         {
             char c0 = text.charAt(i);
 
-            if (c0 == '\247' && i + 1 < text.length())
+            if (c0 == 167 && i + 1 < text.length())
             {
                 int l = "0123456789abcdefklmnor".indexOf(text.toLowerCase(Locale.ENGLISH).charAt(i + 1));
 
@@ -469,7 +472,7 @@ public class FontRenderer implements IResourceManagerReloadListener
                     this.underlineStyle = false;
                     this.italicStyle = false;
 
-                    if (l < 0)
+                    if (l < 0 || l > 15)
                     {
                         l = 15;
                     }
@@ -652,14 +655,14 @@ public class FontRenderer implements IResourceManagerReloadListener
                 text = this.bidiReorder(text);
             }
 
-            if ((color & 0xfc000000) == 0)
+            if ((color & -67108864) == 0)
             {
-                color |= 0xff000000;
+                color |= -16777216;
             }
 
             if (dropShadow)
             {
-                color = (color & 0xfcfcfc) >> 2 | color & 0xff000000;
+                color = (color & 16579836) >> 2 | color & -16777216;
             }
 
             this.red = (float)(color >> 16 & 255) / 255.0F;

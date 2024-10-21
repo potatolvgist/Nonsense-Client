@@ -65,7 +65,7 @@ public class S30PacketWindowItems implements Packet<INetHandlerPlayClient>
         handler.handleWindowItems(this);
     }
 
-    public int getWindowID()
+    public int func_148911_c()
     {
         return this.windowId;
     }

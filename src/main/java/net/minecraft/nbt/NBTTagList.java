@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 public class NBTTagList extends NBTBase
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private List<NBTBase> tagList = Lists.newArrayList();
+    private List<NBTBase> tagList = Lists.<NBTBase>newArrayList();
 
     /**
      * The type byte for the tags in the list - they must all be of the same type.
@@ -25,7 +25,7 @@ public class NBTTagList extends NBTBase
     {
         if (!this.tagList.isEmpty())
         {
-            this.tagType = this.tagList.get(0).getId();
+            this.tagType = ((NBTBase)this.tagList.get(0)).getId();
         }
         else
         {
@@ -37,7 +37,7 @@ public class NBTTagList extends NBTBase
 
         for (int i = 0; i < this.tagList.size(); ++i)
         {
-            this.tagList.get(i).write(output);
+            ((NBTBase)this.tagList.get(i)).write(output);
         }
     }
 
@@ -61,7 +61,7 @@ public class NBTTagList extends NBTBase
             else
             {
                 sizeTracker.read(32L * (long)i);
-                this.tagList = Lists.newArrayListWithCapacity(i);
+                this.tagList = Lists.<NBTBase>newArrayListWithCapacity(i);
 
                 for (int j = 0; j < i; ++j)
                 {

@@ -77,12 +77,12 @@ import org.apache.logging.log4j.Logger;
 public class EntityList
 {
     private static final Logger logger = LogManager.getLogger();
-    private static final Map < String, Class <? extends Entity >> stringToClassMapping = Maps.newHashMap();
-    private static final Map < Class <? extends Entity > , String > classToStringMapping = Maps.newHashMap();
-    private static final Map < Integer, Class <? extends Entity >> idToClassMapping = Maps.newHashMap();
-    private static final Map < Class <? extends Entity > , Integer > classToIDMapping = Maps.newHashMap();
-    private static final Map<String, Integer> stringToIDMapping = Maps.newHashMap();
-    public static final Map<Integer, EntityList.EntityEggInfo> entityEggs = Maps.newLinkedHashMap();
+    private static final Map < String, Class <? extends Entity >> stringToClassMapping = Maps. < String, Class <? extends Entity >> newHashMap();
+    private static final Map < Class <? extends Entity > , String > classToStringMapping = Maps. < Class <? extends Entity > , String > newHashMap();
+    private static final Map < Integer, Class <? extends Entity >> idToClassMapping = Maps. < Integer, Class <? extends Entity >> newHashMap();
+    private static final Map < Class <? extends Entity > , Integer > classToIDMapping = Maps. < Class <? extends Entity > , Integer > newHashMap();
+    private static final Map<String, Integer> stringToIDMapping = Maps.<String, Integer>newHashMap();
+    public static final Map<Integer, EntityList.EntityEggInfo> entityEggs = Maps.<Integer, EntityList.EntityEggInfo>newLinkedHashMap();
 
     /**
      * adds a mapping between Entity classes and both a string representation and an ID
@@ -93,7 +93,7 @@ public class EntityList
         {
             throw new IllegalArgumentException("ID is already registered: " + entityName);
         }
-        else if (idToClassMapping.containsKey(id))
+        else if (idToClassMapping.containsKey(Integer.valueOf(id)))
         {
             throw new IllegalArgumentException("ID is already registered: " + id);
         }
@@ -109,9 +109,9 @@ public class EntityList
         {
             stringToClassMapping.put(entityName, entityClass);
             classToStringMapping.put(entityClass, entityName);
-            idToClassMapping.put(id, entityClass);
-            classToIDMapping.put(entityClass, id);
-            stringToIDMapping.put(entityName, id);
+            idToClassMapping.put(Integer.valueOf(id), entityClass);
+            classToIDMapping.put(entityClass, Integer.valueOf(id));
+            stringToIDMapping.put(entityName, Integer.valueOf(id));
         }
     }
 
@@ -121,7 +121,7 @@ public class EntityList
     private static void addMapping(Class <? extends Entity > entityClass, String entityName, int entityID, int baseColor, int spotColor)
     {
         addMapping(entityClass, entityName, entityID);
-        entityEggs.put(entityID, new EntityList.EntityEggInfo(entityID, baseColor, spotColor));
+        entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, baseColor, spotColor));
     }
 
     /**
@@ -133,11 +133,11 @@ public class EntityList
 
         try
         {
-            Class <? extends Entity > oclass = stringToClassMapping.get(entityName);
+            Class <? extends Entity > oclass = (Class)stringToClassMapping.get(entityName);
 
             if (oclass != null)
             {
-                entity = oclass.getConstructor(new Class[] {World.class}).newInstance(worldIn);
+                entity = (Entity)oclass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {worldIn});
             }
         }
         catch (Exception exception)
@@ -163,7 +163,7 @@ public class EntityList
 
         try
         {
-            Class <? extends Entity > oclass = stringToClassMapping.get(nbt.getString("id"));
+            Class <? extends Entity > oclass = (Class)stringToClassMapping.get(nbt.getString("id"));
 
             if (oclass != null)
             {
@@ -221,8 +221,8 @@ public class EntityList
      */
     public static int getEntityID(Entity entityIn)
     {
-        Integer integer = classToIDMapping.get(entityIn.getClass());
-        return integer == null ? 0 : integer;
+        Integer integer = (Integer)classToIDMapping.get(entityIn.getClass());
+        return integer == null ? 0 : integer.intValue();
     }
 
     public static Class <? extends Entity > getClassFromID(int entityID)
@@ -243,7 +243,7 @@ public class EntityList
      */
     public static int getIDFromString(String entityName)
     {
-        Integer integer = stringToIDMapping.get(entityName);
+        Integer integer = (Integer)stringToIDMapping.get(entityName);
         return integer == null ? 90 : integer.intValue();
     }
 

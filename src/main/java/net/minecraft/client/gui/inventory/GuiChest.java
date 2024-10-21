@@ -10,8 +10,8 @@ public class GuiChest extends GuiContainer
 {
     /** The ResourceLocation containing the chest GUI texture. */
     private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
-    public final IInventory upperChestInventory;
-    public final IInventory lowerChestInventory;
+    private IInventory upperChestInventory;
+    public IInventory lowerChestInventory;
 
     /**
      * window height is calculated with these values; the more rows, the heigher
@@ -35,8 +35,8 @@ public class GuiChest extends GuiContainer
      */
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRendererObj.drawString(this.lowerChestInventory.getDisplayName().getUnformattedText(), 8, 6, 0x404040);
-        this.fontRendererObj.drawString(this.upperChestInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 0x404040);
+        this.fontRendererObj.drawString(this.lowerChestInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
+        this.fontRendererObj.drawString(this.upperChestInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     /**

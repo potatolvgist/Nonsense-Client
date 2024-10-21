@@ -2,9 +2,9 @@ package wtf.bhopper.nonsense.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
-import org.lwjglx.BufferUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjglx.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

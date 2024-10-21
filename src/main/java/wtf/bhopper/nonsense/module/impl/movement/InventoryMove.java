@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.settings.KeyBinding;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 import wtf.bhopper.nonsense.event.impl.EventPreMotion;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;

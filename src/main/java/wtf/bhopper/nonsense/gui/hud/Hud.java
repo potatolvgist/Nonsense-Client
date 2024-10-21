@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.nanovg.NVGColor;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.components.RenderComponent;
 import wtf.bhopper.nonsense.gui.font.Fonts;
@@ -12,7 +11,6 @@ import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
 import wtf.bhopper.nonsense.gui.hud.notification.NotificationManager;
 import wtf.bhopper.nonsense.module.impl.visual.HudMod;
 
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 

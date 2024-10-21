@@ -99,7 +99,7 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient>
         this.pitch = pitch;
     }
 
-    public enum EnumFlags
+    public static enum EnumFlags
     {
         X(0),
         Y(1),
@@ -107,16 +107,16 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient>
         Y_ROT(3),
         X_ROT(4);
 
-        private int index;
+        private int field_180058_f;
 
-        EnumFlags(int index)
+        private EnumFlags(int p_i45992_3_)
         {
-            this.index = index;
+            this.field_180058_f = p_i45992_3_;
         }
 
         private int func_180055_a()
         {
-            return 1 << this.index;
+            return 1 << this.field_180058_f;
         }
 
         private boolean func_180054_b(int p_180054_1_)
@@ -126,7 +126,7 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient>
 
         public static Set<S08PacketPlayerPosLook.EnumFlags> func_180053_a(int p_180053_0_)
         {
-            Set<S08PacketPlayerPosLook.EnumFlags> set = EnumSet.noneOf(S08PacketPlayerPosLook.EnumFlags.class);
+            Set<S08PacketPlayerPosLook.EnumFlags> set = EnumSet.<S08PacketPlayerPosLook.EnumFlags>noneOf(S08PacketPlayerPosLook.EnumFlags.class);
 
             for (S08PacketPlayerPosLook.EnumFlags s08packetplayerposlook$enumflags : values())
             {

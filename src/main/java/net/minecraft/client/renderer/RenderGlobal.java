@@ -39,10 +39,10 @@ import net.optifine.util.ChunkUtils;
 import net.optifine.util.RenderChunkUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjglx.input.Keyboard;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import org.lwjglx.util.vector.Vector3f;
-import org.lwjglx.util.vector.Vector4f;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;

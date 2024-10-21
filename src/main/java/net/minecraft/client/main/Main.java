@@ -106,7 +106,12 @@ public class Main {
                 new GameConfiguration.ServerInformation(server, port)
         );
 
-        Runtime.getRuntime().addShutdownHook(new Thread(Minecraft::stopIntegratedServer, "Client Shutdown Thread"));
+        Runtime.getRuntime().addShutdownHook(new Thread("Client Shutdown Thread") {
+            @Override
+            public void run() {
+                Minecraft.stopIntegratedServer();
+            }
+        });
 
         Thread.currentThread().setName("Client thread");
         new Minecraft(gameConfig).run();

@@ -5,24 +5,17 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFWNativeWin32;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.util.nfd.NFDFilterItem;
-import org.lwjgl.util.nfd.NFDOpenDialogArgs;
-import org.lwjglx.opengl.Display;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.alt.Alt;
 import wtf.bhopper.nonsense.alt.AltManager;
 import wtf.bhopper.nonsense.alt.loginthread.CookieLoginThread;
 import wtf.bhopper.nonsense.gui.hud.notification.Notification;
 import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
-import wtf.bhopper.nonsense.util.misc.NativeUtil;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
-
-import static org.lwjgl.util.nfd.NativeFileDialog.*;
 
 public class GuiAddCookieAlt extends GuiScreen {
 
@@ -68,23 +61,10 @@ public class GuiAddCookieAlt extends GuiScreen {
             AltManager.loginThread.start();
         } else if (button.id == 2) {
 
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                long window = NativeUtil.getWindowHandle();
-                NFDFilterItem.Buffer filters = NFDFilterItem.malloc(1);
-                filters.get(0).name(stack.UTF8("Cooke Files")).spec(stack.UTF8("txt"));
-                PointerBuffer path = stack.mallocPointer(1);
-
-                int result = NFD_OpenDialog_With(path, NFDOpenDialogArgs.calloc(stack)
-                        .filterList(filters)
-                        .parentWindow(it -> it.type(NativeUtil.getNfdHandleType()).handle(window)));
-
-                if (result == NFD_OKAY) {
-                    this.cookieFile.setText(path.getStringUTF8(0));
-                    NFD_FreePath(path.get(0));
-                } else {
-                    Nonsense.LOGGER.error("NFD Error: {}\n", NFD_GetError());
-                }
-
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileNameExtensionFilter("Exported Cookie Files", "txt"));
+            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                this.cookieFile.setText(chooser.getSelectedFile().getAbsolutePath());
             }
 
         }

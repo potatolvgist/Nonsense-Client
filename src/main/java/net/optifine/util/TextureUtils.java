@@ -47,10 +47,10 @@ import net.optifine.TextureAnimations;
 import net.optifine.entity.model.CustomEntityModels;
 import net.optifine.shaders.MultiTexID;
 import net.optifine.shaders.Shaders;
-import org.lwjglx.BufferUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjglx.opengl.GLContext;
+import org.lwjgl.opengl.GLContext;
 
 public class TextureUtils
 {

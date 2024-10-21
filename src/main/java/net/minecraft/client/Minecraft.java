@@ -87,21 +87,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.lwjglx.LWJGLException;
-import org.lwjglx.Sys;
-import org.lwjglx.input.Keyboard;
-import org.lwjglx.input.Mouse;
-import org.lwjglx.opengl.*;
-import org.lwjglx.util.glu.GLU;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.*;
+import org.lwjgl.util.glu.GLU;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventClickAction;
 import wtf.bhopper.nonsense.event.impl.EventItemSelect;
 import wtf.bhopper.nonsense.event.impl.EventPreClick;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
-import wtf.bhopper.nonsense.module.impl.movement.InventoryMove;
 import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
@@ -577,9 +574,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         Display.setTitle("Minecraft 1.8.9 - " + Nonsense.NAME + " (" + Nonsense.VERSION + ")");
 
         try {
-            Display.create(new PixelFormat()
-                    .withDepthBits(24)
-                    .withSamples(4));
+            Display.create((new PixelFormat()).withDepthBits(24));
         } catch (LWJGLException exception) {
             logger.error("Couldn't set pixel format", exception);
 
@@ -988,7 +983,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.mcProfiler.endSection();
         this.mcProfiler.startSection("render");
         GlStateManager.pushMatrix();
-        GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
+        GlStateManager.clear(0x4100);
         this.framebufferMc.bindFramebuffer(true);
         this.mcProfiler.startSection("display");
         GlStateManager.enableTexture2D();
@@ -1235,7 +1230,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.fontRendererObj.drawStringWithShadow(s = decimalformat.format(profiler$result.field_76330_b) + "%", (float) (j + i - this.fontRendererObj.getStringWidth(s)), (float) (k - i / 2 - 16), l2);
 
             for (int k2 = 0; k2 < list.size(); ++k2) {
-                Profiler.Result profiler$result2 = list.get(k2);
+                Profiler.Result profiler$result2 = (Profiler.Result) list.get(k2);
                 String s1 = "";
 
                 if (profiler$result2.field_76331_c.equals("unspecified")) {
@@ -1578,8 +1573,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             }
         }
 
-        if (this.currentScreen == null || this.currentScreen.allowUserInput || Nonsense.module(InventoryMove.class).allowMove()) {
-
+        if (this.currentScreen == null || this.currentScreen.allowUserInput) {
             this.mcProfiler.endStartSection("mouse");
 
             while (Mouse.next()) {
@@ -1618,7 +1612,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                         if (!this.inGameHasFocus && Mouse.getEventButtonState()) {
                             this.setIngameFocus();
                         }
-                    } else {
+                    } else if (this.currentScreen != null) {
                         this.currentScreen.handleMouseInput();
                     }
                 }
@@ -1775,13 +1769,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                 }
             }
 
-            if (!this.thePlayer.isSpectator()) {
-                EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
-                Nonsense.INSTANCE.eventBus.post(eventItemSelect);
-                InventoryUtil.serverItem = eventItemSelect.slot;
-                if (!eventItemSelect.silent) {
-                    this.thePlayer.inventory.currentItem = eventItemSelect.slot;
-                }
+            EventItemSelect eventItemSelect = new EventItemSelect(this.thePlayer.inventory.currentItem);
+            Nonsense.INSTANCE.eventBus.post(eventItemSelect);
+            InventoryUtil.serverItem = eventItemSelect.slot;
+            if (!eventItemSelect.silent) {
+                this.thePlayer.inventory.currentItem = eventItemSelect.slot;
             }
 
             boolean chatVisible = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
@@ -1819,7 +1811,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
                 EventClickAction eventLeft = new EventClickAction(EventClickAction.Button.LEFT, false, true);
                 Nonsense.INSTANCE.eventBus.post(eventLeft);
-                if (eventLeft.click && !eventRelease.blockNext) {
+                if (eventLeft.click) {
                     this.clickMouse(eventLeft.silentSwing);
                 }
 
@@ -1958,7 +1950,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
      * Arguments: World foldername,  World ingame name, WorldSettings
      */
     public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {
-        this.loadWorld(null);
+        this.loadWorld((WorldClient) null);
         System.gc();
         ISaveHandler isavehandler = this.saveLoader.getSaveLoader(folderName, false);
         WorldInfo worldinfo = isavehandler.loadWorldInfo();
@@ -2113,7 +2105,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.thePlayer.setReducedDebug(entityplayersp.hasReducedDebug());
 
         if (this.currentScreen instanceof GuiGameOver) {
-            this.displayGuiScreen(null);
+            this.displayGuiScreen((GuiScreen) null);
         }
     }
 

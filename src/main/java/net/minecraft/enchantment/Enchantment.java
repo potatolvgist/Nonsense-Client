@@ -17,7 +17,7 @@ public abstract class Enchantment
 {
     public static final Enchantment[] enchantmentsList = new Enchantment[256];
     public static final Enchantment[] enchantmentsBookList;
-    private static final Map<ResourceLocation, Enchantment> locationEnchantments = Maps.newHashMap();
+    private static final Map<ResourceLocation, Enchantment> locationEnchantments = Maps.<ResourceLocation, Enchantment>newHashMap();
     public static final Enchantment protection = new EnchantmentProtection(0, new ResourceLocation("protection"), 10, 0);
 
     /** Protection against fire */
@@ -120,7 +120,7 @@ public abstract class Enchantment
      */
     public static Enchantment getEnchantmentByLocation(String location)
     {
-        return locationEnchantments.get(new ResourceLocation(location));
+        return (Enchantment)locationEnchantments.get(new ResourceLocation(location));
     }
 
     public static Set<ResourceLocation> func_181077_c()

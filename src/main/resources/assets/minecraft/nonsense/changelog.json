@@ -1,6 +1,13 @@
 {
   "changelog": [
     {
+      "version": "Alpha-241021",
+      "changes": [
+        "Reverted to LWJGL2",
+        "Fixed some bugs in $lInventory Manager$r"
+      ]
+    },
+    {
       "version": "Alpha-241020",
       "changes": [
         "Added $lInventory Manager$r",

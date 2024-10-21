@@ -64,16 +64,16 @@ import net.optifine.util.TimedEvent;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjglx.LWJGLException;
-import org.lwjglx.Sys;
-import org.lwjglx.opengl.Display;
-import org.lwjglx.opengl.DisplayMode;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
-import org.lwjglx.opengl.GLContext;
-import org.lwjglx.opengl.PixelFormat;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.PixelFormat;
 
 public class Config
 {
@@ -81,7 +81,7 @@ public class Config
     public static final String MC_VERSION = "1.8.9";
     public static final String OF_EDITION = "HD_U";
     public static final String OF_RELEASE = "M5";
-    public static final String VERSION = OF_NAME + "_" + MC_VERSION + "_" + OF_EDITION + "_" + OF_RELEASE;
+    public static final String VERSION = "OptiFine_1.8.9_HD_U_M5";
     private static String build = null;
     private static String newRelease = null;
     private static boolean notify64BitJava = false;
@@ -109,7 +109,7 @@ public class Config
     private static boolean fullscreenModeChecked = false;
     private static boolean desktopModeChecked = false;
     private static DefaultResourcePack defaultResourcePackLazy = null;
-    public static final Float DEF_ALPHA_FUNC_LEVEL = 0.1F;
+    public static final Float DEF_ALPHA_FUNC_LEVEL = Float.valueOf(0.1F);
     private static final Logger LOGGER = LogManager.getLogger();
     public static final boolean logDetail = System.getProperty("log.detail", "false").equals("true");
     private static String mcDebugLast = null;
@@ -118,30 +118,30 @@ public class Config
 
     public static String getVersion()
     {
-        return VERSION;
+        return "OptiFine_1.8.9_HD_U_M5";
     }
 
     public static String getVersionDebug()
     {
-        StringBuilder builder = new StringBuilder(32);
+        StringBuffer stringbuffer = new StringBuffer(32);
 
         if (isDynamicLights())
         {
-            builder.append("DL: ");
-            builder.append(DynamicLights.getCount());
-            builder.append(", ");
+            stringbuffer.append("DL: ");
+            stringbuffer.append(String.valueOf(DynamicLights.getCount()));
+            stringbuffer.append(", ");
         }
 
-        builder.append(VERSION);
+        stringbuffer.append("OptiFine_1.8.9_HD_U_M5");
         String s = Shaders.getShaderPackName();
 
         if (s != null)
         {
-            builder.append(", ");
-            builder.append(s);
+            stringbuffer.append(", ");
+            stringbuffer.append(s);
         }
 
-        return builder.toString();
+        return stringbuffer.toString();
     }
 
     public static void initGameSettings(GameSettings p_initGameSettings_0_)
@@ -256,7 +256,7 @@ public class Config
     {
         if (minecraftVersionInt < 0)
         {
-            String[] astring = tokenize(MC_VERSION, ".");
+            String[] astring = tokenize("1.8.9", ".");
             int i = 0;
 
             if (astring.length > 0)
@@ -297,7 +297,7 @@ public class Config
         if (glVersion == null)
         {
             String s = GL11.glGetString(GL11.GL_VERSION);
-            glVersion = parseGlVersion(s, null);
+            glVersion = parseGlVersion(s, (GlVersion)null);
 
             if (glVersion == null)
             {
@@ -318,7 +318,7 @@ public class Config
         if (glslVersion == null)
         {
             String s = GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION);
-            glslVersion = parseGlVersion(s, null);
+            glslVersion = parseGlVersion(s, (GlVersion)null);
 
             if (glslVersion == null)
             {
@@ -797,12 +797,12 @@ public class Config
         return isShaders() && Shaders.aoLevel >= 0.0F ? Shaders.aoLevel : gameSettings.ofAoLevel;
     }
 
-    public static String listToString(List<?> p_listToString_0_)
+    public static String listToString(List p_listToString_0_)
     {
         return listToString(p_listToString_0_, ", ");
     }
 
-    public static String listToString(List<?> p_listToString_0_, String p_listToString_1_)
+    public static String listToString(List p_listToString_0_, String p_listToString_1_)
     {
         if (p_listToString_0_ == null)
         {
@@ -821,7 +821,7 @@ public class Config
                     stringbuffer.append(p_listToString_1_);
                 }
 
-                stringbuffer.append(object);
+                stringbuffer.append(String.valueOf(object));
             }
 
             return stringbuffer.toString();
@@ -852,7 +852,7 @@ public class Config
                     stringbuffer.append(p_arrayToString_1_);
                 }
 
-                stringbuffer.append(object);
+                stringbuffer.append(String.valueOf(object));
             }
 
             return stringbuffer.toString();
@@ -883,7 +883,7 @@ public class Config
                     stringbuffer.append(p_arrayToString_1_);
                 }
 
-                stringbuffer.append(j);
+                stringbuffer.append(String.valueOf(j));
             }
 
             return stringbuffer.toString();

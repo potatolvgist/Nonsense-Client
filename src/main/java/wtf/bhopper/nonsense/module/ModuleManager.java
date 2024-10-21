@@ -48,7 +48,6 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new PingSpoofer());
 //        this.addModule(new Disabler());
         this.addModule(new Teleport());
-        this.addModule(new ItemSpoofer());
         this.addModule(new ServerLagger());
         this.addModule(new Plugins());
 

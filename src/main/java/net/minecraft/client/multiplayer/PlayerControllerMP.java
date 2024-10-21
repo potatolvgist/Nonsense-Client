@@ -28,8 +28,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
-import wtf.bhopper.nonsense.Nonsense;
-import wtf.bhopper.nonsense.module.impl.player.FastMine;
 import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
 
 public class PlayerControllerMP
@@ -319,7 +317,7 @@ public class PlayerControllerMP
 
                 ++this.stepSoundTickCounter;
 
-                if (this.curBlockDamageMP >= Nonsense.module(FastMine.class).getBreakRequirement())
+                if (this.curBlockDamageMP >= 1.0F)
                 {
                     this.isHittingBlock = false;
                     this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, posBlock, directionFacing));
@@ -389,9 +387,9 @@ public class PlayerControllerMP
     public boolean onPlayerRightClick(EntityPlayerSP player, WorldClient worldIn, ItemStack heldStack, BlockPos hitPos, EnumFacing side, Vec3 hitVec)
     {
         this.syncCurrentPlayItem();
-        float facingX = (float)(hitVec.xCoord - (double)hitPos.getX());
-        float facingY = (float)(hitVec.yCoord - (double)hitPos.getY());
-        float facingZ = (float)(hitVec.zCoord - (double)hitPos.getZ());
+        float f = (float)(hitVec.xCoord - (double)hitPos.getX());
+        float f1 = (float)(hitVec.yCoord - (double)hitPos.getY());
+        float f2 = (float)(hitVec.zCoord - (double)hitPos.getZ());
         boolean flag = false;
 
         if (!this.mc.theWorld.getWorldBorder().contains(hitPos))
@@ -404,7 +402,7 @@ public class PlayerControllerMP
             {
                 IBlockState iblockstate = worldIn.getBlockState(hitPos);
 
-                if ((!player.isSneaking() || player.getHeldItem() == null) && iblockstate.getBlock().onBlockActivated(worldIn, hitPos, iblockstate, player, side, facingX, facingY, facingZ))
+                if ((!player.isSneaking() || player.getHeldItem() == null) && iblockstate.getBlock().onBlockActivated(worldIn, hitPos, iblockstate, player, side, f, f1, f2))
                 {
                     flag = true;
                 }
@@ -420,7 +418,7 @@ public class PlayerControllerMP
                 }
             }
 
-            this.netClientHandler.addToSendQueue(new C08PacketPlayerBlockPlacement(hitPos, side.getIndex(), player.inventory.getCurrentItem(), facingX, facingY, facingZ));
+            this.netClientHandler.addToSendQueue(new C08PacketPlayerBlockPlacement(hitPos, side.getIndex(), player.inventory.getCurrentItem(), f, f1, f2));
 
             if (!flag && this.currentGameType != WorldSettings.GameType.SPECTATOR)
             {
@@ -432,14 +430,14 @@ public class PlayerControllerMP
                 {
                     int i = heldStack.getMetadata();
                     int j = heldStack.stackSize;
-                    boolean flag1 = heldStack.onItemUse(player, worldIn, hitPos, side, facingX, facingY, facingZ);
+                    boolean flag1 = heldStack.onItemUse(player, worldIn, hitPos, side, f, f1, f2);
                     heldStack.setItemDamage(i);
                     heldStack.stackSize = j;
                     return flag1;
                 }
                 else
                 {
-                    return heldStack.onItemUse(player, worldIn, hitPos, side, facingX, facingY, facingZ);
+                    return heldStack.onItemUse(player, worldIn, hitPos, side, f, f1, f2);
                 }
             }
             else
@@ -532,9 +530,9 @@ public class PlayerControllerMP
      */
     public ItemStack windowClick(int windowId, int slotId, int mouseButtonClicked, int mode, EntityPlayer playerIn)
     {
-        short transactionID = playerIn.openContainer.getNextTransactionID(playerIn.inventory);
+        short short1 = playerIn.openContainer.getNextTransactionID(playerIn.inventory);
         ItemStack itemstack = playerIn.openContainer.slotClick(slotId, mouseButtonClicked, mode, playerIn);
-        this.netClientHandler.addToSendQueue(new C0EPacketClickWindow(windowId, slotId, mouseButtonClicked, mode, itemstack, transactionID));
+        this.netClientHandler.addToSendQueue(new C0EPacketClickWindow(windowId, slotId, mouseButtonClicked, mode, itemstack, short1));
         return itemstack;
     }
 

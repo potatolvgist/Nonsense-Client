@@ -14,7 +14,7 @@ import net.minecraft.util.ReportedException;
 
 public class NBTTagCompound extends NBTBase
 {
-    private Map<String, NBTBase> tagMap = Maps.newHashMap();
+    private Map<String, NBTBase> tagMap = Maps.<String, NBTBase>newHashMap();
 
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
@@ -23,7 +23,7 @@ public class NBTTagCompound extends NBTBase
     {
         for (String s : this.tagMap.keySet())
         {
-            NBTBase nbtbase = this.tagMap.get(s);
+            NBTBase nbtbase = (NBTBase)this.tagMap.get(s);
             writeEntry(s, nbtbase, output);
         }
 
@@ -380,25 +380,6 @@ public class NBTTagCompound extends NBTBase
         }
     }
 
-    public NBTTagList getTagListAny(String key)
-    {
-        try
-        {
-            if (this.getTagId(key) != 9)
-            {
-                return new NBTTagList();
-            }
-            else
-            {
-                return (NBTTagList)this.tagMap.get(key);
-            }
-        }
-        catch (ClassCastException classcastexception)
-        {
-            throw new ReportedException(this.createCrashReport(key, 9, classcastexception));
-        }
-    }
-
     /**
      * Retrieves a boolean value using the specified key, or false if no such key was stored. This uses the getByte
      * method.
@@ -427,7 +408,7 @@ public class NBTTagCompound extends NBTBase
                 stringbuilder.append(',');
             }
 
-            stringbuilder.append(entry.getKey()).append(':').append(entry.getValue());
+            stringbuilder.append((String)entry.getKey()).append(':').append(entry.getValue());
         }
 
         return stringbuilder.append('}').toString();
@@ -448,8 +429,20 @@ public class NBTTagCompound extends NBTBase
     {
         CrashReport crashreport = CrashReport.makeCrashReport(ex, "Reading NBT data");
         CrashReportCategory crashreportcategory = crashreport.makeCategoryDepth("Corrupt NBT tag", 1);
-        crashreportcategory.addCrashSectionCallable("Tag type found", () -> NBTBase.NBT_TYPES[NBTTagCompound.this.tagMap.get(key).getId()]);
-        crashreportcategory.addCrashSectionCallable("Tag type expected", () -> NBTBase.NBT_TYPES[expectedType]);
+        crashreportcategory.addCrashSectionCallable("Tag type found", new Callable<String>()
+        {
+            public String call() throws Exception
+            {
+                return NBTBase.NBT_TYPES[((NBTBase)NBTTagCompound.this.tagMap.get(key)).getId()];
+            }
+        });
+        crashreportcategory.addCrashSectionCallable("Tag type expected", new Callable<String>()
+        {
+            public String call() throws Exception
+            {
+                return NBTBase.NBT_TYPES[expectedType];
+            }
+        });
         crashreportcategory.addCrashSection("Tag name", key);
         return crashreport;
     }
@@ -553,6 +546,25 @@ public class NBTTagCompound extends NBTBase
             {
                 this.setTag(s, nbtbase.copy());
             }
+        }
+    }
+
+    public NBTTagList getTagListAny(String key)
+    {
+        try
+        {
+            if (this.getTagId(key) != 9)
+            {
+                return new NBTTagList();
+            }
+            else
+            {
+                return (NBTTagList)this.tagMap.get(key);
+            }
+        }
+        catch (ClassCastException classcastexception)
+        {
+            throw new ReportedException(this.createCrashReport(key, 9, classcastexception));
         }
     }
 }

@@ -122,7 +122,7 @@ public abstract class Container
 
     public Slot getSlot(int slotId)
     {
-        return this.inventorySlots.get(slotId);
+        return (Slot)this.inventorySlots.get(slotId);
     }
 
     /**
@@ -284,7 +284,7 @@ public abstract class Container
                     return null;
                 }
 
-                Slot slot7 = this.inventorySlots.get(slotId);
+                Slot slot7 = (Slot)this.inventorySlots.get(slotId);
 
                 if (slot7 != null)
                 {

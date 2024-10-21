@@ -128,7 +128,7 @@ public class BlockState
             }
             else
             {
-                return property.getValueClass().cast(this.properties.get(property));
+                return (T)((Comparable)property.getValueClass().cast(this.properties.get(property)));
             }
         }
 
@@ -140,15 +140,11 @@ public class BlockState
             }
             else if (!property.getAllowedValues().contains(value))
             {
-                T allowed = property.getAllowedValues().stream().findFirst().orElse(null);
-                if (allowed == null) {
-                    throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on block " + Block.blockRegistry.getNameForObject(this.block) + ", it is not an allowed value");
-                }
-                return this.properties.get(property) == allowed ? this : this.propertyValueTable.get(property, allowed);
+                throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on block " + Block.blockRegistry.getNameForObject(this.block) + ", it is not an allowed value");
             }
             else
             {
-                return this.properties.get(property) == value ? this : this.propertyValueTable.get(property, value);
+                return (IBlockState)(this.properties.get(property) == value ? this : (IBlockState)this.propertyValueTable.get(property, value));
             }
         }
 

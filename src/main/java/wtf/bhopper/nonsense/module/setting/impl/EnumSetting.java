@@ -1,8 +1,6 @@
 package wtf.bhopper.nonsense.module.setting.impl;
 
 import com.google.gson.JsonObject;
-import imgui.ImGui;
-import wtf.bhopper.nonsense.gui.clickgui.imgui.ImGuiClickGui;
 import wtf.bhopper.nonsense.module.setting.Setting;
 import wtf.bhopper.nonsense.module.setting.util.Description;
 import wtf.bhopper.nonsense.module.setting.util.DisplayName;
@@ -150,27 +148,5 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
         return null;
     }
 
-    public static <E extends Enum<E>> void imGuiDraw(EnumSetting<E> setting) {
-        Map<E, String> nameMap = setting.valueNameMap();
-
-        if (ImGui.beginCombo(setting.displayName, setting.getDisplayValue())) {
-            for (E value : setting.getValues()) {
-
-                if (ImGui.selectable(nameMap.get(value))) {
-                    setting.set(value);
-                }
-                String desc = getEnumDescription(value);
-                if (desc != null) {
-                    ImGuiClickGui.tooltip(desc);
-                }
-
-            }
-
-            ImGui.endCombo();
-        } else {
-            ImGuiClickGui.tooltip(setting.description);
-        }
-
-    }
 
 }

@@ -32,9 +32,9 @@ public class EnchantmentProtection extends Enchantment
      */
     public final int protectionType;
 
-    public EnchantmentProtection(int id, ResourceLocation p_i45765_2_, int p_i45765_3_, int p_i45765_4_)
+    public EnchantmentProtection(int p_i45765_1_, ResourceLocation p_i45765_2_, int p_i45765_3_, int p_i45765_4_)
     {
-        super(id, p_i45765_2_, p_i45765_3_, EnumEnchantmentType.ARMOR);
+        super(p_i45765_1_, p_i45765_2_, p_i45765_3_, EnumEnchantmentType.ARMOR);
         this.protectionType = p_i45765_4_;
 
         if (p_i45765_4_ == 2)
