@@ -3,6 +3,7 @@ package wtf.bhopper.nonsense.module;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.combat.*;
 import wtf.bhopper.nonsense.module.impl.exploit.*;
+import wtf.bhopper.nonsense.module.impl.exploit.disabler.Disabler;
 import wtf.bhopper.nonsense.module.impl.movement.*;
 import wtf.bhopper.nonsense.module.impl.other.*;
 import wtf.bhopper.nonsense.module.impl.player.*;
@@ -46,7 +47,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
 
         // Exploit
         this.addModule(new PingSpoofer());
-//        this.addModule(new Disabler());
+        this.addModule(new Disabler());
         this.addModule(new Teleport());
         this.addModule(new ServerLagger());
         this.addModule(new Plugins());

@@ -3,7 +3,6 @@ package wtf.bhopper.nonsense.util.minecraft.player;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.*;
 import net.minecraft.network.play.client.C10PacketCreativeInventoryAction;
 import net.minecraft.potion.Potion;
@@ -219,15 +218,6 @@ public class InventoryUtil implements MinecraftInstance {
     public static float getBowScore(ItemStack stack) {
         checkItem(stack, item -> item instanceof ItemBow);
 
-        ItemBow item = (ItemBow)stack.getItem();
-
-//        if (stack.isItemStackDamageable()) {
-//            int damageLeft = stack.getMaxDamage() - stack.getItemDamage();
-//            if (damageLeft < 50) {
-//                return 0.0F;
-//            }
-//        }
-
         float power = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack) * 1.25F;
         float punch = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack) * 0.5F;
 
@@ -236,15 +226,6 @@ public class InventoryUtil implements MinecraftInstance {
 
     public static float getRodScore(ItemStack stack) {
         checkItem(stack, item -> item instanceof ItemFishingRod);
-
-        ItemFishingRod item = (ItemFishingRod)stack.getItem();
-
-//        if (stack.isItemStackDamageable()) {
-//            int damageLeft = stack.getMaxDamage() - stack.getItemDamage();
-//            if (damageLeft < 50) {
-//                return 0.0F;
-//            }
-//        }
 
         float kb = EnchantmentHelper.getEnchantmentLevel(Enchantment.knockback.effectId, stack) * 1.25F;
 

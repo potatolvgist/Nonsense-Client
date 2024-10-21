@@ -33,7 +33,7 @@ public class CustomCreativeTabs extends CreativeTabs {
         items.add(new ItemStack(Items.spawn_egg, 1, 200));
 
         items.add(ItemBuilder.of(Items.potionitem)
-                .setMeta(0x4001)
+                .setMeta(0x4001) // 0x4000 for the splash potion and 0x1 for the color
                 .addPotionEffect(Potion.blindness, 1000000, 2)
                 .addPotionEffect(Potion.moveSlowdown, 1000000, 2)
                 .addPotionEffect(Potion.confusion, 1000000, 2)
@@ -180,6 +180,7 @@ public class CustomCreativeTabs extends CreativeTabs {
                 .setLore("\2477Place this block in your house to", "\2477place a Teleport Pad!")
                 .build());
 
+        // skyblock lol
         items.add(ItemBuilder.of(Items.diamond_sword)
                 .setDisplayName("\2476Aspect of the Dragons")
                 .setLore(

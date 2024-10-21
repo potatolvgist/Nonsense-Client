@@ -17,13 +17,13 @@ public class GuiAddAlt extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
 
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, 66, "Microsoft"));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, 90, "Cookie"));
-        this.buttonList.add(new GuiButton(3, this.width / 2 - 100, 114, "Browser"));
-        this.buttonList.add(new GuiButton(4, this.width / 2 - 100, 138, "Session"));
-        this.buttonList.add(new GuiButton(5, this.width / 2 - 100, 162, "Refresh"));
+        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 2 - 76, "Microsoft"));
+        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, this.height / 2 - 54, "Cookie"));
+        this.buttonList.add(new GuiButton(3, this.width / 2 - 100, this.height / 2 - 32, "Browser"));
+        this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 2 - 10, "Session"));
+        this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 2 + 12, "Refresh Token"));
 
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 18, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 2 + 56, I18n.format("gui.cancel")));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class GuiAddAlt extends GuiScreen {
         } else if (button.id == 3) {
 //            this.mc.displayGuiScreen(new GuiAddBrowserAccount(this.parentScreen));
         } else if (button.id == 4) {
-            // Session
+            this.mc.displayGuiScreen(new GuiAddSessionAlt(this.parentScreen));
         } else if (button.id == 5) {
             // Refresh
         }

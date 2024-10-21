@@ -24,6 +24,7 @@ public abstract class Module implements MinecraftInstance {
     private boolean hidden;
 
     private final List<Setting<?>> settings = new CopyOnWriteArrayList<>();
+    private final List<ModuleMode<?>> moduleModes = new CopyOnWriteArrayList<>();
 
     public Module(String displayName, String description, Category category) {
         this.name = displayName.replace(" ", "");
@@ -42,10 +43,22 @@ public abstract class Module implements MinecraftInstance {
 
         if (this.toggled) {
             Nonsense.INSTANCE.eventBus.subscribe(this);
+            for (ModuleMode<?> subModule : this.moduleModes) {
+                Nonsense.INSTANCE.eventBus.subscribe(subModule);
+            }
             this.onEnable();
+            for (ModuleMode<?> subModule : this.moduleModes) {
+                subModule.onEnable();
+            }
         } else {
             Nonsense.INSTANCE.eventBus.unsubscribe(this);
+            for (ModuleMode<?> subModule : this.moduleModes) {
+                Nonsense.INSTANCE.eventBus.unsubscribe(subModule);
+            }
             this.onDisable();
+            for (ModuleMode<?> subModule : this.moduleModes) {
+                subModule.onDisable();
+            }
         }
     }
 
@@ -117,6 +130,10 @@ public abstract class Module implements MinecraftInstance {
                 }
             });
         });
+    }
+
+    protected void addModuleModes(ModuleMode<?>... moduleModes) {
+        this.moduleModes.addAll(Arrays.asList(moduleModes));
     }
 
     public void onEnable() {}

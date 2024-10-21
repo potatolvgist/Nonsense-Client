@@ -109,6 +109,12 @@ public class Alt {
 
         switch (type) {
 
+            case MICROSOFT:
+            case BROWSER:
+            case REFRESH:
+                // All will work with the refresh token
+                break;
+
             case COOKIE:
                 new CookieLoginThread(this.meta, loginData -> {
                     this.accessToken = loginData.accessToken;
@@ -121,6 +127,11 @@ public class Alt {
                     Notification.send("Alt Manager", "Failed to refresh account: " + error.getMessage(), NotificationType.ERROR, 3000);
                 }).start();
                 break;
+
+            case SESSION:
+                Notification.send("Alt Manager", "Session alts cannot be refreshed", NotificationType.ERROR, 3000);
+                break;
+
         }
 
     }

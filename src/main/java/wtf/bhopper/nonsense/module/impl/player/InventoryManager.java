@@ -136,6 +136,8 @@ public class InventoryManager extends Module {
                 new PotionDropSetting("Harming", Potion.harm, 0)
         );
 
+        // TODO: UHC items
+
         this.dropMasterSettings = Arrays.asList(dropSwords, dropBows, dropTools, dropArmor, dropUtil, dropFood, dropBlocks, dropPotions);
 
         this.addSettings(this.slotsGroup, this.autoArmorGroup, this.stealerGroup, this.drops, this.armorGroup, this.toolsGroup, this.utilsGroup, this.potionsGroup, this.delay, this.guiCheck, this.actionCheck);
@@ -342,6 +344,9 @@ public class InventoryManager extends Module {
         for (int i = 0; i < chest.lowerChestInventory.getSizeInventory(); i++) {
             ItemStack stack = chest.lowerChestInventory.getStackInSlot(i);
             if (stack != null) {
+
+                // TODO: further item checking to speed up the amount of time it takes to loot a check
+
                 mc.playerController.windowClick(chest.inventorySlots.windowId, i, 0, 1, mc.thePlayer);
                 return true;
             }
@@ -363,39 +368,6 @@ public class InventoryManager extends Module {
 
         return true;
     }
-
-//    public InventoryUtil.SearchResult getBestArmor(int armorType, InventoryUtil.ScoreCheck scoreCheck) {
-//        int bestIndex = -1;
-//        ItemStack bestStack = null;
-//        float bestScore = 0.0F;
-//        for (int i = InventoryUtil.INCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
-//            ItemStack stack = InventoryUtil.getStackInSlot(i);
-//            if (stack == null) {
-//                continue;
-//            }
-//
-//            if (!(stack.getItem() instanceof ItemArmor && ((ItemArmor) stack.getItem()).armorType == armorType)) {
-//                continue;
-//            }
-//
-//            float score = scoreCheck.getScore(stack);
-//            if (bestStack == null) {
-//                bestIndex = i;
-//                bestStack = stack;
-//                bestScore = score;
-//                continue;
-//            }
-//
-//            if (score > bestScore) {
-//                bestIndex = i;
-//                bestStack = stack;
-//                bestScore = score;
-//            }
-//
-//        }
-//
-//        return new InventoryUtil.SearchResult(bestStack, bestIndex, bestScore);
-//    }
 
     public enum ActionMode {
         ALWAYS,
@@ -492,6 +464,7 @@ public class InventoryManager extends Module {
 
     public static class PotionDropSetting extends DropSetting {
         public PotionDropSetting(String name, Potion potion, int defaultValue) {
+            // TODO: add an option to sort potions by amplifier or duration (right now it's being sorted by ampplifier)
             super(name, stack -> InventoryUtil.isPotion(stack, potion), stack -> InventoryUtil.getPotionScore(stack, potion), defaultValue);
         }
     }
