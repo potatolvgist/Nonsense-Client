@@ -14,6 +14,15 @@ public class MoveUtil implements MinecraftInstance {
         return mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F;
     }
 
+    public static boolean isMovementInput() {
+        return mc.gameSettings.keyBindForward.isKeyDown()
+                || mc.gameSettings.keyBindBack.isKeyDown()
+                || mc.gameSettings.keyBindLeft.isKeyDown()
+                || mc.gameSettings.keyBindRight.isKeyDown()
+                || mc.gameSettings.keyBindJump.isKeyDown()
+                || mc.gameSettings.keyBindSneak.isKeyDown();
+    }
+
     public static double getMotion() {
         double x = mc.thePlayer.motionX;
         double z = mc.thePlayer.motionZ;

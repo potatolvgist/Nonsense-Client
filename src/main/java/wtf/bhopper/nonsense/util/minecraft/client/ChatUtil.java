@@ -8,12 +8,16 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import org.lwjgl.Sys;
+import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.module.impl.other.Debugger;
 import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 
 public class ChatUtil implements MinecraftInstance {
 
     public static final String CHAT_PREFIX = "\2478\247l[\247c\247lNonsense\2478\247l] \247r\2477";
     public static final String CHAT_PREFIX_SHORT = "\247f> \2477";
+    public static final String DEBUG_PREFIX = "\2478[\2473DEBUG\2478] \247r\247b";
 
     public static void raw(String message) {
         raw(new ChatComponentText(message));
@@ -29,6 +33,19 @@ public class ChatUtil implements MinecraftInstance {
 
     public static void info(String message, Object... args) {
         raw(CHAT_PREFIX + String.format(message, args));
+    }
+
+    public static void debug(String message, Object... args) {
+
+        if (!Nonsense.module(Debugger.class).isEnabled()) {
+            return;
+        }
+
+        Nonsense.LOGGER.debug(String.format(message, args));
+
+        Builder.of("%s\247b%s", DEBUG_PREFIX, String.format(message, args))
+                .setColor(EnumChatFormatting.AQUA)
+                .send();
     }
 
     public static void error(String message, Object... args) {

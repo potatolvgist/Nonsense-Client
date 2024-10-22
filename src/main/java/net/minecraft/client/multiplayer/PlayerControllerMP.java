@@ -28,7 +28,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
-import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
+import wtf.bhopper.nonsense.util.minecraft.inventory.InventoryUtil;
 
 public class PlayerControllerMP
 {

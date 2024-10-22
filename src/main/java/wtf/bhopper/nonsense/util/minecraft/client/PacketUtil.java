@@ -10,8 +10,6 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.module.impl.other.Debugger;
-import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
-import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
 public class PacketUtil {
 

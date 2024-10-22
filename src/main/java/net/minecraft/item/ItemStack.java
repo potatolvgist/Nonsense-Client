@@ -1115,4 +1115,12 @@ public final class ItemStack
     public void setClientLore(String clientLore) {
         this.clientLore = clientLore;
     }
+
+    public boolean isOfItem(Item item) {
+        return this.item == item;
+    }
+
+    public boolean isOfItem(Block block) {
+        return this.item instanceof ItemBlock && ((ItemBlock) this.item).getBlock() == block;
+    }
 }

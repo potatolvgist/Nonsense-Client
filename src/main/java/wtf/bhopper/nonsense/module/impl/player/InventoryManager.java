@@ -1,10 +1,7 @@
 package wtf.bhopper.nonsense.module.impl.player;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
@@ -12,460 +9,696 @@ import net.minecraft.potion.Potion;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.EventPreUpdate;
 import wtf.bhopper.nonsense.module.Module;
+import wtf.bhopper.nonsense.module.impl.combat.KillAura;
 import wtf.bhopper.nonsense.module.setting.impl.BooleanSetting;
 import wtf.bhopper.nonsense.module.setting.impl.EnumSetting;
 import wtf.bhopper.nonsense.module.setting.impl.GroupSetting;
 import wtf.bhopper.nonsense.module.setting.impl.IntSetting;
-import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
-import wtf.bhopper.nonsense.util.misc.Clock;
+import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
+import wtf.bhopper.nonsense.util.minecraft.inventory.*;
+import wtf.bhopper.nonsense.util.minecraft.player.MoveUtil;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("FieldCanBeLocal") // Annoying...
 public class InventoryManager extends Module {
 
-//    private static final List<String> BLACKLISTED_CONTAINERS = Arrays.asList("mode", "delivery", "menu", "selector", "game", "gui", "server", "inventory", "play", "teleporter", //
-//            "shop", "melee", "armor", "block", "castle", "mini", "warp", "teleport", "user", "team", "tool", "sure", "trade", "cancel", "accept",  //
-//            "soul", "book", "recipe", "profile", "tele", "port", "map", "kit", "select", "lobby", "vault", "lock", "anticheat", "travel", "settings", //
-//            "user", "preference", "compass", "cake", "wars", "buy", "upgrade", "ranged", "potions", "utility", "collectibles");
+    private final GroupSetting slotsGroup = new GroupSetting("Slots", "Item slots", this);
+    private final IntSetting swordSlot = newSlotSetting("Sword", 1);
+    private final IntSetting bowSlot = newSlotSetting("Bow");
+    private final IntSetting rodSlot = newSlotSetting("Fishing Rod");
+    private final IntSetting pearlSlot = newSlotSetting("Ender Pearl");
+    private final IntSetting gappleSlot = newSlotSetting("Golden Apple", 9);
+    private final IntSetting blocksSlot = newSlotSetting("Blocks", 2);
+    private final IntSetting pickaxeSlot = newSlotSetting("Pickaxe");
+    private final IntSetting axeSlot = newSlotSetting("Axe");
+    private final IntSetting shovelSlot = newSlotSetting("Shovel");
 
-    private final GroupSetting slotsGroup = new GroupSetting("Slots", "Slots", this);
+    private final GroupSetting dropsGroup = new GroupSetting("Drop", "Item drops", this);
+    private final BooleanSetting dropGarbage = new BooleanSetting("Garbage", "Drop items that are not considered useful", true);
+    private final BooleanSetting hotbarDrop = new BooleanSetting("Hotbar", "Drop items out of your hotbar", true);
 
-    @SuppressWarnings("unchecked")
-    private final EnumSetting<ItemSlot>[] slotSettings = (EnumSetting<ItemSlot>[]) Array.newInstance(EnumSetting.class, 9);
+    private final GroupSetting weaponsGroup = new GroupSetting("Weapons", "Weapons", this);
+    private final GroupSetting toolsGroup = new GroupSetting("Tools", "Tools", this);
+    private final GroupSetting utilGroup = new GroupSetting("Utilities", "Utilities", this);
+    private final GroupSetting potionGroup = new GroupSetting("Potions", "Potions", this);
 
-    private final GroupSetting autoArmorGroup = new GroupSetting("Auto Armor", "Auto armor", this);
-    private final BooleanSetting enableAutoArmor = new BooleanSetting("Enable", "Enable auto armor", true);
-    private final BooleanSetting armorHotbar = new BooleanSetting("Hotbar", "Put on armor in hotbar", true);
-    private final BooleanSetting armorDrop = new BooleanSetting("Drop", "Drop armor", true);
+    private final BooleanSetting openGui = new BooleanSetting("Open Inventory", "Requires your Inventory to be open", false);
+    private final EnumSetting<ActionMode> swapMode = new EnumSetting<>("Swap Mode", "Item swapping mode", ActionMode.PRIORITY);
+    private final EnumSetting<ActionMode> dropMode = new EnumSetting<>("Drop Mode", "Item dropping mode", ActionMode.PRIORITY);
+    private final EnumSetting<ActionMode> sortMode = new EnumSetting<>("Sort Mode", "Item sorting mode", ActionMode.PRIORITY);
+    private final EnumSetting<SortMethod> sortMethod = new EnumSetting<>("Sort Method", "Sorting method", SortMethod.CLICK);
+    private final DelaySetting swapDelay = new DelaySetting("Swap Delay", 0, 1000, 150, 250);
+    private final DelaySetting dropDelay = new DelaySetting("Drop Delay", 0, 1000, 10, 150);
+    private final DelaySetting sortDelay = new DelaySetting("Sort Delay", 0, 1000, 100, 200);
+    private final IntSetting minHoldTime = new IntSetting("Min Hold Time", "Time an item must be in your inventory before doing actions on it", 0, 1000, 300, "%dms", null);
 
-    private final GroupSetting stealerGroup = new GroupSetting("Chest Stealer", "Check stealer", this);
-    private final BooleanSetting stealerEnable = new BooleanSetting("Enable", "Enable chest stealer", true);
-    private final BooleanSetting autoClose = new BooleanSetting("Auto Close", "Automatically closes the chest when done", true);
-    private final BooleanSetting stealerWhitelist = new BooleanSetting("Whitelist GUI", "Don't take from certain GUI's", true);
+    private final Map<Integer, ItemSlot> itemSlots = new HashMap<>();
 
-    private final GroupSetting drops = new GroupSetting("Drop", "What items to drop", this);
-    private final List<DropMasterSetting> dropMasterSettings;
-    private final DropMasterSetting dropSwords = new DropMasterSetting("Swords", false);
-    private final DropMasterSetting dropBows = new DropMasterSetting("Bows", false);
-    private final DropMasterSetting dropTools = new DropMasterSetting("Tools", true);
-    private final DropMasterSetting dropArmor = new DropMasterSetting("Armor", false);
-    private final DropMasterSetting dropUtil = new DropMasterSetting("Util", false);
-    private final DropMasterSetting dropFood = new DropMasterSetting("Food", false);
-    private final DropMasterSetting dropBlocks = new DropMasterSetting("Blocks", true);
-    private final DropMasterSetting dropPotions = new DropMasterSetting("Potions", false);
-    private final BooleanSetting dropGarbage = new BooleanSetting("Garbage", "Drop Garbage", true);
+    private final List<ItemTracker> itemTrackers = new ArrayList<>();
+    private final List<ItemSwapper> itemSwappers = new ArrayList<>();
+    private final List<ItemSorter> itemSorters = new ArrayList<>();
 
-    private final GroupSetting armorGroup = new GroupSetting("Armor", "Armor stacks", this);
-    private final GroupSetting toolsGroup = new GroupSetting("Tools", "Tool stacks", this);
-    private final GroupSetting utilsGroup = new GroupSetting("Utilities", "Utility stacks", this);
-    private final GroupSetting potionsGroup = new GroupSetting("Potions", "Potion stacks", this);
+    private final List<Integer> garbageSlots = new ArrayList<>();
 
-    private final IntSetting delay = new IntSetting("Delay", "Delay", 0, 10000, 100, "%dms", null);
-    private final BooleanSetting guiCheck = new BooleanSetting("Gui Check", "Check that that inventory is open", false);
-    private final BooleanSetting actionCheck = new BooleanSetting("Action Check", "Check for conflictions with other modules", true);
+    private final Map<Integer, ItemStack> currentTickItems = new HashMap<>();
+    private final Map<Integer, ItemStack> prevTickItems = new HashMap<>();
+    private final Map<Integer, Integer> itemTimeInSlot = new HashMap<>(); // 5kr411 used ticks to calculate slot times, I'm using milliseconds for more accuracy
 
-    private final Clock timer = new Clock();
+    private final List<Integer> dropsToPerform = new ArrayList<>();
+    private final List<SwapAction> swapsToPerform = new ArrayList<>();
+    private final List<SwapAction> sortsToPerform = new ArrayList<>();
+
+    private final List<InventoryAction> inventoryActions = new ArrayList<>();
+    private final List<InventoryAction> hotbarActions = new ArrayList<>();
+
+    private int delay = 0;
 
     public InventoryManager() {
-        super("Inventory Manager", "Manage your inventory", Category.PLAYER);
+        super("Inventory Manager", "Manages your inventory, (made with help from 5kr411)", Category.PLAYER);
+        this.slotsGroup.add(this.swordSlot, this.bowSlot, this.rodSlot, this.pearlSlot, this.gappleSlot, this.blocksSlot, this.pickaxeSlot, this.axeSlot, this.shovelSlot);
+        this.dropsGroup.add(this.dropGarbage, this.hotbarDrop);
 
-        for (int i = 0; i < 9; i++) {
-            String name = "Slot " + (i + 1);
-            ItemSlot value = i == 0 ? ItemSlot.SWORD
-                    : i == 1 ? ItemSlot.BLOCKS
-                    : i == 8 ? ItemSlot.GOLDEN_APPLE
-                    : ItemSlot.NONE;
+        this.weaponsGroup.add(
+                new DropSetting("Swords", 1, stack -> stack.getItem() instanceof ItemSword, ItemScores::sword, swordSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.swordSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Bows", 1, stack -> stack.getItem() == Items.bow, ItemScores::bow, bowSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.bowSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Helmets", 1, stack -> InventoryUtil.isArmor(stack, 0), ItemScores::helmet),
+                new DropSetting("Chestplates", 1, stack -> InventoryUtil.isArmor(stack, 1), ItemScores::chestplate),
+                new DropSetting("Leggings", 1, stack -> InventoryUtil.isArmor(stack, 2), ItemScores::leggings),
+                new DropSetting("Boots", 1, stack -> InventoryUtil.isArmor(stack, 3), ItemScores::boots)
+        );
 
-            slotSettings[i] = new EnumSetting<>(name, name, value);
+        this.toolsGroup.add(
+                new DropSetting("Pickaxes", 1, stack -> stack.getItem() instanceof ItemPickaxe, ItemScores::pickaxe, pickaxeSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pickaxeSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Axes", 1, stack -> stack.getItem() instanceof ItemAxe, ItemScores::axe, axeSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.axeSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Shovels", 1, stack -> stack.getItem() instanceof ItemSpade, ItemScores::shovel,shovelSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.shovelSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Fishing Rods", 1, stack -> stack.isOfItem(Items.fishing_rod), ItemScores::fishingRod, rodSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.rodSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Shears", 1, stack -> stack.isOfItem(Items.shears), ItemScores.DURABILITY),
+                new DropSetting("Flint and Steel", 1, stack -> stack.isOfItem(Items.flint_and_steel), ItemScores.DURABILITY)
+        );
+
+        this.utilGroup.add(
+                new DropSetting("Blocks", 3, stack -> stack.getItem() instanceof ItemBlock, ItemScores.STACK_SIZE, blocksSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.blocksSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Golden Apple", 1, stack -> stack.isOfItem(Items.golden_apple), ItemScores.STACK_SIZE, gappleSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.gappleSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Ender Pearls", 1, stack -> stack.isOfItem(Items.ender_pearl), ItemScores.STACK_SIZE, pearlSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pearlSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Boats", 1, stack -> stack.isOfItem(Items.boat), ItemScores.STACK_SIZE),
+                new DropSetting("TNT", 1, stack -> stack.isOfItem(Blocks.tnt), ItemScores.STACK_SIZE),
+                new DropSetting("Arrows", 1, stack -> stack.isOfItem(Items.arrow), ItemScores.STACK_SIZE, null, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.bowSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Eggs Snowballs", 1, stack -> stack.isOfItem(Items.egg) || stack.isOfItem(Items.snowball), ItemScores.STACK_SIZE),
+                new DropSetting("Food", 1, stack -> stack.getItem() instanceof ItemFood, ItemScores.STACK_SIZE),
+                new DropSetting("Water Buckets", 1, stack -> stack.isOfItem(Items.water_bucket), ItemScores.STACK_SIZE),
+                new DropSetting("Lava Buckets", 1, stack -> stack.isOfItem(Items.lava_bucket), ItemScores.STACK_SIZE),
+                new DropSetting("Milk Buckets", 1, stack -> stack.isOfItem(Items.milk_bucket), ItemScores.STACK_SIZE),
+                new DropSetting("Sand Gravel", 1, stack -> stack.isOfItem(Blocks.sand) || stack.isOfItem(Blocks.gravel), ItemScores.STACK_SIZE),
+                new DropSetting("Cobwebs", 1, stack -> stack.isOfItem(Blocks.web), ItemScores.STACK_SIZE)
+        );
+
+        this.potionGroup.add(
+                new PotionDropSetting("Speed", 3, Potion.moveSpeed, Potion.jump),
+                new PotionDropSetting("Strength", 3, Potion.damageBoost),
+                new PotionDropSetting("Regeneration", 3, Potion.regeneration),
+                new PotionDropSetting("Healing", 3, Potion.heal),
+                new PotionDropSetting("Jump Boost", 0, Potion.jump),
+                new PotionDropSetting("Fire Resistance", 3, Potion.fireResistance),
+                new PotionDropSetting("Resistance", 3, Potion.resistance),
+                new PotionDropSetting("Invisibility", 0, Potion.invisibility),
+                new PotionDropSetting("Absorption", 1, Potion.absorption),
+                new PotionDropSetting("Weakness", 0, Potion.weakness),
+                new PotionDropSetting("Slowness", 0, Potion.moveSlowdown),
+                new PotionDropSetting("Poison", 0, Potion.poison),
+                new PotionDropSetting("Harming", 0, Potion.harm)
+        );
+
+        this.addSettings(this.slotsGroup, this.dropsGroup, this.weaponsGroup, this.toolsGroup, this.utilGroup, this.potionGroup,
+                this.openGui, this.swapMode, this.dropMode, this.sortMode, this.sortMethod);
+        this.swapDelay.addSettings();
+        this.dropDelay.addSettings();
+        this.sortDelay.addSettings();
+        this.addSettings(this.minHoldTime);
+
+
+    }
+
+    /**
+     * Queues an item swap
+     *
+     * @param srcSlot The slot of the item to move (source slot)
+     * @param dstSlot The destination slot of the item
+     */
+    private void queueSwap(int srcSlot, int dstSlot) {
+        switch (this.sortMethod.get()) {
+            case CLICK:
+                // Pick up the item
+                InventoryUtil.click(srcSlot, 0, false);
+
+                // Place the item in the destination slot
+                this.inventoryActions.add(new InventoryAction(() -> InventoryUtil.click(dstSlot, 0, false), this.sortDelay.getDelay()));
+
+                // Place whatever item was in the destination slot in the source slot (if any)
+                this.inventoryActions.add(new InventoryAction(() -> InventoryUtil.click(srcSlot, 0, false), this.sortDelay.getDelay()));
+                break;
+
+            case SWAP:
+                // Swap the item in the source slot with an arbitrary hotbar slot (in this case we're using the 8th
+                // hotbar slot)
+                InventoryUtil.hotbarSwap(srcSlot, 7);
+
+                // Swap the item in the destination slot with the arbitrary slot which will result in the source item
+                // being in the destination slot
+                this.inventoryActions.add(new InventoryAction(() -> InventoryUtil.hotbarSwap(dstSlot, 7), this.sortDelay.getDelay()));
+
+                // Swap the source slot and arbitrary slot again so that the destination item is in the source slot and
+                // the item that was in the arbitrary slot is back in that slot
+                this.inventoryActions.add(new InventoryAction(() -> InventoryUtil.hotbarSwap(srcSlot, 7), this.sortDelay.getDelay()));
+                break;
+
+            default:
+                throw new IllegalStateException("Sort Method setting returned null... (how?)");
         }
-        this.slotsGroup.add(this.slotSettings);
+    }
 
-        this.autoArmorGroup.add(enableAutoArmor, armorHotbar, armorDrop);
-        this.stealerGroup.add(this.stealerEnable, this.autoClose, this.stealerWhitelist);
-        this.drops.add(dropSwords, dropBows, dropTools, dropArmor, dropUtil, dropFood, dropBlocks, dropPotions, dropGarbage);
+    /**
+     * A wrapper that helps withe different cases olf item swapping
+     *
+     * @param srcSlot The slot of the item to move (source slot)
+     * @param dstSlot The destination slot of the item
+     */
+    private void swap(int srcSlot, int dstSlot) {
 
-        this.dropSwords.addSettings(toolsGroup, new DropSetting("Swords", stack -> stack.getItem() instanceof ItemSword, InventoryUtil::getSwordScore, 1));
-        this.dropBows.addSettings(toolsGroup, new DropSetting("Bows", stack -> stack.getItem() instanceof ItemBow, InventoryUtil::getBowScore, 1));
-        this.dropTools.addSettings(toolsGroup,
-                new DropSetting("Pickaxes", stack -> stack.getItem() instanceof ItemPickaxe, InventoryUtil::getPickaxeScore, 1),
-                new DropSetting("Axes", stack -> stack.getItem() instanceof ItemAxe, InventoryUtil::getAxeScore, 1),
-                new DropSetting("Shovels", stack -> stack.getItem() instanceof ItemSpade, InventoryUtil::getShovelScore, 1),
-                new DropSetting("Fishing Rods", stack -> stack.getItem() == Items.fishing_rod, InventoryUtil::getRodScore, 1),
-                new DropSetting("Shears", stack -> stack.getItem() == Items.shears, InventoryUtil.DURABILITY_SCORE, 1),
-                new DropSetting("Flint and Steel", stack -> stack.getItem() == Items.flint_and_steel, InventoryUtil.DURABILITY_SCORE, 1)
-        );
-        this.dropBlocks.addSettings(utilsGroup, new DropSetting("Blocks", Scaffold::isValid, InventoryUtil.STACK_SIZE_SCORE, 3));
-        this.dropUtil.addSettings(utilsGroup,
-                new DropSetting("Golden Apples", stack -> stack.getItem() == Items.golden_apple, InventoryUtil.STACK_SIZE_SCORE, 3),
-                new DropSetting("Ender Pearls", stack -> stack.getItem() == Items.ender_pearl, InventoryUtil.STACK_SIZE_SCORE, 1),
-                new DropSetting("Boats", stack -> stack.getItem() == Items.boat, InventoryUtil.STACK_SIZE_SCORE, 0),
-                new DropSetting("Arrows", stack -> stack.getItem() == Items.arrow, InventoryUtil.STACK_SIZE_SCORE, 1),
-                new DropSetting("Eggs and Snowballs", stack -> stack.getItem() == Items.egg || stack.getItem() == Items.snowball, InventoryUtil.STACK_SIZE_SCORE, 1),
-                new DropSetting("Spawn Eggs", stack -> stack.getItem() == Items.spawn_egg, InventoryUtil.STACK_SIZE_SCORE, 0),
-                new DropSetting("Food", stack -> stack.getItem() instanceof ItemFood && stack.getItem() != Items.golden_apple, InventoryUtil.STACK_SIZE_SCORE, 1),
-                new DropSetting("Water", stack -> stack.getItem() == Items.water_bucket, InventoryUtil.NO_SCORE, 1),
-                new DropSetting("Lava", stack -> stack.getItem() == Items.lava_bucket, InventoryUtil.NO_SCORE, 1),
-                new DropSetting("Milk", stack -> stack.getItem() == Items.milk_bucket, InventoryUtil.NO_SCORE, 1),
-                new DropSetting("Sand and Gravel", stack -> InventoryUtil.isBlock(stack, Blocks.sand, Blocks.grass), InventoryUtil.STACK_SIZE_SCORE, 1),
-                new DropSetting("Cobwebs", stack -> InventoryUtil.isBlock(stack, Blocks.web), InventoryUtil.STACK_SIZE_SCORE, 0)
-        );
-        this.dropArmor.addSettings(armorGroup,
-                new DropSetting("Helmets", stack -> InventoryUtil.isArmor(stack, 0), InventoryUtil::getHelmetScore, 1),
-                new DropSetting("Chestplates", stack -> InventoryUtil.isArmor(stack, 1), InventoryUtil::getChestplateScore, 1),
-                new DropSetting("Leggings", stack -> InventoryUtil.isArmor(stack, 2), InventoryUtil::getLeggingsScore, 1),
-                new DropSetting("Boots", stack -> InventoryUtil.isArmor(stack, 3), InventoryUtil::getBootsScore, 1)
-        );
-        this.dropPotions.addSettings(potionsGroup,
-                // Speed needs to make sure it also doesn't have jump boost because of Frog Potions (even tho I'm not making Hypixel bypasses LOL)
-                new DropSetting("Speed", stack -> InventoryUtil.isPotion(stack, Potion.moveSpeed) && !InventoryUtil.isPotion(stack, Potion.jump), stack -> InventoryUtil.getPotionScore(stack, Potion.moveSpeed), 3),
-                new PotionDropSetting("Strength", Potion.damageBoost, 3),
-                new PotionDropSetting("Regeneration", Potion.regeneration, 3),
-                new PotionDropSetting("Healing", Potion.heal, 3),
-                new PotionDropSetting("Jump Boost", Potion.jump, 0),
-                new PotionDropSetting("Fire Resistance", Potion.fireResistance, 3),
-                new PotionDropSetting("Resistance", Potion.resistance, 3),
-                new PotionDropSetting("Invisibility", Potion.invisibility, 0),
-                new PotionDropSetting("Absorption", Potion.absorption, 1),
-                new PotionDropSetting("Weakness", Potion.weakness, 0),
-                new PotionDropSetting("Slowness", Potion.moveSlowdown, 0),
-                new PotionDropSetting("Poison", Potion.poison, 0),
-                new PotionDropSetting("Harming", Potion.harm, 0)
-        );
+        // Swap the items
+        if (srcSlot != dstSlot && dstSlot >= InventoryUtil.HOTBAR_BEGIN && dstSlot < InventoryUtil.END) {
+            InventoryUtil.hotbarSwap(srcSlot, dstSlot - InventoryUtil.HOTBAR_BEGIN);
+        } else if (srcSlot != dstSlot && dstSlot >= InventoryUtil.EXCLUDE_ARMOR_BEGIN && dstSlot < InventoryUtil.HOTBAR_BEGIN) {
+            this.queueSwap(srcSlot, dstSlot);
+        } else {
+            ChatUtil.debug("Swap called with unexpected args: %d -> %d", srcSlot, dstSlot);
+        }
 
-        // TODO: UHC items
+        // Update the trackers
+        ItemSlot srcItemSlot = this.itemSlots.get(srcSlot);
+        ItemSlot dstItemSlot = this.itemSlots.get(dstSlot);
 
-        this.dropMasterSettings = Arrays.asList(dropSwords, dropBows, dropTools, dropArmor, dropUtil, dropFood, dropBlocks, dropPotions);
+        if (srcItemSlot != null) {
+            srcItemSlot.setSlot(srcSlot);
+        }
 
-        this.addSettings(this.slotsGroup, this.autoArmorGroup, this.stealerGroup, this.drops, this.armorGroup, this.toolsGroup, this.utilsGroup, this.potionsGroup, this.delay, this.guiCheck, this.actionCheck);
+        if (dstItemSlot != null) {
+            dstItemSlot.setSlot(srcSlot);
+        }
+
+        this.itemSlots.put(srcSlot, srcItemSlot);
+        this.itemSlots.put(dstSlot, dstItemSlot);
+
+        this.itemTimeInSlot.put(srcSlot, 0);
+        this.itemTimeInSlot.put(dstSlot, 0);
+
+    }
+
+    private void drop(int slot, boolean hotbar) {
+        if (hotbar) {
+            int currentSlot = InventoryUtil.serverItem;
+            InventoryUtil.serverItem = slot - 36;
+            this.delay = this.dropDelay.getDelay();
+            this.hotbarActions.add(new InventoryAction(() -> mc.thePlayer.dropOneItem(true), this.dropDelay.getDelay()));
+            this.hotbarActions.add(new InventoryAction(() -> InventoryUtil.serverItem = currentSlot, this.dropDelay.getDelay()));
+        } else {
+            InventoryUtil.drop(slot);
+        }
+        this.itemSlots.put(slot, null);
+        this.itemTimeInSlot.put(slot, 0);
+    }
+
+    private void update() {
+
+        ChatUtil.debug("InvManager: Update");
+
+        // Search through all the items, add them to the relevant trackers and determine whether the item is garbage
+        for (int slot = InventoryUtil.EXCLUDE_ARMOR_BEGIN; slot < InventoryUtil.END; slot++) {
+            ItemStack item = InventoryUtil.getStackInSlot(slot);
+            if (item != null) {
+                boolean isGarbage = true;
+
+                ItemSlot itemSlot = new ItemSlot(item, slot);
+                this.itemSlots.put(slot, itemSlot);
+                for (ItemTracker tracker : this.itemTrackers) {
+                    if (tracker.isItemType(itemSlot.getItemStack())) {
+                        tracker.addItem(itemSlot);
+                        isGarbage = false;
+                    }
+                }
+
+                if (isGarbage) {
+                    this.garbageSlots.add(slot);
+                }
+            }
+
+            this.prevTickItems.put(slot, this.currentTickItems.get(slot));
+
+            if (item != null) {
+                this.currentTickItems.put(slot, item);
+            } else {
+                this.currentTickItems.remove(slot);
+            }
+
+            ItemStack prevTickItem = this.prevTickItems.get(slot);
+            ItemStack currentTickItem = this.currentTickItems.get(slot);
+            if (!this.itemTimeInSlot.containsKey(slot) ||
+                    (prevTickItem == null && currentTickItem != null) ||
+                    (prevTickItem != null && currentTickItem == null) ||
+                    !ItemStack.areItemStacksEqual(prevTickItem, currentTickItem)) {
+                this.itemTimeInSlot.put(slot, 0);
+            } else {
+                this.itemTimeInSlot.put(slot, this.itemTimeInSlot.getOrDefault(slot, 0) + 1);
+            }
+
+        }
+
+        this.computeSwaps();
+        this.computeDrops();
+        this.computeSorts();
+
+        ChatUtil.debug("InvManager: End Update");
+    }
+
+    private void computeSwaps() {
+
+        ChatUtil.debug("InvManager: Computing Swaps");
+        this.swapsToPerform.clear();
+
+        if (this.swapMode.is(ActionMode.NONE)) {
+            return;
+        }
+
+        for (ItemSwapper swapper : this.itemSwappers) {
+            ItemTracker tracker = swapper.getItemTracker();
+            int targetSlot = swapper.getTargetSlot();
+            if (targetSlot >= InventoryUtil.HOTBAR_BEGIN && targetSlot < InventoryUtil.END
+                    && tracker.getAmountOfItems() > 0 && tracker.getLast().getSlot() != targetSlot) {
+                ItemSlot bestItem = tracker.getLast();
+                ItemSlot currentItem = this.itemSlots.get(targetSlot);
+                int timeInSlot = this.itemTimeInSlot.getOrDefault(targetSlot, -1);
+                if (timeInSlot != -1 && timeInSlot >= this.minHoldTime.get() / 50 &&
+                        (currentItem == null
+                                || !tracker.isItemType(currentItem.getItemStack())
+                                || tracker.getItemScore(bestItem.getItemStack()) > tracker.getItemScore(currentItem.getItemStack()))) {
+                    this.swapsToPerform.add(new SwapAction(bestItem.getSlot(), targetSlot));
+                }
+            }
+        }
+
+        this.sortActions(this.swapsToPerform, this.swapMode.get(), Comparator.comparingInt(swap -> swap.dstSlot));
+
+        ChatUtil.debug("Swap computing done: %d", this.swapsToPerform.size());
+
+    }
+
+    private boolean doSwaps() {
+
+        ChatUtil.debug("InvManager: swapping items");
+        boolean didSwap = false;
+
+        while (!this.swapsToPerform.isEmpty()) {
+            SwapAction action = this.swapsToPerform.remove(0);
+            this.swap(action.srcSlot, action.dstSlot);
+            didSwap = true;
+
+            this.delay = this.swapDelay.getDelay();
+            if (this.delay > 0) {
+                break;
+            }
+        }
+
+        if (!didSwap) {
+            ChatUtil.debug("InvManager: Nothing to swap!");
+        }
+
+        return didSwap;
+    }
+
+    private void computeDrops() {
+
+        ChatUtil.debug("InvManager: Computing Drops");
+        this.dropsToPerform.clear();
+
+        if (this.dropMode.is(ActionMode.NONE)) {
+            return;
+        }
+
+        for (ItemTracker tracker : this.itemTrackers) {
+            if (tracker.getAmountToKeep() != -1) {
+                for (int i = 0; i < tracker.getItems().size() - tracker.getAmountToKeep(); i++) {
+                    ItemSlot itemSlot = tracker.getItems().get(i);
+                    int timeInSlot = this.itemTimeInSlot.getOrDefault(itemSlot.getSlot(), -1);
+                    if (timeInSlot != -1 && timeInSlot >= this.minHoldTime.get() / 50) {
+                        this.dropsToPerform.add(itemSlot.getSlot());
+                    }
+                }
+            }
+        }
+
+        if (this.dropGarbage.get()) {
+            for (int slot : this.garbageSlots) {
+                int timeInSlot = this.itemTimeInSlot.getOrDefault(slot, -1);
+                if (timeInSlot != -1 && timeInSlot >= this.minHoldTime.get() / 50) {
+                    this.dropsToPerform.add(slot);
+                }
+            }
+        }
+
+        this.sortActions(this.dropsToPerform, this.dropMode.get(), Integer::compare);
+
+        ChatUtil.debug("Drop computing done: %d", this.dropsToPerform.size());
+    }
+
+    private boolean doDrops() {
+
+        ChatUtil.debug("InvManager: dropping items");
+        boolean didDrop = false;
+
+        while (!this.dropsToPerform.isEmpty()) {
+            int slot = this.dropsToPerform.remove(0);
+            this.drop(slot, false);
+            didDrop = true;
+
+            this.delay = this.dropDelay.getDelay();
+            if (this.delay > 0) {
+                break;
+            }
+
+        }
+
+        if (!didDrop) {
+            ChatUtil.debug("InvManager: Nothing to drop!");
+        }
+
+        return didDrop;
+    }
+
+    private void queueHotbarDrops() {
+        List<Integer> hotbarDrops = this.dropsToPerform.stream()
+                .filter(slot -> slot >= InventoryUtil.HOTBAR_BEGIN && slot < InventoryUtil.END)
+                .collect(Collectors.toList());
+
+        for (int slot : hotbarDrops) {
+            this.drop(slot, true);
+        }
+    }
+
+    private void computeSorts() {
+
+        ChatUtil.debug("InvManager: Computing Sorts");
+        this.sortsToPerform.clear();
+
+        if (this.sortMode.is(ActionMode.NONE)) {
+            return;
+        }
+
+        for (ItemSorter sorter : this.itemSorters) {
+            ItemTracker tracker = sorter.getItemTracker();
+            if (tracker.getAmountOfItems() > 0) {
+                List<ItemSlot> itemSlots = tracker.getItems();
+                itemSlots.sort(Comparator.comparingDouble(slot -> tracker.getItemScore(slot.getItemStack())));
+
+                for (int rank = 1; rank < itemSlots.size(); rank++) {
+                    ItemSlot itemSlot = itemSlots.get(itemSlots.size() - rank - 1);
+                    int targetSlot = sorter.getTargetSlot(rank, itemSlot.getSlot());
+                    ItemSlot currentItem = this.itemSlots.get(targetSlot);
+                    int timeInSlot = this.itemTimeInSlot.getOrDefault(itemSlot.getSlot(), -1);
+                    if (timeInSlot != -1 && timeInSlot > this.minHoldTime.get() / 50
+                            && targetSlot != -1
+                            && itemSlot.getSlot() != targetSlot
+                            && (currentItem == null || tracker.getItemScore(itemSlot.getItemStack()) > tracker.getItemScore(currentItem.getItemStack()))) {
+                        this.sortsToPerform.add(new SwapAction(itemSlot.getSlot(), targetSlot));
+                    }
+                }
+            }
+        }
+
+        this.sortActions(this.sortsToPerform, this.sortMode.get(), Comparator.comparingInt(o -> o.dstSlot));
+
+        ChatUtil.debug("Sort computing done: %d", this.sortsToPerform.size());
+    }
+
+    private boolean doSorts() {
+
+        ChatUtil.debug("InvManager: sorting items");
+        boolean didSort = false;
+
+        while (!this.sortsToPerform.isEmpty()) {
+            SwapAction action = this.sortsToPerform.remove(0);
+            this.swap(action.srcSlot, action.dstSlot);
+            didSort = true;
+
+            this.delay = this.sortDelay.getDelay();
+            if (this.delay > 0) {
+                break;
+            }
+        }
+
+        if (!didSort) {
+            ChatUtil.debug("InvManager: Nothing to sort!");
+        }
+
+        return didSort;
+    }
+
+    private void reset() {
+        for (ItemTracker itemTracker : this.itemTrackers) {
+            itemTracker.clear();
+        }
+        this.itemSlots.clear();
+        this.garbageSlots.clear();
+    }
+
+    private <T> void sortActions(List<T> actions, ActionMode mode, Comparator<T> comparator) {
+
+        switch (mode) {
+
+            case REVERSE_PRIORITY: // Reverse the actions list
+                Collections.reverse(actions);
+                break;
+
+            case SEQUENTIAL: // Sort the actions list
+                actions.sort(comparator);
+                break;
+
+            case REVERSE: // Sort and reverse the actions list
+                actions.sort(comparator);
+                Collections.reverse(actions);
+                break;
+
+            case RANDOM: // Shuffle the actions list
+                Collections.shuffle(actions);
+                break;
+
+            case NONE: // Clear the actions list
+                actions.clear();
+                break;
+        }
+
+    }
+
+    private boolean canUpdate() {
+        return this.inventoryActions.isEmpty() && this.hotbarActions.isEmpty() && this.delay <= 0;
+    }
+
+    private boolean canInventoryInteract() {
+        return (!this.openGui.get() || mc.currentScreen instanceof GuiInventory) || !MoveUtil.isMovementInput() && this.delay <= 0;
+    }
+
+    private boolean canHotbarInteract() {
+        return this.hotbarDrop.get() && this.delay <= 0 && !Nonsense.module(KillAura.class).hasTarget() && !Nonsense.module(Scaffold.class).isEnabled();
+    }
+
+    private boolean doInventoryQueueActions() {
+        boolean didAction = false;
+        while (!this.inventoryActions.isEmpty()) {
+            InventoryAction action = this.inventoryActions.remove(0);
+            action.execute();
+            didAction = true;
+            this.delay = action.getDelay();
+            if (this.delay > 0) {
+                break;
+            }
+        }
+
+        return didAction;
+    }
+
+    private boolean doHotbarQueueActions() {
+        boolean didAction = false;
+        while (!this.hotbarActions.isEmpty()) {
+            InventoryAction action = this.hotbarActions.remove(0);
+            action.execute();
+            didAction = true;
+            this.delay = action.getDelay();
+            if (this.delay > 0) {
+                break;
+            }
+        }
+
+        return didAction;
     }
 
     @EventHandler
     public void onUpdate(EventPreUpdate event) {
 
-        if (mc.currentScreen instanceof GuiContainerCreative) {
-            return;
-        }
+        if (this.canUpdate()) {
 
-        if (this.actionCheck.get()) {
-            if (Nonsense.module(Scaffold.class).isEnabled()) {
-                return;
-            }
-        }
+            this.update();
 
-        if (!this.timer.hasReached(this.delay.get())) {
-            return;
-        }
-
-        if (this.stealerEnable.get()) {
-            if (mc.currentScreen instanceof GuiChest)
-            {
-                GuiChest chest = (GuiChest) mc.currentScreen;
-                if (this.stealerWhitelist.get() && !chest.lowerChestInventory.getName().contains(I18n.format("container.chest"))) {
-                    return;
-                }
-
-                if (this.steal(chest)) {
-                    this.timer.reset();
-                    return;
-                } else if (this.autoClose.get()) {
-                    mc.thePlayer.closeScreen();
-                }
-
-            }
-        }
-
-        boolean doNormal = true;
-        boolean doArmor = true;
-
-        if (this.guiCheck.get()) {
-            if (!(mc.currentScreen instanceof GuiChest || mc.currentScreen instanceof GuiInventory)) {
-                doNormal = false;
+            if (this.canInventoryInteract()) {
+                this.doSwaps();
             }
 
-            if (!(mc.currentScreen instanceof GuiInventory)) {
-                doArmor = false;
+            if (this.canInventoryInteract()) {
+                this.doDrops();
+            } else if (this.canHotbarInteract()) {
+                this.queueHotbarDrops();
             }
+
+            if (this.canInventoryInteract()) {
+                this.doSorts();
+            }
+
+            this.reset();
+        } else if (this.canInventoryInteract()) {
+            this.doInventoryQueueActions();
+        } else if (this.canHotbarInteract()) {
+            this.doHotbarQueueActions();
         }
 
-        if (doNormal) {
-
-            if (this.drop()) {
-                this.timer.reset();
-                return;
-            }
-
-            if (this.swap()) {
-                this.timer.reset();
-                return;
-            }
-        }
-
-        if (this.enableAutoArmor.get() && doArmor) {
-            if (this.autoArmor()) {
-                this.timer.reset();
-                return;
-            }
-        }
-
-
+        this.delay--;
     }
 
-    private boolean drop() {
-
-        for (int i = InventoryUtil.INCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
-            ItemStack stack = InventoryUtil.getStackInSlot(i);
-
-            if (stack == null || stack.getItem() == null) {
-                continue;
-            }
-
-            boolean checked = false;
-            for (DropMasterSetting masterSetting : this.dropMasterSettings) {
-
-                for (DropSetting dropSetting : masterSetting.dropSettings) {
-                    if (dropSetting.check.check(stack)) {
-                        checked = true;
-
-                        if (!masterSetting.get())  {
-                            continue;
-                        }
-
-                        InventoryUtil.SearchResult best = InventoryUtil.getBest(dropSetting.check, dropSetting.score, true);
-                        if (dropSetting.get() == 0 || (best.slot != i && InventoryUtil.getAmountOfStacks(dropSetting.check, true) > dropSetting.get())) {
-                            InventoryUtil.drop(i);
-                            return true;
-                        }
-
-                    }
-                }
-
-            }
-
-            if (!checked && this.dropGarbage.get()) {
-                InventoryUtil.drop(i);
-                return true;
-            }
-
-        }
-
-        return false;
+    private static IntSetting newSlotSetting(String name, int defaultValue) {
+        return new IntSetting(name, name + " slot", 0, 9, defaultValue);
     }
 
-    private boolean autoArmor() {
-
-        if (this.autoArmor(0, InventoryUtil::getHelmetScore)) {
-            return true;
-        }
-
-        if (this.autoArmor(1, InventoryUtil::getChestplateScore)) {
-            return true;
-        }
-
-        if (this.autoArmor(2, InventoryUtil::getLeggingsScore)) {
-            return true;
-        }
-
-        if (this.autoArmor(3, InventoryUtil::getBootsScore)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean swap() {
-
-        List<Integer> blocked = new ArrayList<>();
-
-        for (int i = 0; i < 9; i++) {
-
-            InventoryUtil.SearchResult best = this.slotSettings[i].get().findBest();
-            if (best.slot == -1) {
-                // Best slot not found
-                continue;
-            }
-
-            float scoreInPlace = 0.0F;
-            try {
-                ItemStack stack = InventoryUtil.getStackInSlot(i + InventoryUtil.ONLY_HOT_BAR_BEGIN);
-                if (stack != null) {
-                    scoreInPlace = this.slotSettings[i].get().scoreCheck.getScore(stack);
-                }
-            } catch (IllegalArgumentException ignored) {}
-
-            if (scoreInPlace == best.score || best.slot == InventoryUtil.ONLY_HOT_BAR_BEGIN + i) {
-                // Item is already in the best slot
-                blocked.add(best.slot);
-                continue;
-            }
-
-            if (blocked.contains(best.slot)) {
-                // Previous slot contains that item
-                continue;
-            }
-
-            InventoryUtil.swap(best.slot, i);
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    private boolean autoArmor(int type, InventoryUtil.ScoreCheck scoreCheck) {
-        InventoryUtil.SearchResult bestArmor = InventoryUtil.getBest(stack -> stack.getItem() instanceof ItemArmor && ((ItemArmor) stack.getItem()).armorType == type, scoreCheck, true);
-        if (!bestArmor.valid()) {
-            return false;
-        }
-
-        if (bestArmor.slot < InventoryUtil.EXCLUDE_ARMOR_BEGIN) {
-            return false;
-        }
-
-        if (InventoryUtil.getStackInSlot(InventoryUtil.INCLUDE_ARMOR_BEGIN + type) != null) {
-            InventoryUtil.click(InventoryUtil.INCLUDE_ARMOR_BEGIN + type, 0, true);
-        } else {
-            InventoryUtil.click(bestArmor.slot, 0, true);
-        }
-
-        return true;
-    }
-
-    private boolean steal(GuiChest chest) {
-
-        if (this.inventoryFull()) {
-            return false;
-        }
-
-        for (int i = 0; i < chest.lowerChestInventory.getSizeInventory(); i++) {
-            ItemStack stack = chest.lowerChestInventory.getStackInSlot(i);
-            if (stack != null) {
-
-                // TODO: further item checking to speed up the amount of time it takes to loot a check
-
-                mc.playerController.windowClick(chest.inventorySlots.windowId, i, 0, 1, mc.thePlayer);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean needItem(ItemStack stack) {
-        return false;
-    }
-
-    private boolean inventoryFull() {
-        for (ItemStack stack : mc.thePlayer.inventory.mainInventory) {
-            if (stack == null) {
-                return false;
-            }
-        }
-
-        return true;
+    private static IntSetting newSlotSetting(String name) {
+        return new IntSetting(name, name + " slot", 0, 9, 0);
     }
 
     public enum ActionMode {
-        ALWAYS,
-        INVENTORY,
-        NOT_MOVING,
-        NEVER
+        PRIORITY,
+        REVERSE_PRIORITY,
+        SEQUENTIAL,
+        REVERSE,
+        RANDOM,
+        NONE
     }
 
-    public enum ItemSlot {
-        SWORD(stack -> stack.getItem() instanceof ItemSword, InventoryUtil::getSwordScore),
-        BOW(stack -> stack.getItem() == Items.bow, InventoryUtil::getBowScore),
-        ROD(stack -> stack.getItem() == Items.fishing_rod, InventoryUtil::getRodScore),
-        ENDER_PEARL(stack -> stack.getItem() == Items.ender_pearl, InventoryUtil.STACK_SIZE_SCORE),
-        GOLDEN_APPLE(stack -> stack.getItem() == Items.golden_apple, InventoryUtil.STACK_SIZE_SCORE),
-        GOLDEN_HEAD(stack -> stack.getItem() == Items.skull && stack.hasDisplayName() && stack.getDisplayName().toLowerCase().contains("golden head"), InventoryUtil.STACK_SIZE_SCORE),
-        BLOCKS(Scaffold::isValid, InventoryUtil.STACK_SIZE_SCORE),
-        PICKAXE(stack -> stack.getItem() instanceof ItemPickaxe, InventoryUtil::getPickaxeScore),
-        AXE(stack -> stack.getItem() instanceof ItemAxe, InventoryUtil::getAxeScore),
-        SHOVEL(stack -> stack.getItem() instanceof ItemSpade, InventoryUtil::getShovelScore),
-        NONE(stack -> false, InventoryUtil.STACK_SIZE_SCORE);
+    public enum SortMethod {
+        CLICK,
+        SWAP
+    }
 
-        private final InventoryUtil.StackCheck stackCheck;
-        private final InventoryUtil.ScoreCheck scoreCheck;
+    /**
+     * Wrapper class for 2 integer settings to make the delay settings easier
+     */
+    public class DelaySetting {
 
-        ItemSlot(InventoryUtil.StackCheck stackCheck, InventoryUtil.ScoreCheck comparator) {
-            this.stackCheck = stackCheck;
-            this.scoreCheck = comparator;
+        private final IntSetting min;
+        private final IntSetting max;
+
+        public DelaySetting(String name, int min, int max, int defaultMin, int defaultMax) {
+            this.min = new IntSetting("Min " + name, "Minimum " + name, min, max, defaultMin, "%dms", this::changedMin);
+            this.max = new IntSetting("Max " + name, "Maximum " + name, min, max, defaultMax, "%dms", this::changedMax);
         }
 
-        public boolean check(ItemStack stack) {
-            if (stack == null) {
-                return false;
+        public int getDelay() {
+            if (this.min.get().equals(this.max.get())) {
+                return this.min.get() / 50;
             }
-            return this.stackCheck.check(stack);
+            return ThreadLocalRandom.current().nextInt(this.min.get(), this.max.get()) / 50;
         }
 
-        public InventoryUtil.SearchResult findBest() {
-            int bestIndex = -1;
-            float bestScore = 0.0F;
-            ItemStack bestStack = null;
-            for (int i = InventoryUtil.EXCLUDE_ARMOR_BEGIN; i < InventoryUtil.END; i++) {
-                ItemStack stack = InventoryUtil.getStackInSlot(i);
-                if (!this.check(stack)) {
-                    continue;
-                }
-
-                float score = this.scoreCheck.getScore(stack);
-
-                if (bestIndex == -1) {
-                    bestIndex = i;
-                    bestScore = score;
-                    bestStack = stack;
-                    continue;
-                }
-
-                if (score > bestScore) {
-                    bestIndex = i;
-                    bestScore = score;
-                    bestStack = stack;
-                }
-
+        private void changedMin(Integer value) {
+            if (this.max.get() < value) {
+                this.max.set(value);
             }
+        }
 
-            return new InventoryUtil.SearchResult(bestStack, bestIndex, bestScore);
+        private void changedMax(Integer value) {
+            if (this.min.get() > value) {
+                this.min.set(value);
+            }
+        }
+
+        public void addSettings() {
+            InventoryManager.this.addSettings(this.min, this.max);
         }
 
     }
 
-    public static class DropMasterSetting extends BooleanSetting {
+    private class DropSetting extends IntSetting {
 
-        public final List<DropSetting> dropSettings = new ArrayList<>();
+        private final ItemTypeChecker itemTypeChecker;
+        private final ItemScoreCalculator itemScoreCalculator;
+        private final ItemAmountChecker itemAmountChecker;
+        private final ItemSwapper.TargetSlotMethod swapMethod;
+        private final ItemSorter.TargetSlotMethod sortMethod;
 
-        public DropMasterSetting(String name, boolean defaultValue) {
-            super(name, "Drop " + name, defaultValue);
+        public DropSetting(String name,
+                           int defaultValue,
+                           ItemTypeChecker typeChecker,
+                           ItemScoreCalculator scoreCalculator) {
+            this(name, defaultValue, typeChecker, scoreCalculator, null, null);
         }
 
-        public void addSettings(GroupSetting group, DropSetting... settings) {
-            this.dropSettings.addAll(Arrays.asList(settings));
-            group.add(settings);
+
+
+        public DropSetting(String name,
+                           int defaultValue,
+                           ItemTypeChecker typeChecker,
+                           ItemScoreCalculator scoreCalculator,
+                           ItemSwapper.TargetSlotMethod swapMethod,
+                           ItemSorter.TargetSlotMethod sortMethod) {
+            super(name, name + " stacks", 0, 5, defaultValue, "%d stacks", null);
+            this.itemTypeChecker = typeChecker;
+            this.itemScoreCalculator = scoreCalculator;
+            this.itemAmountChecker = this::get;
+            this.swapMethod = swapMethod;
+            this.sortMethod = sortMethod;
+            this.generateTracker();
+        }
+
+        private void generateTracker() {
+            ItemTracker tracker = new ItemTracker(this.itemTypeChecker, this.itemScoreCalculator, this.itemAmountChecker);
+            InventoryManager.this.itemTrackers.add(tracker);
+            if (this.swapMethod != null) {
+                InventoryManager.this.itemSwappers.add(new ItemSwapper(tracker, this.swapMethod));
+            }
+            if (this.sortMethod != null) {
+                InventoryManager.this.itemSorters.add(new ItemSorter(tracker, this.sortMethod));
+            }
+        }
+
+    }
+
+    public class PotionDropSetting extends DropSetting {
+
+        public PotionDropSetting(String name, int defaultValue, Potion potion) {
+            super(name, defaultValue,
+                    stack -> InventoryUtil.isPotion(stack, potion),
+                    stack -> ItemScores.potion(stack, potion));
+        }
+
+        public PotionDropSetting(String name, int defaultValue, Potion potion, Potion remove) {
+            super(name, defaultValue,
+                    stack -> InventoryUtil.isPotion(stack, potion) && !InventoryUtil.isPotion(stack, remove),
+                    stack -> ItemScores.potion(stack, potion));
         }
     }
 
-    public static class DropSetting extends IntSetting {
+    public static class SwapAction {
+        public final int srcSlot;
+        public final int dstSlot;
 
-        public final InventoryUtil.StackCheck check;
-        public final InventoryUtil.ScoreCheck score;
-
-        public DropSetting(String name, InventoryUtil.StackCheck check, InventoryUtil.ScoreCheck score, int defaultValue) {
-            super(name, name, 0, 5, defaultValue, "%d stacks", null);
-            this.check = check;
-            this.score = score;
-        }
-    }
-
-    public static class PotionDropSetting extends DropSetting {
-        public PotionDropSetting(String name, Potion potion, int defaultValue) {
-            // TODO: add an option to sort potions by amplifier or duration (right now it's being sorted by ampplifier)
-            super(name, stack -> InventoryUtil.isPotion(stack, potion), stack -> InventoryUtil.getPotionScore(stack, potion), defaultValue);
+        public SwapAction(int srcSlot, int dstSlot) {
+            this.srcSlot = srcSlot;
+            this.dstSlot = dstSlot;
         }
     }
 

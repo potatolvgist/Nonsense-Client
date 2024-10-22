@@ -40,6 +40,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new Scaffold());
         this.addModule(new NoFall());
         this.addModule(new InventoryManager());
+//        this.addModule(new OldInventoryManager());
         this.addModule(new FastMine());
         this.addModule(new GameSpeed());
         this.addModule(new NoRotate());

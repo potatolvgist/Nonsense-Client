@@ -8,7 +8,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import wtf.bhopper.nonsense.command.Command;
 import wtf.bhopper.nonsense.util.minecraft.client.ChatUtil;
-import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
+import wtf.bhopper.nonsense.util.minecraft.inventory.InventoryUtil;
 
 public class GiveCmd extends Command {
 

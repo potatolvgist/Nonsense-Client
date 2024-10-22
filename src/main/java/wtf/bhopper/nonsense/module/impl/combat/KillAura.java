@@ -477,6 +477,10 @@ public class KillAura extends Module {
         this.blockAttack = true;
     }
 
+    public boolean hasTarget() {
+        return this.target != null;
+    }
+
     private boolean canStrafe() {
         if (!enableStrafe.get()) {
             return false;

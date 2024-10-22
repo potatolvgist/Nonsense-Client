@@ -99,7 +99,7 @@ import wtf.bhopper.nonsense.event.impl.EventItemSelect;
 import wtf.bhopper.nonsense.event.impl.EventPreClick;
 import wtf.bhopper.nonsense.event.impl.EventPreTick;
 import wtf.bhopper.nonsense.gui.screens.NonsenseMainMenu;
-import wtf.bhopper.nonsense.util.minecraft.player.InventoryUtil;
+import wtf.bhopper.nonsense.util.minecraft.inventory.InventoryUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 
 import javax.imageio.ImageIO;
