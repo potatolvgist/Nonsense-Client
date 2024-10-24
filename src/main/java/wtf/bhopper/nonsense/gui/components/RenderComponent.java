@@ -1,12 +1,18 @@
 package wtf.bhopper.nonsense.gui.components;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
+import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.module.setting.impl.IntSetting;
+import wtf.bhopper.nonsense.util.minecraft.MinecraftInstance;
 
-public abstract class RenderComponent {
+import java.awt.*;
+
+public abstract class RenderComponent implements MinecraftInstance {
 
     private final String name;
     private final IntSetting x;
@@ -28,14 +34,23 @@ public abstract class RenderComponent {
         this.y.setDisplayed(false);
         this.width = width;
         this.height = height;
+        Hud.addComponent(this);
     }
 
-    public abstract void draw(ScaledResolution res, float delta);
+    public abstract void draw(ScaledResolution res, float delta, int mouseX, int mouseY, boolean bypass);
 
-    public void drawString(TTFFontRenderer font, String text, int x, int y, int color) {
-        GlStateManager.scale(2.0F, 2.0F, 2.0F);
-        font.drawStringWithShadow(text, this.getX() + (float)(x / 2), this.getY() + (float)(y / 2), color);
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+    public void onClick(int x, int y, int button) {}
+
+    public void handleMouseClick(int x, int y, int button) {
+        this.onClick(x - this.getX(), y - this.getY(), button);
+    }
+
+    public void drawString(FontRenderer font, String text, int x, int y, int color) {
+        font.drawStringWithShadow(text, this.getX() + x, this.getY() + y, color);
+    }
+
+    public void drawString(String text, int x, int y, int color) {
+        mc.fontRendererObj.drawStringWithShadow(text, this.getX() + x, this.getY() + y, color);
     }
 
     public boolean mouseIntersecting(int mouseX, int mouseY) {
@@ -43,7 +58,11 @@ public abstract class RenderComponent {
     }
 
     public void drawRect(int x, int y, int width, int height, int color) {
-        Gui.drawRect(this.getX() + x * 2, this.getY() + y * 2, this.getX() + (x + width) * 2, this.getY() + (y + height) * 2, color);
+        Gui.drawRect(this.getX() + x, this.getY() + y, this.getX() + x + width, this.getY() + y + height, color);
+    }
+
+    public void drawBackground(int color) {
+        Gui.drawRect(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color);
     }
 
     public String getName() {
@@ -88,6 +107,15 @@ public abstract class RenderComponent {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public void drawOutline() {
+        int x = this.getX();
+        int y = this.getY();
+        Gui.drawRect(x - 1, y - 1, x + this.width + 1, y, 0xAAAAAAAA);
+        Gui.drawRect(x - 1, y + this.height, x + this.width + 1, y + this.height + 1, 0xAAAAAAAA);
+        Gui.drawRect(x - 1, y, x, y + this.height, 0xAAAAAAAA);
+        Gui.drawRect(x + this.width, y, x + this.width + 1, y + this.height, 0xAAAAAAAA);
     }
 
 }

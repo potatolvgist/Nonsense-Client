@@ -161,10 +161,23 @@ public class InventoryUtil implements MinecraftInstance {
     }
 
     public static int stackAboveSwapSlot(int swapSlot, int rank, int currentSlot) {
+
+        if (rank == 0) {
+            return -1;
+        }
+
         int slot = swapSlot - 9 * rank;
         ChatUtil.debug("SLOT: (%d, %d) -> %d", swapSlot, rank, slot);
         if (swapSlot != 0 && slot >= EXCLUDE_ARMOR_BEGIN && slot < END) {
             return slot;
+        }
+
+        return highestNonHotbarSlot(currentSlot);
+    }
+
+    public static int armorOrOther(int swapSlot, int rank, int currentSlot) {
+        if (rank == 0) {
+            return swapSlot;
         }
 
         return highestNonHotbarSlot(currentSlot);

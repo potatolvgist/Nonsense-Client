@@ -31,8 +31,9 @@ public class DropdownModuleButton {
             if (setting instanceof NumberSetting) this.components.add(new DropdownSlider(this.panel, (NumberSetting<?>)setting, false));
             if (setting instanceof EnumSetting) this.components.add(new DropdownModeSelector(this.panel, (EnumSetting<?>)setting, false));
             if (setting instanceof ColorSetting) this.components.add(new DropdownColorPicker(this.panel, (ColorSetting)setting, false));
-            if (setting instanceof GroupSetting) this.components.add(new DropdownGroup(this.panel, (GroupSetting)setting, false));
             if (setting instanceof StringSetting) this.components.add(new DropdownTextBox(this.panel, (StringSetting)setting, false));
+            if (setting instanceof ButtonSetting) this.components.add(new DropdownButton(this.panel, (ButtonSetting)setting, false));
+            if (setting instanceof GroupSetting) this.components.add(new DropdownGroup(this.panel, (GroupSetting)setting, false));
         }
     }
 

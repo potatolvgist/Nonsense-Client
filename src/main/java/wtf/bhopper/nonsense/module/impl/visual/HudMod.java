@@ -1,9 +1,11 @@
 package wtf.bhopper.nonsense.module.impl.visual;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.util.ResourceLocation;
 import wtf.bhopper.nonsense.Nonsense;
+import wtf.bhopper.nonsense.gui.screens.GuiMoveHudComponents;
 import wtf.bhopper.nonsense.module.Module;
 import wtf.bhopper.nonsense.module.setting.impl.*;
 import wtf.bhopper.nonsense.module.setting.util.Description;
@@ -46,6 +48,7 @@ public class HudMod extends Module {
     public final ColorSetting color = new ColorSetting("Color", "HUD color", 0xFFFF5555);
     public final BooleanSetting customFont = new BooleanSetting("Custom Font", "Uses a custom font", true);
     public final BooleanSetting hidef3 = new BooleanSetting("Hide In F3", "Hide the HUD when the debug/F3 menu is open", true);
+    public final ButtonSetting openComponentEditor = new ButtonSetting("Move Components", "Open the components editor", () -> Minecraft.getMinecraft().displayGuiScreen(new GuiMoveHudComponents()));
 
     public HudMod() {
         super("HUD", "Heads Up Display", Category.VISUAL);
@@ -81,7 +84,16 @@ public class HudMod extends Module {
                 this.notificationEnabled,
                 this.notificationSound
         );
-        this.addSettings(this.moduleListGroup, this.watermarkGroup, this.infoGroup, this.notificationGroup, this.color, this.customFont, this.hidef3);
+        this.addSettings(
+                this.moduleListGroup,
+                this.watermarkGroup,
+                this.infoGroup,
+                this.notificationGroup,
+                this.color,
+                this.customFont,
+                this.hidef3,
+                this.openComponentEditor
+        );
 
         this.toggle(true);
     }

@@ -59,6 +59,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new PackSpoofer());
         this.addModule(new AutoHypixel());
         this.addModule(new PartySpammer());
+        this.addModule(new GuessTheBuild());
         this.addModule(new Panic());
         this.addModule(new Debugger());
 

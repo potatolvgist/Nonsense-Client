@@ -24,7 +24,11 @@ public class ItemTracker {
     }
 
     public float getItemScore(ItemStack itemStack) {
-        return this.itemScoreCalculator.getScore(itemStack);
+        try {
+            return this.itemScoreCalculator.getScore(itemStack);
+        } catch (ClassCastException | IllegalArgumentException exception) {
+            return -1.0F;
+        }
     }
 
     public int getAmountToKeep() {

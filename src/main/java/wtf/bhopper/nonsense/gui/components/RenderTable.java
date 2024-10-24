@@ -1,23 +1,26 @@
 package wtf.bhopper.nonsense.gui.components;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.font.Fonts;
 import wtf.bhopper.nonsense.gui.font.TTFFontRenderer;
 import wtf.bhopper.nonsense.util.misc.MathUtil;
 
+import java.awt.*;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 
 public class RenderTable<T> extends RenderComponent {
 
-    private final TTFFontRenderer font;
     private final int rowHeight;
 
+    private final FontRenderer font;
     private final List<T> rows = new ArrayList<>();
     private final Class<T> clazz;
     private final Comparator<T> comparator;
@@ -26,8 +29,8 @@ public class RenderTable<T> extends RenderComponent {
 
     public RenderTable(Class<T> clazz, Comparator<T> comparator, String name, int x, int y) {
         super(name, x, y,0, 0);
-        this.font = Nonsense.INSTANCE.fontManager.getFont(Fonts.ARIAL, 12);
-        this.rowHeight = this.font.getHeight() / 2 + 4;
+        this.font = mc.bitFontRenderer;
+        this.rowHeight = font.FONT_HEIGHT + 4;
         this.clazz = clazz;
         this.comparator = comparator;
         for (Field field : clazz.getDeclaredFields()) {
@@ -39,7 +42,7 @@ public class RenderTable<T> extends RenderComponent {
     }
 
     @Override
-    public void draw(ScaledResolution res, float delta) {
+    public void draw(ScaledResolution res, float delta, int mouseX, int mouseY, boolean bypass) {
 
         List<String[]> displayRows = new ArrayList<>();
 
@@ -79,7 +82,7 @@ public class RenderTable<T> extends RenderComponent {
         int xOffset = 0;
         count = 0;
         for (TableColumn rowHeader : this.rowNames) {
-            this.drawString(this.font, rowHeader.value(), xOffset + 2, 2, -1);
+            this.drawString(rowHeader.value(), xOffset + 2, 2, -1);
             xOffset += lengths[count];
             count++;
         }
@@ -88,7 +91,7 @@ public class RenderTable<T> extends RenderComponent {
         for (String[] row : displayRows) {
             xOffset = 0;
             for (int i = 0; i < row.length; i++) {
-                this.drawString(this.font, row[i], rowHeight * (count + 1) + 2, xOffset + 2, 0xFFAAAAAA);
+                this.drawString(row[i], rowHeight * (count + 1) + 2, xOffset + 2, 0xFFAAAAAA);
                 xOffset += lengths[i];
             }
             count++;
@@ -96,7 +99,8 @@ public class RenderTable<T> extends RenderComponent {
 
     }
 
-    public void setRows(T... rows) {
+    @SafeVarargs
+    public final void setRows(T... rows) {
         this.setRows(Arrays.asList(rows));
     }
 

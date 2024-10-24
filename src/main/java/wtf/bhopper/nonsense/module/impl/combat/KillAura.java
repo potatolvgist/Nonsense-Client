@@ -2,13 +2,25 @@ package wtf.bhopper.nonsense.module.impl.combat;
 
 import io.netty.util.internal.ThreadLocalRandom;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Tuple;
+import net.minecraft.util.Vec3;
+import org.lwjgl.opengl.GL11;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.event.impl.*;
+import wtf.bhopper.nonsense.gui.components.RenderComponent;
+import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.gui.hud.notification.Notification;
 import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
 import wtf.bhopper.nonsense.module.Module;
@@ -20,7 +32,10 @@ import wtf.bhopper.nonsense.util.misc.MathUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.PlayerUtil;
 import wtf.bhopper.nonsense.util.minecraft.player.Rotation;
 import wtf.bhopper.nonsense.util.minecraft.player.RotationUtil;
+import wtf.bhopper.nonsense.util.render.ColorUtil;
+import wtf.bhopper.nonsense.util.render.RenderUtil;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,6 +78,9 @@ public class KillAura extends Module {
     private final EnumSetting<StrafeMode> strafeMode = new EnumSetting<>("Mode", "Strafe mode", StrafeMode.CIRCLE);
     private final FloatSetting strafeRadius = new FloatSetting("Radius", "Strafe radius", 0.1F, 4.0F, 1.0F);
 
+    private final GroupSetting renderGroup = new GroupSetting("Render", "Rendering options", this);
+    private final EnumSetting<HudMode> hudMode = new EnumSetting<>("Target Hud", "Target HUD", HudMode.DETAILED);
+
     private final FloatSetting attackRange = new FloatSetting("Attack Range", "Attacking range", 1.0F, 10.0F, 4.2F);
     private final FloatSetting swingRange = new FloatSetting("Swing Range", "Swinging range", 1.0F, 16.0F, 5.2F);
     private final FloatSetting rotateRange = new FloatSetting("Rotate Range", "Rotating range", 1.0F, 16.0F, 5.2F);
@@ -95,26 +113,38 @@ public class KillAura extends Module {
     private int strafeDirection = 1;
     private int strafeTicks = 0;
 
+    private final TargetHud targetHud = new TargetHud();
+
     public KillAura() {
         super("Kill Aura", "Automatically attacks nearby entities", Category.COMBAT);
         this.targetsGroup.add(players, mobs, animals, others, invis, dead, teams);
         this.attackSpeed.add(minAps, maxAps);
         this.rotationsGroup.add(fov, rotationMode, randomization);
         this.strafeGroup.add(enableStrafe, onSpace, strafeMode, strafeRadius);
+        this.renderGroup.add(hudMode);
         this.addSettings(mode,
-                targetsGroup, attackSpeed, rotationsGroup, strafeGroup,
+                targetsGroup, attackSpeed, rotationsGroup, strafeGroup, renderGroup,
                 attackRange, swingRange, rotateRange,
                 sorting, attackMode, swingMode,
                 walls, ticksExisted, autoDisable, switchDelay);
         this.mode.updateChange();
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        this.targetHud.setX(sr.getScaledWidth() / 2 + 20);
+        this.targetHud.setY(sr.getScaledHeight() / 2 + 10);
     }
 
     @Override
     public void onEnable() {
         this.prevRotations.yaw = mc.thePlayer.rotationYaw;
         this.prevRotations.pitch = mc.thePlayer.rotationPitch;
-        this.updateAttackDelay();
         this.strafing = false;
+        this.updateAttackDelay();
+    }
+
+    @Override
+    public void onDisable() {
+        this.target = null;
     }
 
     @EventHandler
@@ -401,7 +431,7 @@ public class KillAura extends Module {
 
         switch (this.sorting.get()) {
             case DISTANCE:
-                return Comparator.<EntityLivingBase>comparingDouble(entity -> RotationUtil.rayCastRange(entity.getEntityBoundingBox())).reversed();
+                return Comparator.comparingDouble(entity -> RotationUtil.rayCastRange(entity.getEntityBoundingBox()));
 
             case HEALTH:
                 return Comparator.comparingDouble(EntityLivingBase::getHealth).reversed();
@@ -497,9 +527,206 @@ public class KillAura extends Module {
         return true;
     }
 
+    @EventHandler
+    public void onRender2D(EventRender2D event) {
+        this.targetHud.setEnabled(!this.hudMode.is(HudMode.NONE));
+    }
+
     @Override
     public String getSuffix() {
         return this.mode.getDisplayValue();
+    }
+
+    private class TargetHud extends RenderComponent {
+
+        private final DecimalFormat healthFormat = new DecimalFormat("#0.0#");
+
+        public TargetHud() {
+            super("Target HUD");
+        }
+
+        @Override
+        public void draw(ScaledResolution res, float delta, int mouseX, int mouseY, boolean bypass) {
+
+            EntityLivingBase target = KillAura.this.target;
+            if (target == null) {
+                if (!bypass) {
+                    return;
+                }
+                target = mc.thePlayer;
+            }
+
+            switch (KillAura.this.hudMode.get()) {
+                case DETAILED: {
+                    this.setWidth(200);
+                    this.setHeight(100);
+
+                    int x = this.getX();
+                    int y = this.getY();
+
+                    FontRenderer font = mc.bitFontRenderer;
+
+                    float health = target.getHealth() + target.getAbsorptionAmount();
+                    float maxHealth = target.getMaxHealth() + target.getAbsorptionAmount();
+                    float hurtTime = target.hurtTime;
+                    float maxHurtTime = target.maxHurtTime == 0 ? 10 : target.maxHurtTime;
+                    float playerHealth = mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount();
+
+                    int healthColor = target.getAbsorptionAmount() != 0.0F ? 0xFFFFAA00 : ColorUtil.health(health, maxHealth);
+                    int hurtColor = ColorUtil.health(hurtTime, maxHurtTime);
+
+                    String displayHealth = "\247fHealth: \247r" + healthFormat.format(health);
+
+                    String winningText = "Tied";
+                    int winningColor = 0xFFFFFF00;
+                    if (health < playerHealth) {
+                        winningText = "Winning \247fby " + healthFormat.format(playerHealth - health);
+                        winningColor = 0xFF00FF00;
+                    } else if (health > playerHealth) {
+                        winningText = "Losing \247fby " + healthFormat.format(health - playerHealth);
+                        winningColor = 0xFFFF0000;
+                    }
+
+                    this.drawBackground(0x80000000);
+
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    GuiInventory.drawEntityOnScreen(x + 24, y + 70, 30, -40, 0, target);
+
+                    this.drawString(font, target.getName(), 50, 10, -1);
+                    this.drawString(font, displayHealth, 50, 30, healthColor);
+
+                    this.drawString(font, winningText, 50, 40, winningColor);
+                    this.drawString(font, "\247Hurt Time: \247r" + hurtTime, 50, 50, hurtColor);
+
+                    this.drawRect(5, 85, 185, 10, ColorUtil.darken(healthColor, 5));
+                    this.drawRect(5, 85, (int)(185.0F * (health / maxHealth)),10, healthColor);
+
+                    int hurtOffset = (int)(100.0F * (hurtTime / maxHurtTime));
+                    this.drawRect(198, 0, 2, 100, ColorUtil.darken(hurtColor, 5));
+                    this.drawRect(198, hurtOffset, 2, 100 - hurtOffset, hurtColor);
+
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(target.getHeldItem(), x + 175, y + 2);
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(3), x + 175, y + 18);
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(2), x + 175, y + 34);
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(1), x + 175, y + 50);
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(0), x + 175, y + 66);
+                    break;
+                }
+
+                case RAVEN: {
+
+                    FontRenderer font = mc.fontRendererObj;
+                    String text = target.getDisplayName().getFormattedText() + " ";
+                    if (target.getHealth() > target.getMaxHealth() * 0.75F) {
+                        text += "\247a" + new DecimalFormat("#0.0").format(target.getHealth()) + " ";
+                    } else if (target.getHealth() > target.getMaxHealth() * 0.5F) {
+                        text += "\247e" + new DecimalFormat("#0.0").format(target.getHealth()) + " ";
+                    } else if (target.getHealth() > target.getMaxHealth() * 0.25F) {
+                        text += "\2476" + new DecimalFormat("#0.0").format(target.getHealth()) + " ";
+                    } else {
+                        text += "\247c" + new DecimalFormat("#0.0").format(target.getHealth()) + " ";
+                    }
+                    if (target.getHealth() > mc.thePlayer.getHealth()) {
+                        text += "\247cL";
+                    } else if (target.getHealth() < mc.thePlayer.getHealth()) {
+                        text += "\247aW";
+                    } else {
+                        text += "\247eN";
+                    }
+
+                    int x = this.getX();
+                    int y = this.getY();
+                    int width = font.getStringWidth(text) + 20;
+                    int height = 40;
+                    this.setWidth(width);
+                    this.setHeight(height);
+
+                    Tessellator tessellator = Tessellator.getInstance();
+                    WorldRenderer renderer = tessellator.getWorldRenderer();
+
+                    RenderUtil.drawCircleRect(x, y, x + width, y + height, 5, 0x80000000);
+                    this.drawString(text, 10, 10, -1);
+                    RenderUtil.drawCircleRect(x + 10, y + 25, x + width - 10, y + 30, 2, 0x80000000);
+                    RenderUtil.drawCircleRect(x + 10, y + 25, x + 15 + (width - 25) * (target.getHealth() / target.getMaxHealth()), y + 30, 2, Hud.color());
+
+                    GlStateManager.enableBlend();
+                    GlStateManager.disableDepth();
+                    GlStateManager.disableTexture2D();
+                    GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+                    GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
+                    GL11.glEnable(GL11.GL_LINE_SMOOTH);
+                    GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+                    GL11.glLineWidth(2.0F);
+
+                    renderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+
+                    renderer.posColor(this.ravenVertex(x, y, 5.0, 0.0));
+                    renderer.posColor(this.ravenVertex(x, y, width - 5.0, 0.0));
+
+                    for (double i = 270; i < 360; i++) {
+                        renderer.posColor(this.ravenVertex(x, y,
+                                width - 5.0 + Math.cos(Math.toRadians(i)) * 5.0,
+                                5.0 + Math.sin(Math.toRadians(i)) * 5.0
+                        ));
+                    }
+
+                    renderer.posColor(this.ravenVertex(x, y, width, 5.0));
+                    renderer.posColor(this.ravenVertex(x, y, width, height - 5.0));
+
+                    for (double i = 0; i < 90; i++) {
+                        renderer.posColor(this.ravenVertex(x, y,
+                                width - 5.0 + Math.cos(Math.toRadians(i)) * 5.0,
+                                height - 5.0 + Math.sin(Math.toRadians(i)) * 5.0
+                        ));
+                    }
+
+                    renderer.posColor(this.ravenVertex(x, y, width - 5.0, height));
+                    renderer.posColor(this.ravenVertex(x, y, 5.0, height));
+
+                    for (double i = 90; i < 180; i++) {
+                        renderer.posColor(this.ravenVertex(x, y,
+                                5.0 + Math.cos(Math.toRadians(i)) * 5.0,
+                                height - 5.0 + Math.sin(Math.toRadians(i)) * 5.0
+                        ));
+                    }
+
+                    renderer.posColor(this.ravenVertex(x, y, 0.0, height - 5.0));
+                    renderer.posColor(this.ravenVertex(x, y, 0.0, 5.0));
+
+                    for (double i = 180; i < 270; i++) {
+                        renderer.posColor(this.ravenVertex(x, y,
+                                5.0 + Math.cos(Math.toRadians(i)) * 5.0,
+                                5.0 + Math.sin(Math.toRadians(i)) * 5.0
+                        ));
+                    }
+
+                    renderer.posColor(this.ravenVertex(x, y, 5.0, 0.0));
+
+                    tessellator.draw();
+
+                    GL11.glDisable(GL11.GL_LINE_SMOOTH);
+                    GlStateManager.shadeModel(GL11.GL_FLAT);
+                    GlStateManager.disableBlend();
+                    GlStateManager.enableAlpha();
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableTexture2D();
+
+                    break;
+                }
+
+            }
+
+        }
+
+        private Tuple<Vec3, Integer> ravenVertex(double x, double y, double offsetX, double offsetY) {
+            return new Tuple<>(
+                    new Vec3(x + offsetX, y + offsetY, 0.0),
+                    ColorUtil.lerp(Hud.color(), -1, (float)(offsetX / this.getWidth())) | 0xFF000000
+            );
+        }
+
+
     }
 
     private enum Mode {
@@ -522,6 +749,12 @@ public class KillAura extends Module {
     private enum StrafeMode {
         CIRCLE,
         BACK
+    }
+
+    private enum HudMode {
+        DETAILED,
+        RAVEN,
+        NONE
     }
 
     private enum TargetSorting {

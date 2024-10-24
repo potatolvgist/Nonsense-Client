@@ -134,17 +134,16 @@ public class BlockState
 
         public <T extends Comparable<T>, V extends T> IBlockState withProperty(IProperty<T> property, V value)
         {
-            if (!this.properties.containsKey(property))
-            {
-                throw new IllegalArgumentException("Cannot set property " + property + " as it does not exist in " + this.block.getBlockState());
-            }
-            else if (!property.getAllowedValues().contains(value))
-            {
-                throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on block " + Block.blockRegistry.getNameForObject(this.block) + ", it is not an allowed value");
-            }
-            else
-            {
-                return (IBlockState)(this.properties.get(property) == value ? this : (IBlockState)this.propertyValueTable.get(property, value));
+            try {
+                if (!this.properties.containsKey(property)) {
+                    throw new IllegalArgumentException("Cannot set property " + property + " as it does not exist in " + this.block.getBlockState());
+                } else if (!property.getAllowedValues().contains(value)) {
+                    throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on block " + Block.blockRegistry.getNameForObject(this.block) + ", it is not an allowed value");
+                } else {
+                    return (IBlockState) (this.properties.get(property) == value ? this : (IBlockState) this.propertyValueTable.get(property, value));
+                }
+            } catch (IllegalArgumentException exception) {
+                return this;
             }
         }
 

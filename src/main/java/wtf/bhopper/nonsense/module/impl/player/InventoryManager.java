@@ -30,10 +30,14 @@ public class InventoryManager extends Module {
     private final IntSetting rodSlot = newSlotSetting("Fishing Rod");
     private final IntSetting pearlSlot = newSlotSetting("Ender Pearl");
     private final IntSetting gappleSlot = newSlotSetting("Golden Apple", 9);
+    private final IntSetting gheadSlot = newSlotSetting("Golden Head");
     private final IntSetting blocksSlot = newSlotSetting("Blocks", 2);
     private final IntSetting pickaxeSlot = newSlotSetting("Pickaxe");
     private final IntSetting axeSlot = newSlotSetting("Axe");
     private final IntSetting shovelSlot = newSlotSetting("Shovel");
+
+    private final GroupSetting armorGroup = new GroupSetting("Auto Armor", "Automatically puts on armor", this);
+    private final BooleanSetting autoArmorEnable = new BooleanSetting("Enable", "Enables auto armor", true);
 
     private final GroupSetting dropsGroup = new GroupSetting("Drop", "Item drops", this);
     private final BooleanSetting dropGarbage = new BooleanSetting("Garbage", "Drop items that are not considered useful", true);
@@ -78,33 +82,35 @@ public class InventoryManager extends Module {
     public InventoryManager() {
         super("Inventory Manager", "Manages your inventory, (made with help from 5kr411)", Category.PLAYER);
         this.slotsGroup.add(this.swordSlot, this.bowSlot, this.rodSlot, this.pearlSlot, this.gappleSlot, this.blocksSlot, this.pickaxeSlot, this.axeSlot, this.shovelSlot);
+        this.armorGroup.add(this.autoArmorEnable);
         this.dropsGroup.add(this.dropGarbage, this.hotbarDrop);
 
         this.weaponsGroup.add(
-                new DropSetting("Swords", 1, stack -> stack.getItem() instanceof ItemSword, ItemScores::sword, swordSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.swordSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Bows", 1, stack -> stack.getItem() == Items.bow, ItemScores::bow, bowSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.bowSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Helmets", 1, stack -> InventoryUtil.isArmor(stack, 0), ItemScores::helmet),
-                new DropSetting("Chestplates", 1, stack -> InventoryUtil.isArmor(stack, 1), ItemScores::chestplate),
-                new DropSetting("Leggings", 1, stack -> InventoryUtil.isArmor(stack, 2), ItemScores::leggings),
-                new DropSetting("Boots", 1, stack -> InventoryUtil.isArmor(stack, 3), ItemScores::boots)
+                new DropSetting("Swords", 1, stack -> stack.getItem() instanceof ItemSword, ItemScores::sword, swordSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.swordSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Bows", 1, stack -> stack.getItem() == Items.bow, ItemScores::bow, bowSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.bowSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Helmets", 1, stack -> InventoryUtil.isArmor(stack, 0), ItemScores::helmet, null, (rank, currentSlot) -> autoArmorEnable.get() ? InventoryUtil.armorOrOther(5, rank, currentSlot) : -1),
+                new DropSetting("Chestplates", 1, stack -> InventoryUtil.isArmor(stack, 1), ItemScores::chestplate, null, (rank, currentSlot) -> autoArmorEnable.get() ? InventoryUtil.armorOrOther(6, rank, currentSlot) : -1),
+                new DropSetting("Leggings", 1, stack -> InventoryUtil.isArmor(stack, 2), ItemScores::leggings, null, (rank, currentSlot) -> autoArmorEnable.get() ? InventoryUtil.armorOrOther(7, rank, currentSlot) : -1),
+                new DropSetting("Boots", 1, stack -> InventoryUtil.isArmor(stack, 3), ItemScores::boots, null, (rank, currentSlot) -> autoArmorEnable.get() ? InventoryUtil.armorOrOther(8, rank, currentSlot) : -1)
         );
 
         this.toolsGroup.add(
-                new DropSetting("Pickaxes", 1, stack -> stack.getItem() instanceof ItemPickaxe, ItemScores::pickaxe, pickaxeSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pickaxeSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Axes", 1, stack -> stack.getItem() instanceof ItemAxe, ItemScores::axe, axeSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.axeSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Shovels", 1, stack -> stack.getItem() instanceof ItemSpade, ItemScores::shovel,shovelSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.shovelSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Fishing Rods", 1, stack -> stack.isOfItem(Items.fishing_rod), ItemScores::fishingRod, rodSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.rodSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Pickaxes", 1, stack -> stack.getItem() instanceof ItemPickaxe, ItemScores::pickaxe, pickaxeSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pickaxeSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Axes", 1, stack -> stack.getItem() instanceof ItemAxe, ItemScores::axe, axeSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.axeSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Shovels", 1, stack -> stack.getItem() instanceof ItemSpade, ItemScores::shovel,shovelSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.shovelSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Fishing Rods", 1, stack -> stack.isOfItem(Items.fishing_rod), ItemScores::fishingRod, rodSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.rodSlot.get() + 35, rank, currentSlot)),
                 new DropSetting("Shears", 1, stack -> stack.isOfItem(Items.shears), ItemScores.DURABILITY),
                 new DropSetting("Flint and Steel", 1, stack -> stack.isOfItem(Items.flint_and_steel), ItemScores.DURABILITY)
         );
 
         this.utilGroup.add(
-                new DropSetting("Blocks", 3, stack -> stack.getItem() instanceof ItemBlock, ItemScores.STACK_SIZE, blocksSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.blocksSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Golden Apple", 1, stack -> stack.isOfItem(Items.golden_apple), ItemScores.STACK_SIZE, gappleSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.gappleSlot.get() + 35, slot, currentSlot)),
-                new DropSetting("Ender Pearls", 1, stack -> stack.isOfItem(Items.ender_pearl), ItemScores.STACK_SIZE, pearlSlot::get, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pearlSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Blocks", 3, stack -> stack.getItem() instanceof ItemBlock, ItemScores.STACK_SIZE, blocksSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.blocksSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Golden Apples", 1, stack -> stack.isOfItem(Items.golden_apple), ItemScores.STACK_SIZE, gappleSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.gappleSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Golden Head", 1, stack -> stack.isOfItem(Items.skull) && stack.hasDisplayName() && stack.getDisplayName().toLowerCase().contains("golden head"), ItemScores.STACK_SIZE, gheadSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.gheadSlot.get() + 35, rank, currentSlot)),
+                new DropSetting("Ender Pearls", 1, stack -> stack.isOfItem(Items.ender_pearl), ItemScores.STACK_SIZE, pearlSlot::get, (rank, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.pearlSlot.get() + 35, rank, currentSlot)),
                 new DropSetting("Boats", 1, stack -> stack.isOfItem(Items.boat), ItemScores.STACK_SIZE),
                 new DropSetting("TNT", 1, stack -> stack.isOfItem(Blocks.tnt), ItemScores.STACK_SIZE),
-                new DropSetting("Arrows", 1, stack -> stack.isOfItem(Items.arrow), ItemScores.STACK_SIZE, null, (slot, currentSlot) -> InventoryUtil.stackAboveSwapSlot(this.bowSlot.get() + 35, slot, currentSlot)),
+                new DropSetting("Arrows", 1, stack -> stack.isOfItem(Items.arrow), ItemScores.STACK_SIZE),
                 new DropSetting("Eggs Snowballs", 1, stack -> stack.isOfItem(Items.egg) || stack.isOfItem(Items.snowball), ItemScores.STACK_SIZE),
                 new DropSetting("Food", 1, stack -> stack.getItem() instanceof ItemFood, ItemScores.STACK_SIZE),
                 new DropSetting("Water Buckets", 1, stack -> stack.isOfItem(Items.water_bucket), ItemScores.STACK_SIZE),
@@ -130,7 +136,7 @@ public class InventoryManager extends Module {
                 new PotionDropSetting("Harming", 0, Potion.harm)
         );
 
-        this.addSettings(this.slotsGroup, this.dropsGroup, this.weaponsGroup, this.toolsGroup, this.utilGroup, this.potionGroup,
+        this.addSettings(this.slotsGroup, this.armorGroup, this.dropsGroup, this.weaponsGroup, this.toolsGroup, this.utilGroup, this.potionGroup,
                 this.openGui, this.swapMode, this.dropMode, this.sortMode, this.sortMethod);
         this.swapDelay.addSettings();
         this.dropDelay.addSettings();
@@ -142,12 +148,17 @@ public class InventoryManager extends Module {
 
     /**
      * Queues an item swap
-     *
      * @param srcSlot The slot of the item to move (source slot)
      * @param dstSlot The destination slot of the item
      */
     private void queueSwap(int srcSlot, int dstSlot) {
-        switch (this.sortMethod.get()) {
+
+        SortMethod sortMethod = this.sortMethod.get();
+        if (srcSlot < InventoryUtil.EXCLUDE_ARMOR_BEGIN || dstSlot < InventoryUtil.EXCLUDE_ARMOR_BEGIN) {
+            sortMethod = SortMethod.CLICK; // Swapping won't work with armor slots so force it to use clicking
+        }
+
+        switch (sortMethod) {
             case CLICK:
                 // Pick up the item
                 InventoryUtil.click(srcSlot, 0, false);
@@ -189,7 +200,7 @@ public class InventoryManager extends Module {
         // Swap the items
         if (srcSlot != dstSlot && dstSlot >= InventoryUtil.HOTBAR_BEGIN && dstSlot < InventoryUtil.END) {
             InventoryUtil.hotbarSwap(srcSlot, dstSlot - InventoryUtil.HOTBAR_BEGIN);
-        } else if (srcSlot != dstSlot && dstSlot >= InventoryUtil.EXCLUDE_ARMOR_BEGIN && dstSlot < InventoryUtil.HOTBAR_BEGIN) {
+        } else if (srcSlot != dstSlot && dstSlot >= InventoryUtil.INCLUDE_ARMOR_BEGIN && dstSlot < InventoryUtil.HOTBAR_BEGIN) {
             this.queueSwap(srcSlot, dstSlot);
         } else {
             ChatUtil.debug("Swap called with unexpected args: %d -> %d", srcSlot, dstSlot);
@@ -234,7 +245,7 @@ public class InventoryManager extends Module {
         ChatUtil.debug("InvManager: Update");
 
         // Search through all the items, add them to the relevant trackers and determine whether the item is garbage
-        for (int slot = InventoryUtil.EXCLUDE_ARMOR_BEGIN; slot < InventoryUtil.END; slot++) {
+        for (int slot = InventoryUtil.INCLUDE_ARMOR_BEGIN; slot < InventoryUtil.END; slot++) {
             ItemStack item = InventoryUtil.getStackInSlot(slot);
             if (item != null) {
                 boolean isGarbage = true;
@@ -420,7 +431,7 @@ public class InventoryManager extends Module {
                 List<ItemSlot> itemSlots = tracker.getItems();
                 itemSlots.sort(Comparator.comparingDouble(slot -> tracker.getItemScore(slot.getItemStack())));
 
-                for (int rank = 1; rank < itemSlots.size(); rank++) {
+                for (int rank = 0; rank < itemSlots.size(); rank++) {
                     ItemSlot itemSlot = itemSlots.get(itemSlots.size() - rank - 1);
                     int targetSlot = sorter.getTargetSlot(rank, itemSlot.getSlot());
                     ItemSlot currentItem = this.itemSlots.get(targetSlot);
@@ -632,6 +643,9 @@ public class InventoryManager extends Module {
 
     }
 
+    /**
+     * A wrapper class for the item amount settings that will automatically register the swappers, sorters and trackers
+     */
     private class DropSetting extends IntSetting {
 
         private final ItemTypeChecker itemTypeChecker;
@@ -646,8 +660,6 @@ public class InventoryManager extends Module {
                            ItemScoreCalculator scoreCalculator) {
             this(name, defaultValue, typeChecker, scoreCalculator, null, null);
         }
-
-
 
         public DropSetting(String name,
                            int defaultValue,

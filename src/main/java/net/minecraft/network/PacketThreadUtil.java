@@ -10,41 +10,37 @@ public class PacketThreadUtil
 {
     public static int lastDimensionId = Integer.MIN_VALUE;
 
-    public static <T extends INetHandler> void checkThreadAndEnqueue(final Packet<T> p_180031_0_, final T p_180031_1_, IThreadListener p_180031_2_) throws ThreadQuickExitException
+    public static <T extends INetHandler> void checkThreadAndEnqueue(final Packet<T> packet, final T handler, IThreadListener listener) throws ThreadQuickExitException
     {
-        if (!p_180031_2_.isCallingFromMinecraftThread())
+        if (!listener.isCallingFromMinecraftThread())
         {
-            p_180031_2_.addScheduledTask(new Runnable()
-            {
-                public void run()
-                {
-                    PacketThreadUtil.clientPreProcessPacket(p_180031_0_);
-                    p_180031_0_.processPacket(p_180031_1_);
-                }
+            listener.addScheduledTask(() -> {
+                PacketThreadUtil.clientPreProcessPacket(packet);
+                packet.processPacket(handler);
             });
             throw ThreadQuickExitException.INSTANCE;
         }
         else
         {
-            clientPreProcessPacket(p_180031_0_);
+            clientPreProcessPacket(packet);
         }
     }
 
-    protected static void clientPreProcessPacket(Packet p_clientPreProcessPacket_0_)
+    protected static void clientPreProcessPacket(Packet packet)
     {
-        if (p_clientPreProcessPacket_0_ instanceof S08PacketPlayerPosLook)
+        if (packet instanceof S08PacketPlayerPosLook)
         {
             Config.getRenderGlobal().onPlayerPositionSet();
         }
 
-        if (p_clientPreProcessPacket_0_ instanceof S07PacketRespawn)
+        if (packet instanceof S07PacketRespawn)
         {
-            S07PacketRespawn s07packetrespawn = (S07PacketRespawn)p_clientPreProcessPacket_0_;
+            S07PacketRespawn s07packetrespawn = (S07PacketRespawn)packet;
             lastDimensionId = s07packetrespawn.getDimensionID();
         }
-        else if (p_clientPreProcessPacket_0_ instanceof S01PacketJoinGame)
+        else if (packet instanceof S01PacketJoinGame)
         {
-            S01PacketJoinGame s01packetjoingame = (S01PacketJoinGame)p_clientPreProcessPacket_0_;
+            S01PacketJoinGame s01packetjoingame = (S01PacketJoinGame)packet;
             lastDimensionId = s01packetjoingame.getDimension();
         }
         else

@@ -25,6 +25,7 @@ public class DropdownGroup extends DropdownComponent {
             if (s instanceof EnumSetting) this.components.add(new DropdownModeSelector(this.panel, (EnumSetting<?>)s, true));
             if (s instanceof ColorSetting) this.components.add(new DropdownColorPicker(this.panel, (ColorSetting)s, true));
             if (s instanceof StringSetting) this.components.add(new DropdownTextBox(this.panel, (StringSetting)s, true));
+            if (s instanceof ButtonSetting) this.components.add(new DropdownButton(this.panel, (ButtonSetting)s, true));
         }
     }
 

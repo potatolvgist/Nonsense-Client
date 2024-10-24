@@ -97,6 +97,15 @@ public class ColorUtil {
         };
     }
 
+    public static float[] separateF(int color) {
+        return new float[]{
+                ((color >> 16) & 0xFF) / 255.0F,
+                ((color >> 8) & 0xFF) / 255.0F,
+                (color & 0xFF) / 255.0F,
+                ((color >> 24) & 0xFF) / 255.0F
+        };
+    }
+
     public static int merge(int r, int g, int b, int a) {
         return  ((a & 0xFF) << 24) |
                 ((r & 0xFF) << 16) |

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.Render;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.gui.components.RenderComponent;
 import wtf.bhopper.nonsense.gui.font.Fonts;
@@ -13,6 +14,7 @@ import wtf.bhopper.nonsense.module.impl.visual.HudMod;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Hud {
 
@@ -22,7 +24,7 @@ public class Hud {
     public static final Watermark watermark = new Watermark();
     public static final InfoDisplay infoDisplay = new InfoDisplay();
     public static final NotificationManager notificationManager = new NotificationManager();
-    private static final List<RenderComponent> components = new ArrayList<>();
+    private static final List<RenderComponent> components = new CopyOnWriteArrayList<>();
 
     private static FontRenderer font;
     private static TTFFontRenderer customFont;
@@ -37,6 +39,35 @@ public class Hud {
 
     public static void addComponent(RenderComponent component) {
         components.add(component);
+    }
+
+    public static void drawComponents(ScaledResolution scaledResolution, float delta, int mouseX, int mouseY, boolean drawOutline) {
+        scaledResolution.scaleToFactor(2.0F);
+        int mx = scaledResolution.scaleMouse(mouseX, 2);
+        int my = scaledResolution.scaleMouse(mouseY, 2);
+        for (RenderComponent component : components) {
+            if (component.isEnabled()) {
+                component.draw(scaledResolution, delta, mx, my, drawOutline);
+                if (drawOutline) {
+                    component.drawOutline();
+                }
+            }
+        }
+    }
+
+    public static void componentsClick(int mouseX, int mouseY, int button) {
+        ScaledResolution scaledResolution = new ScaledResolution(mc);
+        int mx = scaledResolution.scaleMouse(mouseX, 2);
+        int my = scaledResolution.scaleMouse(mouseY, 2);
+        for (RenderComponent component : components) {
+            if (component.isEnabled()) {
+                component.onClick(mx, my, button);
+            }
+        }
+    }
+
+    public static List<RenderComponent> getComponents() {
+        return components;
     }
 
     public static HudMod mod() {
@@ -60,25 +91,24 @@ public class Hud {
     }
 
     public static void beginDraw(ScaledResolution sr) {
-        float inverseScale = 1.0F / sr.getScaleFactor();
         GlStateManager.pushMatrix();
-        GlStateManager.scale(inverseScale, inverseScale, 0.0F);
+        sr.scaleToFactor(1.0F);
     }
 
     public static void endDraw() {
         GlStateManager.popMatrix();
     }
 
-    public static void drawComponents(ScaledResolution res, float delta) {
-        float inverseScale = 1.0F / res.getScaleFactor();
-        GlStateManager.scale(inverseScale, inverseScale, inverseScale);
-        for (RenderComponent component : components) {
-            if (component.isEnabled()) {
-                component.draw(res, delta);
-            }
-        }
-        GlStateManager.scale(res.getScaleFactor(), res.getScaleFactor(), res.getScaleFactor());
-    }
+//    public static void drawComponents(ScaledResolution res, float delta) {
+//        float inverseScale = 1.0F / res.getScaleFactor();
+//        GlStateManager.scale(inverseScale, inverseScale, inverseScale);
+//        for (RenderComponent component : components) {
+//            if (component.isEnabled()) {
+//                component.draw(res, delta);
+//            }
+//        }
+//        GlStateManager.scale(res.getScaleFactor(), res.getScaleFactor(), res.getScaleFactor());
+//    }
 
     public static void drawString(String text, float x, float y, int color, boolean shadow) {
         GlStateManager.scale(2.0F, 2.0F, 0.0F);

@@ -10,6 +10,7 @@ import wtf.bhopper.nonsense.command.CommandManager;
 import wtf.bhopper.nonsense.config.ConfigManager;
 import wtf.bhopper.nonsense.event.NonsenseEventBus;
 import wtf.bhopper.nonsense.gui.clickgui.dropdown.DropdownClickGui;
+import wtf.bhopper.nonsense.gui.components.RenderComponent;
 import wtf.bhopper.nonsense.gui.font.FontManager;
 import wtf.bhopper.nonsense.gui.hud.Hud;
 import wtf.bhopper.nonsense.module.Module;
@@ -19,6 +20,8 @@ import wtf.bhopper.nonsense.util.minecraft.world.TickRate;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public enum Nonsense {
     INSTANCE;

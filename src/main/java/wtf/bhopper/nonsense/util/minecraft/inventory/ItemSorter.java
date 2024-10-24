@@ -14,12 +14,12 @@ public class ItemSorter {
         return this.itemTracker;
     }
 
-    public int getTargetSlot(int slot, int currentSlot) {
-        return this.targetSlotMethod.getTargetSlot(slot, currentSlot);
+    public int getTargetSlot(int rank, int currentSlot) {
+        return this.targetSlotMethod.getTargetSlot(rank, currentSlot);
     }
 
     public interface TargetSlotMethod {
-        int getTargetSlot(int slot, int currentSlot);
+        int getTargetSlot(int rank, int currentSlot);
     }
 
 }

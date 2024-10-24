@@ -76,7 +76,7 @@ public class PacketBuffer extends ByteBuf
 
     public IChatComponent readChatComponent() throws IOException
     {
-        return IChatComponent.Serializer.jsonToComponent(this.readStringFromBuffer(32767));
+        return IChatComponent.Serializer.jsonToComponent(this.readStringFromBuffer(0x7fff));
     }
 
     public void writeChatComponent(IChatComponent component) throws IOException
@@ -86,7 +86,7 @@ public class PacketBuffer extends ByteBuf
 
     public <T extends Enum<T>> T readEnumValue(Class<T> enumClass)
     {
-        return (T)((Enum[])enumClass.getEnumConstants())[this.readVarIntFromBuffer()];
+        return enumClass.getEnumConstants()[this.readVarIntFromBuffer()];
     }
 
     public void writeEnumValue(Enum<?> value)

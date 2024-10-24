@@ -14,15 +14,14 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.src.Config;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.*;
 import net.optifine.SmartAnimations;
 import net.optifine.render.RenderEnv;
 import net.optifine.shaders.SVertexBuilder;
 import net.optifine.util.TextureUtils;
 import org.apache.logging.log4j.LogManager;
 import org.lwjgl.opengl.GL11;
+import wtf.bhopper.nonsense.util.render.ColorUtil;
 
 public class WorldRenderer
 {
@@ -497,6 +496,12 @@ public class WorldRenderer
     public void noColor()
     {
         this.noColor = true;
+    }
+
+    public WorldRenderer color(int color)
+    {
+        int[] separated = ColorUtil.separate(color);
+        return this.color(separated[0], separated[1], separated[2], separated[3]);
     }
 
     public WorldRenderer color(float red, float green, float blue, float alpha)
@@ -1041,6 +1046,18 @@ public class WorldRenderer
     public boolean isColorDisabled()
     {
         return this.noColor;
+    }
+
+    public void posColor(Vec3 pos, int color) {
+        this.pos(pos.xCoord, pos.yCoord, pos.zCoord)
+                .color(color)
+                .endVertex();
+    }
+
+    public void posColor(Tuple<Vec3, Integer> data) {
+        this.pos(data.getFirst().xCoord, data.getFirst().yCoord, data.getFirst().zCoord)
+                .color(data.getSecond())
+                .endVertex();
     }
 
     public class State

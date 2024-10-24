@@ -120,7 +120,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
      */
     private int chatSpamThresholdCount;
     private int itemDropThreshold;
-    private IntHashMap<Short> field_147372_n = new IntHashMap();
+    private IntHashMap<Short> field_147372_n = new IntHashMap<>();
     private double lastPosX;
     private double lastPosY;
     private double lastPosZ;
@@ -442,7 +442,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
 
     public void setPlayerLocation(double x, double y, double z, float yaw, float pitch)
     {
-        this.setPlayerLocation(x, y, z, yaw, pitch, Collections.<S08PacketPlayerPosLook.EnumFlags>emptySet());
+        this.setPlayerLocation(x, y, z, yaw, pitch, Collections.emptySet());
     }
 
     public void setPlayerLocation(double x, double y, double z, float yaw, float pitch, Set<S08PacketPlayerPosLook.EnumFlags> relativeSet)
@@ -811,7 +811,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
             }
             else
             {
-                IChatComponent ichatcomponent = new ChatComponentTranslation("chat.type.text", new Object[] {this.playerEntity.getDisplayName(), s});
+                IChatComponent ichatcomponent = new ChatComponentTranslation("chat.type.text", this.playerEntity.getDisplayName(), s);
                 this.serverController.getConfigurationManager().sendChatMsgImpl(ichatcomponent, false);
             }
 

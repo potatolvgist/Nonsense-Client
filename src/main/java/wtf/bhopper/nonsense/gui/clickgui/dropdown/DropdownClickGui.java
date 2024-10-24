@@ -96,22 +96,25 @@ public class DropdownClickGui extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        int mx = Math.round((float)mouseX * mc.gameSettings.guiScale);
-        int my = Math.round((float)mouseY * mc.gameSettings.guiScale);
+        ScaledResolution sr = new ScaledResolution(mc);
+        int mx = sr.scaleMouse(mouseX, 1);
+        int my = sr.scaleMouse(mouseY, 1);
         PANELS.forEach(panel -> panel.mouseClicked(mx, my, mouseButton));
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-        int mx = Math.round((float)mouseX * mc.gameSettings.guiScale);
-        int my = Math.round((float)mouseY * mc.gameSettings.guiScale);
+        ScaledResolution sr = new ScaledResolution(mc);
+        int mx = sr.scaleMouse(mouseX, 1);
+        int my = sr.scaleMouse(mouseY, 1);
         PANELS.forEach(panel -> panel.mouseReleased(mx, my, state));
     }
 
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-        int mx = Math.round((float)mouseX * mc.gameSettings.guiScale);
-        int my = Math.round((float)mouseY * mc.gameSettings.guiScale);
+        ScaledResolution sr = new ScaledResolution(mc);
+        int mx = sr.scaleMouse(mouseX, 1);
+        int my = sr.scaleMouse(mouseY, 1);
         PANELS.forEach(panel -> panel.mouseClickMove(mx, my, clickedMouseButton, timeSinceLastClick));
     }
 

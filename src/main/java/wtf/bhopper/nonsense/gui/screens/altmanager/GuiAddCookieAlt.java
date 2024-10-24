@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
-import org.lwjgl.PointerBuffer;
 import wtf.bhopper.nonsense.Nonsense;
 import wtf.bhopper.nonsense.alt.Alt;
 import wtf.bhopper.nonsense.alt.AltManager;
@@ -14,8 +13,10 @@ import wtf.bhopper.nonsense.gui.hud.notification.NotificationType;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class GuiAddCookieAlt extends GuiScreen {
 
@@ -61,11 +62,19 @@ public class GuiAddCookieAlt extends GuiScreen {
             AltManager.loginThread.start();
         } else if (button.id == 2) {
 
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileFilter(new FileNameExtensionFilter("Exported Cookie Files", "txt"));
-            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                this.cookieFile.setText(chooser.getSelectedFile().getAbsolutePath());
-            }
+//            JFileChooser chooser = new JFileChooser();
+//            chooser.setFileFilter(new FileNameExtensionFilter("Exported Cookie Files", "txt"));
+//            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+//                this.cookieFile.setText(chooser.getSelectedFile().getAbsolutePath());
+//            }
+
+            FileDialog dialog = new FileDialog((Frame)null, "Select Cookie File");
+            dialog.setMode(FileDialog.LOAD);
+            dialog.setFile("*.txt");
+            dialog.setVisible(true);
+            String file = new File(dialog.getDirectory(), dialog.getFile()).getAbsolutePath();
+            dialog.dispose();
+            this.cookieFile.setText(file);
 
         }
     }
