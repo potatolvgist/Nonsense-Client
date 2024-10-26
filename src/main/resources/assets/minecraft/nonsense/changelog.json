@@ -1,6 +1,13 @@
 {
   "changelog": [
     {
+      "version": "Alpha-241026",
+      "changes": [
+        "Recoded $lLag Notifier$r",
+        "Added $lAstolfo$r Target HUD to $lKill Aura$r"
+      ]
+    },
+    {
       "version": "Alpha-241025",
       "changes": [
         "Recoded $lInventory Manager$r (still a bit buggy)",
