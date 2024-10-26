@@ -75,6 +75,7 @@ public class ModuleManager extends LinkedHashMap<Class<? extends Module>, Module
         this.addModule(new DiscordRPCMod());
         this.addModule(new BarrierView());
         this.addModule(new ItemPhysics());
+        this.addModule(new LagNotifier());
     }
 
     public void addModule(Module module) {

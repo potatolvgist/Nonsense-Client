@@ -27,7 +27,7 @@ public enum Nonsense {
     INSTANCE;
 
     public static final String NAME = "Nonsense";
-    public static final String VERSION = "Alpha-241021";
+    public static final String VERSION = "Alpha-241025";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
     public static final Gson GSON = new Gson();

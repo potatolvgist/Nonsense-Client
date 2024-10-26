@@ -2,6 +2,7 @@ package net.minecraft.client.renderer.vertex;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 public class VertexFormatElement
 {
@@ -77,7 +78,7 @@ public class VertexFormatElement
         else if (p_equals_1_ != null && this.getClass() == p_equals_1_.getClass())
         {
             VertexFormatElement vertexformatelement = (VertexFormatElement)p_equals_1_;
-            return this.elementCount != vertexformatelement.elementCount ? false : (this.index != vertexformatelement.index ? false : (this.type != vertexformatelement.type ? false : this.usage == vertexformatelement.usage));
+            return this.elementCount == vertexformatelement.elementCount && (this.index == vertexformatelement.index && (this.type == vertexformatelement.type && this.usage == vertexformatelement.usage));
         }
         else
         {
@@ -94,21 +95,21 @@ public class VertexFormatElement
         return i;
     }
 
-    public static enum EnumType
+    public enum EnumType
     {
-        FLOAT(4, "Float", 5126),
-        UBYTE(1, "Unsigned Byte", 5121),
-        BYTE(1, "Byte", 5120),
-        USHORT(2, "Unsigned Short", 5123),
-        SHORT(2, "Short", 5122),
-        UINT(4, "Unsigned Int", 5125),
-        INT(4, "Int", 5124);
+        FLOAT(4, "Float", GL11.GL_FLOAT),
+        UBYTE(1, "Unsigned Byte", GL11.GL_UNSIGNED_BYTE),
+        BYTE(1, "Byte", GL11.GL_BYTE),
+        USHORT(2, "Unsigned Short", GL11.GL_UNSIGNED_SHORT),
+        SHORT(2, "Short", GL11.GL_SHORT),
+        UINT(4, "Unsigned Int", GL11.GL_UNSIGNED_INT),
+        INT(4, "Int", GL11.GL_INT);
 
         private final int size;
         private final String displayName;
         private final int glConstant;
 
-        private EnumType(int sizeIn, String displayNameIn, int glConstantIn)
+        EnumType(int sizeIn, String displayNameIn, int glConstantIn)
         {
             this.size = sizeIn;
             this.displayName = displayNameIn;
@@ -131,7 +132,7 @@ public class VertexFormatElement
         }
     }
 
-    public static enum EnumUsage
+    public enum EnumUsage
     {
         POSITION("Position"),
         NORMAL("Normal"),
@@ -143,7 +144,7 @@ public class VertexFormatElement
 
         private final String displayName;
 
-        private EnumUsage(String displayNameIn)
+        EnumUsage(String displayNameIn)
         {
             this.displayName = displayNameIn;
         }

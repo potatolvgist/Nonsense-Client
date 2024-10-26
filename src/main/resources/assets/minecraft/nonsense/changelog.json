@@ -1,6 +1,14 @@
 {
   "changelog": [
     {
+      "version": "Alpha-241025",
+      "changes": [
+        "Recoded $lInventory Manager$r (still a bit buggy)",
+        "Added $lGuess The Build$r module",
+        "Added $lTarget HUD$r to $lKill Aura$r"
+      ]
+    },
+    {
       "version": "Alpha-241021",
       "changes": [
         "Reverted to LWJGL2",

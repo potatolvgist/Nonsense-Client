@@ -930,21 +930,21 @@ public class OpenGlHelper
     /**
      * Sets the current coordinates of the given lightmap texture
      */
-    public static void setLightmapTextureCoords(int target, float p_77475_1_, float p_77475_2_)
+    public static void setLightmapTextureCoords(int target, float s, float t)
     {
         if (arbMultitexture)
         {
-            ARBMultitexture.glMultiTexCoord2fARB(target, p_77475_1_, p_77475_2_);
+            ARBMultitexture.glMultiTexCoord2fARB(target, s, t);
         }
         else
         {
-            GL13.glMultiTexCoord2f(target, p_77475_1_, p_77475_2_);
+            GL13.glMultiTexCoord2f(target, s, t);
         }
 
         if (target == lightmapTexUnit)
         {
-            lastBrightnessX = p_77475_1_;
-            lastBrightnessY = p_77475_2_;
+            lastBrightnessX = s;
+            lastBrightnessY = t;
         }
     }
 
@@ -969,7 +969,7 @@ public class OpenGlHelper
 
     public static boolean isFramebufferEnabled()
     {
-        return Config.isFastRender() ? false : (Config.isAntialiasing() ? false : framebufferSupported && Minecraft.getMinecraft().gameSettings.fboEnable);
+        return !Config.isFastRender() && (!Config.isAntialiasing() && framebufferSupported && Minecraft.getMinecraft().gameSettings.fboEnable);
     }
 
     public static void glBufferData(int p_glBufferData_0_, long p_glBufferData_1_, int p_glBufferData_3_)

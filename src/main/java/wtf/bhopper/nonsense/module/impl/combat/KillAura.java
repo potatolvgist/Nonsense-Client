@@ -540,6 +540,7 @@ public class KillAura extends Module {
     private class TargetHud extends RenderComponent {
 
         private final DecimalFormat healthFormat = new DecimalFormat("#0.0#");
+        private final DecimalFormat astolfoFormat = new DecimalFormat("#0.# \u2764");
 
         public TargetHud() {
             super("Target HUD");
@@ -596,7 +597,7 @@ public class KillAura extends Module {
                     this.drawString(font, displayHealth, 50, 30, healthColor);
 
                     this.drawString(font, winningText, 50, 40, winningColor);
-                    this.drawString(font, "\247Hurt Time: \247r" + hurtTime, 50, 50, hurtColor);
+                    this.drawString(font, "\247fHurt Time: \247r" + hurtTime, 50, 50, hurtColor);
 
                     this.drawRect(5, 85, 185, 10, ColorUtil.darken(healthColor, 5));
                     this.drawRect(5, 85, (int)(185.0F * (health / maxHealth)),10, healthColor);
@@ -610,6 +611,31 @@ public class KillAura extends Module {
                     mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(2), x + 175, y + 34);
                     mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(1), x + 175, y + 50);
                     mc.getRenderItem().renderItemAndEffectIntoGUI(target.getCurrentArmor(0), x + 175, y + 66);
+                    break;
+                }
+
+                case ASTOLFO: {
+                    FontRenderer font = mc.fontRendererObj;
+                    int x = this.getX();
+                    int y = this.getY();
+
+                    float health = target.getHealth() + target.getAbsorptionAmount();
+                    float maxHealth = target.getMaxHealth() + target.getAbsorptionAmount();
+                    int healthColor = target.getAbsorptionAmount() != 0.0F ? 0xFFFFAA00 : ColorUtil.health(health, maxHealth);
+
+                    this.setWidth(150);
+                    this.setHeight(50);
+
+                    this.drawBackground();
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    GuiInventory.drawEntityOnScreen(x + 16, y + 45, 20, -40, 0, target);
+                    this.drawString(target.getName(), 36, 5, -1);
+                    GlStateManager.scale(2.0, 2.0, 2.0);
+                    font.drawStringWithShadow(this.astolfoFormat.format(health / 2.0F), (x + 35) / 2.0F, (y + font.FONT_HEIGHT + 8) / 2.0F, healthColor);
+                    GlStateManager.scale(0.5, 0.5, 0.5);
+                    this.drawRect(36, 45 - font.FONT_HEIGHT, 110, font.FONT_HEIGHT, ColorUtil.darken(healthColor, 2));
+                    this.drawRect(36, 45 - font.FONT_HEIGHT, (int)((health / maxHealth) * 110.0F), font.FONT_HEIGHT, healthColor);
+
                     break;
                 }
 
@@ -644,10 +670,10 @@ public class KillAura extends Module {
                     Tessellator tessellator = Tessellator.getInstance();
                     WorldRenderer renderer = tessellator.getWorldRenderer();
 
-                    RenderUtil.drawCircleRect(x, y, x + width, y + height, 5, 0x80000000);
+                    RenderUtil.drawScaledCircleRect(x, y, x + width, y + height, 5, 0x80000000, 0.5F);
                     this.drawString(text, 10, 10, -1);
-                    RenderUtil.drawCircleRect(x + 10, y + 25, x + width - 10, y + 30, 2, 0x80000000);
-                    RenderUtil.drawCircleRect(x + 10, y + 25, x + 15 + (width - 25) * (target.getHealth() / target.getMaxHealth()), y + 30, 2, Hud.color());
+                    RenderUtil.drawScaledCircleRect(x + 10, y + 25, x + width - 10, y + 30, 2, 0x80000000, 0.5F);
+                    RenderUtil.drawScaledCircleRect(x + 10, y + 25, x + 15 + (width - 25) * (target.getHealth() / target.getMaxHealth()), y + 30, 2, Hud.color(), 0.5F);
 
                     GlStateManager.enableBlend();
                     GlStateManager.disableDepth();
@@ -659,7 +685,9 @@ public class KillAura extends Module {
                     GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
                     GL11.glLineWidth(2.0F);
 
-                    renderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.scale(0.5, 0.5, 0.0);
+                    renderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
 
                     renderer.posColor(this.ravenVertex(x, y, 5.0, 0.0));
                     renderer.posColor(this.ravenVertex(x, y, width - 5.0, 0.0));
@@ -705,6 +733,8 @@ public class KillAura extends Module {
 
                     tessellator.draw();
 
+                    GlStateManager.popMatrix();
+
                     GL11.glDisable(GL11.GL_LINE_SMOOTH);
                     GlStateManager.shadeModel(GL11.GL_FLAT);
                     GlStateManager.disableBlend();
@@ -721,7 +751,7 @@ public class KillAura extends Module {
 
         private Tuple<Vec3, Integer> ravenVertex(double x, double y, double offsetX, double offsetY) {
             return new Tuple<>(
-                    new Vec3(x + offsetX, y + offsetY, 0.0),
+                    new Vec3((x + offsetX) * 2.0, (y + offsetY) * 2.0, 0.0),
                     ColorUtil.lerp(Hud.color(), -1, (float)(offsetX / this.getWidth())) | 0xFF000000
             );
         }
@@ -753,6 +783,7 @@ public class KillAura extends Module {
 
     private enum HudMode {
         DETAILED,
+        ASTOLFO,
         RAVEN,
         NONE
     }

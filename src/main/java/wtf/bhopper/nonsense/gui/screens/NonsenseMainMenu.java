@@ -420,7 +420,7 @@ public class NonsenseMainMenu extends GuiScreen {
         }
 
         public void draw(int mouseX, int mouseY) {
-            RenderUtil.drawCircleRect(x, y, x + WIDTH, y + HEIGHT, 8, this.mouseIntersecting(mouseX, mouseY) ? 0xAA000000 : 0x55000000);
+            RenderUtil.drawScaledCircleRect(x, y, x + WIDTH, y + HEIGHT, 8, this.mouseIntersecting(mouseX, mouseY) ? 0xAA000000 : 0x55000000, 0.5F);
             NonsenseMainMenu.this.drawString(NonsenseMainMenu.this.buttonFont, text, (int) (this.x + (WIDTH - NonsenseMainMenu.this.stringWidth(NonsenseMainMenu.this.buttonFont, text)) / 2.0F), (int) (this.y + HEIGHT / 2 - NonsenseMainMenu.this.stringHeight(NonsenseMainMenu.this.buttonFont, text) / 2 + 1), this.mouseIntersecting(mouseX, mouseY) ? 0xFFFF5555 : 0xFFFFFFFF);
             GlStateManager.color(0.0F, 0.0F, 0.0F, 0.0F);
         }

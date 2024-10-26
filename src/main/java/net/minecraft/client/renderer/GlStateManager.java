@@ -44,7 +44,7 @@ public class GlStateManager
 
     public static void pushAttrib()
     {
-        GL11.glPushAttrib(8256);
+        GL11.glPushAttrib(0x2040);
     }
 
     public static void popAttrib()

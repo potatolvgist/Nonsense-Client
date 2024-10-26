@@ -99,9 +99,10 @@ public class RenderUtil {
         glEnable(GL_LINE_SMOOTH);
         glPushMatrix();
         glLineWidth(1F);
-        glBegin(GL_POLYGON);
-        for (int i = 0; i <= 360; i++)
+        glBegin(GL_TRIANGLE_FAN);
+        for (int i = 0; i <= 360; i++) {
             glVertex2d(x + Math.sin(i * Math.PI / 180.0D) * radius, y + Math.cos(i * Math.PI / 180.0D) * radius);
+        }
         glEnd();
         glPopMatrix();
         glEnable(GL_TEXTURE_2D);
@@ -150,11 +151,11 @@ public class RenderUtil {
         GL11.glEnd();
     }
 
-    // TODO: USE GL_POLYGON
+
     public static void drawCircleRect(float x, float y, float x1, float y1, float radius, int color) {
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         glColor(color);
 
         quickRenderCircle(x1 - radius, y1 - radius, 0, 90, radius, radius);
@@ -170,6 +171,36 @@ public class RenderUtil {
 
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+    }
+
+    public static void drawScaledCircleRect(float xIn, float yIn, float x1In, float y1In, float radiusIn, int color, float scaling) {
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(scaling, scaling, scaling);
+        float x = xIn / scaling;
+        float y = yIn / scaling;
+        float x1 = x1In / scaling;
+        float y1 = y1In / scaling;
+        float radius = radiusIn / scaling;
+
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        glColor(color);
+
+        quickRenderCircle(x1 - radius, y1 - radius, 0, 90, radius, radius);
+        quickRenderCircle(x + radius, y1 - radius, 90, 180, radius, radius);
+        quickRenderCircle(x + radius, y + radius, 180, 270, radius, radius);
+        quickRenderCircle(x1 - radius, y + radius, 270, 360, radius, radius);
+
+        quickDrawRect(x + radius, y + radius, x1 - radius, y1 - radius);
+        quickDrawRect(x, y + radius, x + radius, y1 - radius);
+        quickDrawRect(x1 - radius, y + radius, x1, y1 - radius);
+        quickDrawRect(x + radius, y, x1 - radius, y + radius);
+        quickDrawRect(x + radius, y1 - radius, x1 - radius, y1);
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 
     public static void drawGradientSideways(double left, double top, double right, double bottom, int col1, int col2) {
@@ -236,7 +267,9 @@ public class RenderUtil {
             }
         }
 
-        if (modifyAABB == null) modifyAABB = blockAAABB;
+        if (modifyAABB == null) {
+            modifyAABB = blockAAABB;
+        }
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         enableGlCap(GL_BLEND);
@@ -523,8 +556,9 @@ public class RenderUtil {
         glEnable(GL_LINE_SMOOTH);
         glLineWidth(2F);
         glBegin(GL_LINE_STRIP);
-        for (float i = end; i >= start; i -= (360 / 90.0f))
+        for (float i = end; i >= start; i -= (360 / 90.0f)) {
             glVertex2f((float) (x + (cos(i * PI / 180) * (radius * 1.001F))), (float) (y + (sin(i * PI / 180) * (radius * 1.001F))));
+        }
         glEnd();
         glDisable(GL_LINE_SMOOTH);
 
@@ -832,8 +866,9 @@ public class RenderUtil {
     }
 
     public static void enableGlCap(final int... caps) {
-        for (final int cap : caps)
+        for (final int cap : caps) {
             setGlCap(cap, true);
+        }
     }
 
     public static void disableGlCap(final int cap) {
@@ -841,8 +876,9 @@ public class RenderUtil {
     }
 
     public static void disableGlCap(final int... caps) {
-        for (final int cap : caps)
+        for (final int cap : caps) {
             setGlCap(cap, false);
+        }
     }
 
     public static void setGlCap(final int cap, final boolean state) {
@@ -851,10 +887,11 @@ public class RenderUtil {
     }
 
     public static void setGlState(final int cap, final boolean state) {
-        if (state)
+        if (state) {
             glEnable(cap);
-        else
+        } else {
             glDisable(cap);
+        }
     }
 
     public static void drawEntityOnScreen(final int posX, final int posY, final int scale, final EntityLivingBase entity) {
@@ -1139,7 +1176,9 @@ public class RenderUtil {
     }
 
     public static void drawRadius(final Entity entity, final float partialTicks, final double rad, Color colorIn, int pointsIn, boolean outline) {
-        if (entity == null) return;
+        if (entity == null) {
+            return;
+        }
 
 //        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - mc.getRenderManager().viewerPosX;
 //        final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - mc.getRenderManager().viewerPosY;

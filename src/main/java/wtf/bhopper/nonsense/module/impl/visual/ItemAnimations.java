@@ -22,9 +22,9 @@ public class ItemAnimations extends Module {
 
     public ItemAnimations() {
         super("Item Animations", "Modify item animations", Category.VISUAL);
-        swordGroup.add(blockAnimation, oldTransformations, equipAnimation);
+        this.swordGroup.add(blockAnimation, oldTransformations, equipAnimation);
         this.transformGroup.add(tranformX, tranformY, tranformZ, swingSpeed, useX, useY, useZ, useSpeed);
-        this.addSettings(swordGroup);
+        this.addSettings(swordGroup, transformGroup);
     }
 
     public enum BlockAnimation {

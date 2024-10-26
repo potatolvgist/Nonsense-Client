@@ -61,6 +61,10 @@ public abstract class RenderComponent implements MinecraftInstance {
         Gui.drawRect(this.getX() + x, this.getY() + y, this.getX() + x + width, this.getY() + y + height, color);
     }
 
+    public void drawBackground() {
+        this.drawBackground(0x80000000);
+    }
+
     public void drawBackground(int color) {
         Gui.drawRect(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color);
     }
